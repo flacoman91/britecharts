@@ -82,6 +82,8 @@ function createHorizontalStackedBarChart(optionalColorSchema) {
     if (containerWidth) {
         dataset = testDataSet.with3Sources().build();
 
+        console.log(JSON.stringify(dataset));
+
         // StackedAreChart Setup and start
         stackedBar
             .isHorizontal(true)
