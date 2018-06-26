@@ -413,9 +413,21 @@ define(function(require) {
                 .call(yAxis);
 
             if (isHorizontal) {
+                // adding the right Y axis labels,
                 svg.select( '.y-axis-group.axis-right' )
                     .attr('transform', `translate(${ 5 + chartWidth}, 0)`)
                     .call( yAxis2 );
+
+                // shift the labels over to the right a bit
+                svg.selectAll('.y-axis-group.axis-right .tick text')
+                    .attr('transform', `translate(10, 0)`)
+
+                // based on the data, you can use the up or down arrow icon..
+                svg.selectAll('.y-axis-group.axis-right .tick')
+                    .append('rect')
+                    .attr('chevron', function(d){
+                        return d > 0 ? 'up' : 'down';
+                    });
             }
 
             svg.selectAll('.y-axis-group .tick text')
