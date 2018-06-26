@@ -1,0 +1,12 @@
+.test-chart {
+  .y-axis-group,
+  .x-axis-group {
+    path {
+      display: none;
+    }
+  }
+  .tick line {
+    display: none;
+    stroke: none;
+  }
+}
