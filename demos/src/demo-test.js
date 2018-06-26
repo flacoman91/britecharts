@@ -57,7 +57,7 @@ function createHorizontalTestChart() {
             .labelsSuffix('complaints')
             .colorSchema(colors.colorSchemas.britecharts)
             .width(containerWidth)
-            .yAxisPaddingBetweenChart(30)
+            .yAxisPaddingBetweenChart(5)
             .height(300)
             .percentageAxisToMaxRatio(1.3)
             .on('customMouseOver', tooltip.show)
