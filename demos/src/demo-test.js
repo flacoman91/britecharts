@@ -46,7 +46,7 @@ function createHorizontalTestChart() {
             .isHorizontal(true)
             .isAnimated(true)
             .margin({
-                left: 0,
+                left: 90,
                 right: 40,
                 top: 20,
                 bottom: 30

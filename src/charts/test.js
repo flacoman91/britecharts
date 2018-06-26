@@ -3,6 +3,7 @@ define(function(require) {
 
     console.log(' testing 123! ');
 
+    const d3 = require('d3');
     const d3Array = require('d3-array');
     const d3Ease = require('d3-ease');
     const d3Axis = require('d3-axis');
@@ -11,6 +12,7 @@ define(function(require) {
     const d3Format = require('d3-format');
     const d3Scale = require('d3-scale');
     const d3Selection = require('d3-selection');
+    const d3Shape = require('d3-shape');
     const d3Transition = require('d3-transition');
 
     const textHelper = require('./helpers/text');
@@ -153,7 +155,6 @@ define(function(require) {
             _labelsVerticalX = ({name}) => xScale(name),
             _labelsVerticalY = ({value}) => yScale(value) - labelsMargin,
             _labelsVerticalY1 = ({pctChange}) => yScale2(pctChange) - labelsMargin;
-
         /**
          * This function creates the graph using the selection as container
          * @param  {D3Selection} _selection A d3 selection that represents
@@ -165,7 +166,6 @@ define(function(require) {
                 chartWidth = width - margin.left - margin.right - (yAxisPaddingBetweenChart * 1.2);
                 chartHeight = height - margin.top - margin.bottom;
                 ({data, dataZeroed} = sortData(cleanData(_data)));
-
                 buildScales();
                 buildAxis();
                 buildSVG(this);
@@ -194,7 +194,7 @@ define(function(require) {
 
                 yAxis2 = d3Axis.axisRight(yScale2)
                     .tickFormat(function(d, i) {
-                        return d + "%";
+                        return d + '%';
                     });
             } else {
                 xAxis = d3Axis.axisBottom(xScale);
@@ -230,6 +230,8 @@ define(function(require) {
                 .append('g')
                 .attr('transform', `translate(${-1 * (yAxisPaddingBetweenChart)}, 0)`)
                 .classed('y-axis-group axis', true);
+
+            console.log(yAxisPaddingBetweenChart);
             // labels on the right side
             container
                 .append('g')
@@ -418,17 +420,28 @@ define(function(require) {
             if (isHorizontal) {
                 // adding the right Y axis labels,
                 svg.select( '.y-axis-group.axis-right' )
-                    .attr('transform', `translate(${ yAxisPaddingBetweenChart + chartWidth}, 0)`)
+                    .attr('transform', `translate(${ 5 + chartWidth}, 0)`)
                     .call( yAxis2 );
 
                 // shift the labels over to the right a bit
                 svg.selectAll( '.y-axis-group.axis-right .tick text' )
-                    .attr( 'transform', 'translate(5, 0)' )
+                    .attr( 'transform', `translate(5, 0)` )
                     .style( 'fill', ( d ) => {
-                        return d > 0 ? '#20aa3f' : '#D14124';
+                        return d > 0 ? 'green' : 'red';
                     });
 
+
                 // based on the data, you can use the up or down arrow icon..
+                // working circle
+                // svg.selectAll('.y-axis-group.axis-right .tick')
+                //     .append('circle')
+                //     .attr('cx', (d)=>{ return 0 })
+                //     .attr('cy', (d)=>{ return 0 })
+                //     .attr('r', (d)=>{ return 5 })
+                //     .style( 'fill', ( d ) => {
+                //         return d > 0 ? 'green' : 'red';
+                //     });
+
                 svg.selectAll('.y-axis-group.axis-right .tick')
                     .append('polygon')
                     .attr( 'transform', function(d) {
@@ -437,7 +450,7 @@ define(function(require) {
                     .attr('points', function(d) {
                         return d > 0 ? '0,0 6,-9 12,0' : '0,0 6,9 12,0';
                     })
-                       .style('fill', ( d ) => {
+                    .style('fill', ( d ) => {
                         return d > 0 ? '#20aa3f' : '#D14124';
                     })
                     .attr('class', function(d){
