@@ -7,10 +7,7 @@
 @import "helpers/loadingStates.scss";
 
 // Common Elements
-@import "common/_grid.scss";
-@import "common/_axes.scss";
-@import "common/_tooltip.scss";
-@import "common/_legend.scss";
+@import "common.scss";
 
 // Charts
 @import "charts/bar.scss";
@@ -24,3 +21,4 @@
 @import "charts/step.scss";
 @import "charts/brush.scss";
 @import "charts/bullet.scss";
+@import "charts/cfpb-barcharts.scss";

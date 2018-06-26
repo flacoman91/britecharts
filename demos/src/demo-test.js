@@ -47,7 +47,7 @@ function createHorizontalTestChart() {
             .isHorizontal(true)
             .isAnimated(true)
             .margin({
-                left: 120,
+                left: 100,
                 right: 20,
                 top: 20,
                 bottom: 30
@@ -55,10 +55,12 @@ function createHorizontalTestChart() {
             .enableLabels(true)
             .labelsNumberFormat(',d')
             .labelsSuffix('complaints')
-            .colorSchema(colors.colorSchemas.britecharts)
+            .colorSchema(['#20aa3f'])
             .width(containerWidth)
-            .yAxisPaddingBetweenChart(30)
-            .height(300)
+            .yAxisPaddingBetweenChart(20)
+            .height(250)
+            .xTicks( 0 )
+            .yTicks( 0 )
             .percentageAxisToMaxRatio(1.3)
             .on('customMouseOver', tooltip.show)
             .on('customMouseMove', tooltip.update)

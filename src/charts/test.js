@@ -537,9 +537,7 @@ define(function(require) {
         function drawLabels() {
             let labelXPosition = isHorizontal ? _labelsHorizontalX : _labelsVerticalX;
             let labelYPosition = isHorizontal ? _labelsHorizontalY : _labelsVerticalY;
-            let text = _labelsFormatValue
-
-            console.log(text);
+            let text = _labelsFormatValue;
 
             if (labelEl) {
                 svg.selectAll('.percentage-label-group').remove();
