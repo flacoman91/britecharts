@@ -3,6 +3,7 @@ define(function(require) {
 
     console.log(' testing 123! ');
 
+    const d3 = require('d3');
     const d3Array = require('d3-array');
     const d3Ease = require('d3-ease');
     const d3Axis = require('d3-axis');
@@ -11,6 +12,7 @@ define(function(require) {
     const d3Format = require('d3-format');
     const d3Scale = require('d3-scale');
     const d3Selection = require('d3-selection');
+    const d3Shape = require('d3-shape');
     const d3Transition = require('d3-transition');
 
     const textHelper = require('./helpers/text');
@@ -430,9 +432,27 @@ define(function(require) {
                         return d > 0 ? 'green' : 'red';
                     });
 
+                
                 // based on the data, you can use the up or down arrow icon..
+                // working circle
+                // svg.selectAll('.y-axis-group.axis-right .tick')
+                //     .append('circle')
+                //     .attr('cx', (d)=>{ return 0 })
+                //     .attr('cy', (d)=>{ return 0 })
+                //     .attr('r', (d)=>{ return 5 })
+                //     .style( 'fill', ( d ) => {
+                //         return d > 0 ? 'green' : 'red';
+                //     });
+
                 svg.selectAll('.y-axis-group.axis-right .tick')
-                    .append('rect')
+                    .append('polygon')
+                    .attr('points', function(d){
+                        // green / red /
+                        return d > 0 ? '0,0 7,-7 14,0' : '0,0 7,7 14,0';
+                    })
+                    .style('fill', ( d ) => {
+                        return d > 0 ? 'green' : 'red';
+                    })
                     .attr('chevron', function(d){
                         return d > 0 ? 'up' : 'down';
                     });
