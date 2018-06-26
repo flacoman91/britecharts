@@ -142,6 +142,8 @@ define(function(require) {
             getValue = ({value}) => value,
 
             _labelsFormatValue = ({value}) => d3Format.format(labelsNumberFormat)(value) + ' ' + labelsSuffix,
+            _labelsFormatPct = ({pctChange}) => d3Format.format(labelsNumberFormat)(pctChange) + ' ' + labelsSuffix,
+
 
             // labels per bar, aka XX Complaints
             _labelsHorizontalX = ({value}) => xScale(value) + labelsMargin,
@@ -190,7 +192,10 @@ define(function(require) {
 
                 yAxis = d3Axis.axisLeft(yScale);
 
-                yAxis2 = d3Axis.axisRight(yScale2);
+                yAxis2 = d3Axis.axisRight(yScale2)
+                    .tickFormat(function(d, i) {
+                        return d + "%";
+                    });
             } else {
                 xAxis = d3Axis.axisBottom(xScale);
 
@@ -430,7 +435,7 @@ define(function(require) {
                     });
             }
 
-            svg.selectAll('.y-axis-group .tick text')
+            svg.selectAll('.y-axis-group.axis .tick text')
                 .call(wrapText, margin.left - yAxisPaddingBetweenChart)
         }
 

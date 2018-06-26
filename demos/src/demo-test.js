@@ -47,7 +47,7 @@ function createHorizontalTestChart() {
             .isHorizontal(true)
             .isAnimated(true)
             .margin({
-                left: 60,
+                left: 100,
                 right: 40,
                 top: 20,
                 bottom: 30
@@ -57,7 +57,7 @@ function createHorizontalTestChart() {
             .labelsSuffix('complaints')
             .colorSchema(['#20aa3f'])
             .width(containerWidth)
-            .yAxisPaddingBetweenChart(20)
+            .yAxisPaddingBetweenChart(5)
             .height(250)
             .xTicks( 0 )
             .yTicks( 0 )

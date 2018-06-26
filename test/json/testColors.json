@@ -2,32 +2,32 @@
     "data": [
         {
             "name": "Radiating",
-            "value": 2,
+            "value": 2024,
             "pctChange": -20
         },
         {
             "name": "Opalescent",
-            "value": 4,
+            "value": 4221,
             "pctChange": 30
         },
         {
             "name": "Shining",
-            "value": 3,
+            "value": 213,
             "pctChange": 11
         },
         {
             "name": "Vibrant",
-            "value": 6,
+            "value": 6001,
             "pctChange": 10
         },
         {
             "name": "Vivid",
-            "value": 6,
+            "value": 613,
             "pctChange": -9
         },
         {
             "name": "Brilliant",
-            "value": 1,
+            "value": 1900,
             "pctChange": 1
         }
     ]
