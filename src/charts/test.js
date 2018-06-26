@@ -230,8 +230,6 @@ define(function(require) {
                 .append('g')
                 .attr('transform', `translate(${-1 * (yAxisPaddingBetweenChart)}, 0)`)
                 .classed('y-axis-group axis', true);
-
-            console.log(yAxisPaddingBetweenChart);
             // labels on the right side
             container
                 .append('g')
@@ -420,21 +418,30 @@ define(function(require) {
             if (isHorizontal) {
                 // adding the right Y axis labels,
                 svg.select( '.y-axis-group.axis-right' )
-                    .attr('transform', `translate(${ 5 + chartWidth}, 0)`)
+                    .attr('transform', `translate(${ yAxisPaddingBetweenChart + chartWidth}, 0)`)
                     .call( yAxis2 );
 
                 // shift the labels over to the right a bit
                 svg.selectAll( '.y-axis-group.axis-right .tick text' )
-                    .attr( 'transform', `translate(5, 0)` )
+                    .attr( 'transform', 'translate(5, 0)' )
                     .style( 'fill', ( d ) => {
-                        return d > 0 ? 'green' : 'red';
+                        return d > 0 ? '#20aa3f' : '#D14124';
                     });
 
                 // based on the data, you can use the up or down arrow icon..
                 svg.selectAll('.y-axis-group.axis-right .tick')
-                    .append('rect')
-                    .attr('chevron', function(d){
-                        return d > 0 ? 'up' : 'down';
+                    .append('polygon')
+                    .attr( 'transform', function(d) {
+                        return d > 0 ? 'translate(-2, 3)' : 'translate(-2, -3)';
+                    })
+                    .attr('points', function(d) {
+                        return d > 0 ? '0,0 6,-9 12,0' : '0,0 6,9 12,0';
+                    })
+                       .style('fill', ( d ) => {
+                        return d > 0 ? '#20aa3f' : '#D14124';
+                    })
+                    .attr('class', function(d){
+                        return d > 0 ? 'down' : 'up';
                     });
             }
 
