@@ -424,8 +424,11 @@ define(function(require) {
                     .call( yAxis2 );
 
                 // shift the labels over to the right a bit
-                svg.selectAll('.y-axis-group.axis-right .tick text')
-                    .attr('transform', `translate(10, 0)`)
+                svg.selectAll( '.y-axis-group.axis-right .tick text' )
+                    .attr( 'transform', `translate(5, 0)` )
+                    .style( 'fill', ( d ) => {
+                        return d > 0 ? 'green' : 'red';
+                    });
 
                 // based on the data, you can use the up or down arrow icon..
                 svg.selectAll('.y-axis-group.axis-right .tick')
