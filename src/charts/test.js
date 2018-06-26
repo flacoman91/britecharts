@@ -33,11 +33,13 @@ define(function(require) {
      * [
      *     {
      *         value: 1,
-     *         name: 'foobar'
+     *         name: 'foobar',
+     *         pctChange: 23
      *     },
      *     {
      *         value: 1,
-     *         name: 'luminous'
+     *         name: 'luminous',
+     *         pctChange: 20
      *     }
      * ]
      */
@@ -76,7 +78,7 @@ define(function(require) {
             data,
             dataZeroed,
             chartWidth, chartHeight,
-            xScale, yScale,
+            xScale, yScale, yScale2,
             colorSchema = colorHelper.singleColors.aloeGreen,
             colorList,
             colorMap,
@@ -94,7 +96,7 @@ define(function(require) {
             labelsSuffix = '',
             labelsSize = 12,
             betweenTestsPadding = 0.1,
-            xAxis, yAxis,
+            xAxis, yAxis, yAxis2,
             xAxisPadding = {
                 top: 0,
                 left: 0,
@@ -118,6 +120,7 @@ define(function(require) {
 
             valueLabel = 'value',
             nameLabel = 'name',
+            pctChangeLabel = 'pctChange',
             labelEl,
 
             baseLine,
@@ -135,15 +138,19 @@ define(function(require) {
 
             // extractors
             getName = ({name}) => name,
+            getPctChange = ({pctChange}) => pctChange,
             getValue = ({value}) => value,
 
             _labelsFormatValue = ({value}) => d3Format.format(labelsNumberFormat)(value) + ' ' + labelsSuffix,
 
+            // labels per bar, aka XX Complaints
             _labelsHorizontalX = ({value}) => xScale(value) + labelsMargin,
             _labelsHorizontalY= ({name}) => yScale(name) + (yScale.bandwidth() / 2) + (labelsSize * (3/8)),
 
+            // vertical axis labels
             _labelsVerticalX = ({name}) => xScale(name),
-            _labelsVerticalY = ({value}) => yScale(value) - labelsMargin;
+            _labelsVerticalY = ({value}) => yScale(value) - labelsMargin,
+            _labelsVerticalY1 = ({pctChange}) => yScale2(pctChange) - labelsMargin;
 
         /**
          * This function creates the graph using the selection as container
@@ -175,12 +182,15 @@ define(function(require) {
          * @private
          */
         function buildAxis() {
+            console.log('build axis');
             if (isHorizontal) {
                 xAxis = d3Axis.axisBottom(xScale)
                     .ticks(xTicks, numberFormat)
                     .tickSizeInner([-chartHeight]);
 
                 yAxis = d3Axis.axisLeft(yScale);
+
+                yAxis2 = d3Axis.axisRight(yScale2);
             } else {
                 xAxis = d3Axis.axisBottom(xScale);
 
@@ -202,14 +212,29 @@ define(function(require) {
 
             container
                 .append('g').classed('grid-lines-group', true);
+
             container
                 .append('g').classed('chart-group', true);
+
+            // labels on the bottom
             container
                 .append('g').classed('x-axis-group axis', true);
+
+            // this is the labels on the left, and the line
             container
                 .append('g')
                 .attr('transform', `translate(${-1 * (yAxisPaddingBetweenChart)}, 0)`)
                 .classed('y-axis-group axis', true);
+
+            console.log(yAxisPaddingBetweenChart);
+            // labels on the right side
+            container
+                .append('g')
+                .attr('transform', `translate(${10 * (yAxisPaddingBetweenChart)}, 0)`)
+                .classed('y-axis-group axis-right', true);
+
+
+            // the tooltip and also labels on the right
             container
                 .append('g').classed('metadata-group', true);
         }
@@ -255,6 +280,11 @@ define(function(require) {
 
                 yScale = d3Scale.scaleBand()
                     .domain(data.map(getName))
+                    .rangeRound([chartHeight, 0])
+                    .padding(betweenTestsPadding);
+
+                yScale2 = d3Scale.scaleBand()
+                    .domain(data.map(getPctChange))
                     .rangeRound([chartHeight, 0])
                     .padding(betweenTestsPadding);
             } else {
@@ -315,6 +345,7 @@ define(function(require) {
          */
         function cleanData(originalData) {
             let data = originalData.reduce((acc, d) => {
+                d.pctChange = +d[pctChangeLabel];
                 d.value = +d[valueLabel];
                 d.name = String(d[nameLabel]);
 
@@ -322,6 +353,7 @@ define(function(require) {
             }, []);
 
             let dataZeroed = data.map((d) => ({
+                pctChange: 0,
                 value: 0,
                 name: String(d[nameLabel])
             }));
@@ -379,6 +411,12 @@ define(function(require) {
 
             svg.select('.y-axis-group.axis')
                 .call(yAxis);
+
+            if (isHorizontal) {
+                svg.select( '.y-axis-group.axis-right' )
+                    .attr('transform', `translate(${ 5 + chartWidth}, 0)`)
+                    .call( yAxis2 );
+            }
 
             svg.selectAll('.y-axis-group .tick text')
                 .call(wrapText, margin.left - yAxisPaddingBetweenChart)
@@ -537,19 +575,24 @@ define(function(require) {
         function drawLabels() {
             let labelXPosition = isHorizontal ? _labelsHorizontalX : _labelsVerticalX;
             let labelYPosition = isHorizontal ? _labelsHorizontalY : _labelsVerticalY;
-            let text = _labelsFormatValue;
+            let labelYPosition1 = isHorizontal ? _labelsHorizontalY : _labelsVerticalY1;
+
+            let text = _labelsFormatValue
+
+            console.log(text);
 
             if (labelEl) {
                 svg.selectAll('.percentage-label-group').remove();
             }
 
+            console.log(data);
             labelEl = svg.select('.metadata-group')
               .append('g')
                 .classed('percentage-label-group', true)
                 .selectAll('text')
                 .data(data.reverse())
                 .enter()
-              .append('text');
+                .append('text');
 
             labelEl
                 .classed('percentage-label', true)
@@ -1109,6 +1152,21 @@ define(function(require) {
 
             return this;
         }
+
+        /**
+         * Gets or Sets the pctChangeLabel of the chart
+         * @param  {Number} _x Desired pctChangeLabel for the graph
+         * @return { valueLabel | module} Current pctChangeLabel or Chart module to chain calls
+         * @public
+         */
+        exports.pctChangeLabel = function(_x) {
+            if (!arguments.length) {
+                return pctChangeLabel;
+            }
+            pctChangeLabel = _x;
+
+            return this;
+        };
 
         /**
          * Gets or Sets the valueLabel of the chart
