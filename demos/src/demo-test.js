@@ -20,7 +20,6 @@ function createSimpleTestChart() {
 
     if (containerWidth) {
         dataset = aTestDataSet().withLettersFrequency().build();
-
         testChart
             .width(containerWidth)
             .hasPercentage(true)
@@ -47,7 +46,7 @@ function createHorizontalTestChart() {
             .isHorizontal(true)
             .isAnimated(true)
             .margin({
-                left: 100,
+                left: 90,
                 right: 40,
                 top: 20,
                 bottom: 30
@@ -113,7 +112,7 @@ function createLoadingState() {
         dataset = null;
 console.log('loading state');
     if (containerWidth) {
-        console.log('loading state' +containerWidth);
+        console.log('loading state' + containerWidth);
         testContainer.html(testChart.loadingState());
     }
 }
