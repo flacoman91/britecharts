@@ -57,6 +57,9 @@ function createHorizontalTestChart() {
             .colorSchema(['#20aa3f'])
             .width(containerWidth)
             .yAxisPaddingBetweenChart(5)
+            .orderingFunction(function(a,b){
+                return a.value > b.value;
+            })
             .height(250)
             .xTicks( 0 )
             .yTicks( 0 )
