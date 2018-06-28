@@ -1,4 +1,4 @@
-.test-chart {
+.js-horizontal-test-chart-container .test-chart {
   .y-axis-group,
   .x-axis-group {
     path {
@@ -8,5 +8,20 @@
   .tick line {
     display: none;
     stroke: none;
+  }
+  polygon {
+    //&.up {
+    //  transform: rotate(180deg) translate(-2%, -4%);
+    //}
+    //&.down {
+    //  transform: translate(-0.5%, -4%);
+    //}
+  }
+  .tick text {
+    font-weight: 600;
+  }
+  .vertical-grid-line,
+  .horizontal-grid-line {
+    display: none
   }
 }

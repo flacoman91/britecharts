@@ -155,7 +155,6 @@ define(function(require) {
             _labelsVerticalX = ({name}) => xScale(name),
             _labelsVerticalY = ({value}) => yScale(value) - labelsMargin,
             _labelsVerticalY1 = ({pctChange}) => yScale2(pctChange) - labelsMargin;
-
         /**
          * This function creates the graph using the selection as container
          * @param  {D3Selection} _selection A d3 selection that represents
@@ -167,7 +166,6 @@ define(function(require) {
                 chartWidth = width - margin.left - margin.right - (yAxisPaddingBetweenChart * 1.2);
                 chartHeight = height - margin.top - margin.bottom;
                 ({data, dataZeroed} = sortData(cleanData(_data)));
-
                 buildScales();
                 buildAxis();
                 buildSVG(this);
@@ -196,7 +194,7 @@ define(function(require) {
 
                 yAxis2 = d3Axis.axisRight(yScale2)
                     .tickFormat(function(d, i) {
-                        return d + "%";
+                        return d + '%';
                     });
             } else {
                 xAxis = d3Axis.axisBottom(xScale);
@@ -432,7 +430,7 @@ define(function(require) {
                         return d > 0 ? 'green' : 'red';
                     });
 
-                
+
                 // based on the data, you can use the up or down arrow icon..
                 // working circle
                 // svg.selectAll('.y-axis-group.axis-right .tick')
@@ -446,15 +444,17 @@ define(function(require) {
 
                 svg.selectAll('.y-axis-group.axis-right .tick')
                     .append('polygon')
-                    .attr('points', function(d){
-                        // green / red /
-                        return d > 0 ? '0,0 7,-7 14,0' : '0,0 7,7 14,0';
+                    .attr( 'transform', function(d) {
+                        return d > 0 ? 'translate(-2, 3)' : 'translate(-2, -3)';
+                    })
+                    .attr('points', function(d) {
+                        return d > 0 ? '0,0 6,-9 12,0' : '0,0 6,9 12,0';
                     })
                     .style('fill', ( d ) => {
-                        return d > 0 ? 'green' : 'red';
+                        return d > 0 ? '#20aa3f' : '#D14124';
                     })
-                    .attr('chevron', function(d){
-                        return d > 0 ? 'up' : 'down';
+                    .attr('class', function(d){
+                        return d > 0 ? 'down' : 'up';
                     });
             }
 
