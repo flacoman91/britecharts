@@ -121,6 +121,7 @@ define(function(require) {
             valueLabel = 'value',
             nameLabel = 'name',
             pctChangeLabel = 'pctChange',
+            pctOfSetLabel = 'pctOfSet',
             labelEl,
 
             baseLine,
@@ -141,8 +142,14 @@ define(function(require) {
             getPctChange = ({pctChange}) => pctChange,
             getValue = ({value}) => value,
 
-            _labelsFormatValue = ({value}) => d3Format.format(labelsNumberFormat)(value) + ' ' + labelsSuffix,
-            _labelsFormatPct = ({pctChange}) => d3Format.format(labelsNumberFormat)(pctChange) + ' ' + labelsSuffix,
+            _labelsFormatValue = ( { value, pctOfSet } ) => {
+                let pctLabel = '';
+                if(pctOfSet){
+                    pctLabel = "  | " + pctOfSet;
+                }
+                return d3Format.format( labelsNumberFormat )( value ) + ' ' + labelsSuffix + pctLabel;
+            },
+             _labelsFormatPct = ({pctChange}) => d3Format.format(labelsNumberFormat)(pctChange) + ' ' + labelsSuffix,
 
 
             // labels per row, aka XX Complaints
@@ -189,10 +196,12 @@ define(function(require) {
 
                 yAxis = d3Axis.axisLeft(yScale);
 
-                yAxis2 = d3Axis.axisRight(yScale2)
-                    .tickFormat(function(d, i) {
-                        return d + '%';
-                    });
+                //uncomment to show the right labels with arrows
+                // yAxis2 = d3Axis.axisRight(yScale2)
+                //     .ticks(yTicks, numberFormat)
+                //     .tickFormat(function(d, i) {
+                //         return d + '%';
+                //     });
             } else {
                 xAxis = d3Axis.axisBottom(xScale);
 
@@ -346,6 +355,7 @@ define(function(require) {
          */
         function cleanData(originalData) {
             let data = originalData.reduce((acc, d) => {
+                d.pctOfSet = +d[pctOfSetLabel];
                 d.pctChange = +d[pctChangeLabel];
                 d.value = +d[valueLabel];
                 d.name = String(d[nameLabel]);
@@ -415,43 +425,41 @@ define(function(require) {
 
             if (isHorizontal) {
                 // adding the right Y axis labels,
-                svg.select( '.y-axis-group.axis-right' )
-                    .attr('transform', `translate(${ 5 + chartWidth}, 0)`)
-                    .call( yAxis2 );
+                // svg.select( '.y-axis-group.axis-right' )
+                //     .attr('transform', `translate(${ 5 + chartWidth}, 0)`)
+                //     .call( yAxis2 );
 
                 // shift the labels over to the right a bit
-                svg.selectAll( '.y-axis-group.axis-right .tick text' )
-                    .attr( 'transform', `translate(5, 0)` )
-                    .style( 'fill', ( d ) => {
-                        return d > 0 ? 'green' : 'red';
-                    });
+                // UNCOMMENT this for the percentages
 
-
-                // based on the data, you can use the up or down arrow icon..
-                // working circle
-                // svg.selectAll('.y-axis-group.axis-right .tick')
-                //     .append('circle')
-                //     .attr('cx', (d)=>{ return 0 })
-                //     .attr('cy', (d)=>{ return 0 })
-                //     .attr('r', (d)=>{ return 5 })
+                // svg.selectAll( '.y-axis-group.axis-right .tick text' )
+                //     .attr( 'transform', `translate(5, 0)` )
+                //     .attr('fill-opacity', function(d){
+                //         return isNaN(d) ? 0.0: 1.0;
+                //     })
                 //     .style( 'fill', ( d ) => {
                 //         return d > 0 ? 'green' : 'red';
                 //     });
 
-                svg.selectAll('.y-axis-group.axis-right .tick')
-                    .append('polygon')
-                    .attr( 'transform', function(d) {
-                        return d > 0 ? 'translate(-2, 3)' : 'translate(-2, -3)';
-                    })
-                    .attr('points', function(d) {
-                        return d > 0 ? '0,0 6,-9 12,0' : '0,0 6,9 12,0';
-                    })
-                    .style('fill', ( d ) => {
-                        return d > 0 ? '#20aa3f' : '#D14124';
-                    })
-                    .attr('class', function(d){
-                        return d > 0 ? 'down' : 'up';
-                    });
+                // svg.selectAll('.y-axis-group.axis-right .tick')
+                //     .append('polygon')
+                //     .attr( 'transform', function(d) {
+                //         // just hide the percentages if the number is bogus
+                //         return d > 0 ? 'translate(-2, 3)' : 'translate(-2, -3)';
+                //     })
+                //     .attr('points', function(d) {
+                //         return d > 0 ? '0,0 6,-9 12,0' : '0,0 6,9 12,0';
+                //     })
+                //     .style('fill', ( d ) => {
+                //         return d > 0 ? '#20aa3f' : '#D14124';
+                //     })
+                //     .attr('class', function(d){
+                //         return d > 0 ? 'down' : 'up';
+                //     })
+                //     .attr('fill-opacity', function(d){
+                //         console.log(d);
+                //         return isNaN(d) ? 0.0: 1.0;
+                //     });
             }
 
             svg.selectAll('.y-axis-group.axis .tick text')
@@ -1194,6 +1202,23 @@ define(function(require) {
 
             return this;
         };
+
+
+        /**
+         * Gets or Sets the pctOfSet of the chart
+         * @param  {Number} _x Desired pctOfSet for the graph
+         * @return { valueLabel | module} Current pctOfSet or Chart module to chain calls
+         * @public
+         */
+        exports.pctOfSet = function(_x) {
+            if (!arguments.length) {
+                return pctOfSet;
+            }
+            pctOfSet = _x;
+
+            return this;
+        };
+
 
         /**
          * Gets or Sets the valueLabel of the chart
