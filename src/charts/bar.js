@@ -1,8 +1,6 @@
 define(function(require) {
     'use strict';
 
-    console.log(' testing 123! ');
-
     const d3Array = require('d3-array');
     const d3Ease = require('d3-ease');
     const d3Axis = require('d3-axis');

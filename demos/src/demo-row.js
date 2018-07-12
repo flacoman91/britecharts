@@ -3,46 +3,46 @@
 const d3Selection = require('d3-selection');
 const PubSub = require('pubsub-js');
 
-const test = require('./../../src/charts/test');
+const row = require('./../../src/charts/row');
 const miniTooltip = require('./../../src/charts/mini-tooltip');
 const colors = require('./../../src/charts/helpers/color');
-const dataBuilder = require('./../../test/fixtures/testChartDataBuilder');
+const dataBuilder = require('./../../test/fixtures/rowChartDataBuilder');
 
-const aTestDataSet = () => new dataBuilder.TestDataBuilder();
+const aRowDataSet = () => new dataBuilder.RowDataBuilder();
 
 require('./helpers/resizeHelper');
 
-function createSimpleTestChart() {
-    let testChart = test(),
-        testContainer = d3Selection.select('.js-test-chart-container'),
-        containerWidth = testContainer.node() ? testContainer.node().getBoundingClientRect().width : false,
+function createSimpleRowChart() {
+    let rowChart = row(),
+        rowContainer = d3Selection.select('.js-row-chart-container'),
+        containerWidth = rowContainer.node() ? rowContainer.node().getBoundingClientRect().width : false,
         dataset;
 
     if (containerWidth) {
-        dataset = aTestDataSet().withLettersFrequency().build();
-        testChart
+        dataset = aRowDataSet().withLettersFrequency().build();
+        rowChart
             .width(containerWidth)
             .hasPercentage(true)
             .enableLabels(true)
             .labelsNumberFormat('.0%')
             .height(300);
 
-        testContainer.datum(dataset).call(testChart);
+        rowContainer.datum(dataset).call(rowChart);
     }
 }
 
-function createHorizontalTestChart() {
-    let testChart = test(),
+function createHorizontalRowChart() {
+    let rowChart = row(),
         tooltip = miniTooltip(),
-        testContainer = d3Selection.select('.js-horizontal-test-chart-container'),
-        containerWidth = testContainer.node() ? testContainer.node().getBoundingClientRect().width : false,
+        rowContainer = d3Selection.select('.js-horizontal-row-chart-container'),
+        containerWidth = rowContainer.node() ? rowContainer.node().getBoundingClientRect().width : false,
         tooltipContainer,
         dataset;
 
     if (containerWidth) {
-        dataset = aTestDataSet().withColors().build();
+        dataset = aRowDataSet().withColors().build();
 
-        testChart
+        rowChart
             .isHorizontal(true)
             .isAnimated(true)
             .margin({
@@ -68,29 +68,29 @@ function createHorizontalTestChart() {
             .on('customMouseMove', tooltip.update)
             .on('customMouseOut', tooltip.hide);
 
-        testContainer.datum(dataset).call(testChart);
+        rowContainer.datum(dataset).call(rowChart);
 
-        tooltipContainer = d3Selection.select('.js-horizontal-test-chart-container .test-chart .metadata-group');
+        tooltipContainer = d3Selection.select('.js-horizontal-row-chart-container .row-chart .metadata-group');
         tooltipContainer.datum([]).call(tooltip);
     }
 }
 
-function createTestChartWithTooltip() {
-    let testChart = test(),
+function createRowChartWithTooltip() {
+    let rowChart = row(),
         tooltip = miniTooltip(),
-        testContainer = d3Selection.select('.js-test-chart-tooltip-container'),
-        containerWidth = testContainer.node() ? testContainer.node().getBoundingClientRect().width : false,
+        rowContainer = d3Selection.select('.js-row-chart-tooltip-container'),
+        containerWidth = rowContainer.node() ? rowContainer.node().getBoundingClientRect().width : false,
         tooltipContainer,
         dataset;
 
     if (containerWidth) {
         d3Selection.select('.js-download-button').on('click', function() {
-            testChart.exportChart('testchart.png', 'Britecharts Test Chart');
+            rowChart.exportChart('rowchart.png', 'Britecharts Row Chart');
         });
 
-        dataset = aTestDataSet().withLettersFrequency().build();
+        dataset = aRowDataSet().withLettersFrequency().build();
 
-        testChart
+        rowChart
             .width(containerWidth)
             .height(300)
             .isAnimated(true)
@@ -98,40 +98,40 @@ function createTestChartWithTooltip() {
             .on('customMouseMove', tooltip.update)
             .on('customMouseOut', tooltip.hide);
 
-        testContainer.datum(dataset).call(testChart);
+        rowContainer.datum(dataset).call(rowChart);
 
         tooltip
             .numberFormat('.2%')
 
-        tooltipContainer = d3Selection.select('.test-chart .metadata-group');
+        tooltipContainer = d3Selection.select('.row-chart .metadata-group');
         tooltipContainer.datum([]).call(tooltip);
     }
 }
 
 function createLoadingState() {
-    let testChart = test(),
-        testContainer = d3Selection.select('.js-loading-container'),
-        containerWidth = testContainer.node() ? testContainer.node().getBoundingClientRect().width : false,
+    let rowChart = row(),
+        rowContainer = d3Selection.select('.js-loading-container'),
+        containerWidth = rowContainer.node() ? rowContainer.node().getBoundingClientRect().width : false,
         dataset = null;
 console.log('loading state');
     if (containerWidth) {
         console.log('loading state' + containerWidth);
-        testContainer.html(testChart.loadingState());
+        rowContainer.html(rowChart.loadingState());
     }
 }
 
 // Show charts if container available
-if (d3Selection.select('.js-test-chart-tooltip-container').node()){
-    createTestChartWithTooltip();
-    createHorizontalTestChart();
-    createSimpleTestChart();
+if (d3Selection.select('.js-row-chart-tooltip-container').node()){
+    createRowChartWithTooltip();
+    createHorizontalRowChart();
+    createSimpleRowChart();
     createLoadingState();
 
     let redrawCharts = function(){
-        d3Selection.selectAll('.test-chart').remove();
-        createTestChartWithTooltip();
-        createHorizontalTestChart();
-        createSimpleTestChart();
+        d3Selection.selectAll('.row-chart').remove();
+        createRowChartWithTooltip();
+        createHorizontalRowChart();
+        createSimpleRowChart();
         createLoadingState();
     };
 

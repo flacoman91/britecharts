@@ -1,16 +1,16 @@
-    <div class="container" id="test">
+    <div class="container" id="row">
         <div class="row">
             <div class="
 col-md-6">
                 <article>
-                    <h2 class="tutorial__heading">Test Chart with Tooltip and Labels</h2>
-                    <div class="js-test-chart-tooltip-container test-chart-tooltip-container card--chart"></div>
+                    <h2 class="tutorial__heading">Row Chart with Tooltip and Labels</h2>
+                    <div class="js-row-chart-tooltip-container row-chart-tooltip-container card--chart"></div>
                 </article>
             </div>
-            <div class="col-md-6 sidetest">
+            <div class="col-md-6 siderow">
                 <h3>The code</h3>
                 <pre><code class="language-javascript">
-testChart
+rowChart
     .width(containerWidth)
     .height(300)
     .hasPercentage(true)
@@ -21,36 +21,36 @@ testChart
     .on('customMouseMove', tooltip.update)
     .on('customMouseOut', tooltip.hide);
 
-testContainer.datum(dataset).call(testChart);
+rowContainer.datum(dataset).call(rowChart);
 
 tooltip
     .numberFormat('.2%');
 
-tooltipContainer = d3.select('.test-chart .metadata-group');
+tooltipContainer = d3.select('.row-chart .metadata-group');
 tooltipContainer.datum([]).call(tooltip);
                 </code></pre>
 
                 <h4>Data Input</h4>
-                <p>Check the <a href="/britecharts/global.html#TestChartData__anchor">data input schema</a> of this chart.</p>
+                <p>Check the <a href="/britecharts/global.html#RowChartData__anchor">data input schema</a> of this chart.</p>
 
                 <h4>Export Chart</h4>
                 <p>Export this chart by pressing <input class="js-download-button btn-sm btn btn-primary" type="button" value="Export" /></p>
 
                 <h4>Demo Code</h4>
-                <p>Read the whole code of this demo <a href="https://github.com/eventbrite/britecharts/blob/master/demos/src/demo-test.js">in github</a></p>
+                <p>Read the whole code of this demo <a href="https://github.com/eventbrite/britecharts/blob/master/demos/src/demo-row.js">in github</a></p>
             </div>
         </div>
         <div class="row">
             <div class="col-md-6">
                 <article>
-                    <h2 class="tutorial__heading">Horizontal Test Chart</h2>
-                    <div class="js-horizontal-test-chart-container card--chart"></div>
+                    <h2 class="tutorial__heading">Horizontal Row Chart</h2>
+                    <div class="js-horizontal-row-chart-container card--chart"></div>
                 </article>
             </div>
-            <div class="col-md-6 sidetest">
+            <div class="col-md-6 siderow">
                 <h3>The code</h3>
                 <pre><code class="language-javascript">
-testChart
+rowChart
     .margin({
         left: 120,
         right: 20,
@@ -64,35 +64,35 @@ testChart
     .width(containerWidth)
     .height(300);
 
-testContainer.datum(dataset).call(testChart);
+rowContainer.datum(dataset).call(rowChart);
                 </code></pre>
 
                 <h4>Demo Code</h4>
-                <p>Read the whole code of this demo <a href="https://github.com/eventbrite/britecharts/blob/master/demos/src/demo-test.js">in github</a></p>
+                <p>Read the whole code of this demo <a href="https://github.com/eventbrite/britecharts/blob/master/demos/src/demo-row.js">in github</a></p>
             </div>
         </div>
         <div class="row">
             <div class="col-md-6">
                 <article>
-                    <h2 class="tutorial__heading">Simple Test Chart with labels</h2>
-                    <div class="js-test-chart-container card--chart"></div>
+                    <h2 class="tutorial__heading">Simple Row Chart with labels</h2>
+                    <div class="js-row-chart-container card--chart"></div>
                 </article>
             </div>
-            <div class="col-md-6 sidetest">
+            <div class="col-md-6 siderow">
                 <h3>The code</h3>
                 <pre><code class="language-javascript">
-testChart
+rowChart
     .width(containerWidth)
     .hasPercentage(true)
     .enableLabels(true)
     .labelsNumberFormat('.0%')
     .height(300);
 
-testContainer.datum(dataset).call(testChart);
+rowContainer.datum(dataset).call(rowChart);
                 </code></pre>
 
                 <h4>Demo Code</h4>
-                <p>Read the whole code of this demo <a href="https://github.com/eventbrite/britecharts/blob/master/demos/src/demo-test.js">in github</a></p>
+                <p>Read the whole code of this demo <a href="https://github.com/eventbrite/britecharts/blob/master/demos/src/demo-row.js">in github</a></p>
             </div>
         </div>
         <div class="row">
@@ -103,14 +103,14 @@ testContainer.datum(dataset).call(testChart);
                     <div class="js-loading-container"></div>
                 </article>
             </div>
-            <div class="col-md-6 sidetest">
+            <div class="col-md-6 siderow">
                 <h3>The code</h3>
                 <pre><code class="language-javascript">
-testContainer.html(testChart.loadingState())
+rowContainer.html(rowChart.loadingState())
                 </code></pre>
 
                 <h4>Demo Code</h4>
-                <p>Read the whole code of this demo <a href="https://github.com/eventbrite/britecharts/blob/master/demos/src/demo-test.js">in github</a></p>
+                <p>Read the whole code of this demo <a href="https://github.com/eventbrite/britecharts/blob/master/demos/src/demo-row.js">in github</a></p>
             </div>
         </div>
     </div>

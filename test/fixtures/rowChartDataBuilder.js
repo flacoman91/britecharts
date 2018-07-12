@@ -3,12 +3,12 @@ define(function(require) {
 
     var _ = require('underscore'),
 
-        jsonColors = require('json-loader!../json/testColors.json'),
-        jsonLetters = require('json-loader!../json/testDataLetters.json');
+        jsonColors = require('json-loader!../json/rowColors.json'),
+        jsonLetters = require('json-loader!../json/rowDataLetters.json');
 
 
-    function TestDataBuilder(config){
-        this.Klass = TestDataBuilder;
+    function RowDataBuilder(config){
+        this.Klass = RowDataBuilder;
 
         this.config = _.defaults({}, config);
 
@@ -30,6 +30,6 @@ define(function(require) {
     }
 
     return {
-        TestDataBuilder: TestDataBuilder
+        RowDataBuilder: RowDataBuilder
     };
 });

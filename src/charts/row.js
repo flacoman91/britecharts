@@ -1,8 +1,6 @@
 define(function(require) {
     'use strict';
 
-    console.log(' testing 123! ');
-
     const d3 = require('d3');
     const d3Array = require('d3-array');
     const d3Ease = require('d3-ease');
@@ -18,7 +16,7 @@ define(function(require) {
     const textHelper = require('./helpers/text');
     const {exportChart} = require('./helpers/export');
     const colorHelper = require('./helpers/color');
-    const {test} = require('./helpers/load');
+    const {row} = require('./helpers/load');
     const {uniqueId} = require('./helpers/number');
 
     const PERCENTAGE_FORMAT = '%';
@@ -26,7 +24,7 @@ define(function(require) {
 
 
     /**
-     * @typedef TestChartData
+     * @typedef RowChartData
      * @type {Object[]}
      * @property {Number} value        Value of the group (required)
      * @property {String} name         Name of the group (required)
@@ -35,7 +33,7 @@ define(function(require) {
      * [
      *     {
      *         value: 1,
-     *         name: 'foobar',
+     *         name: 'foorow',
      *         pctChange: 23
      *     },
      *     {
@@ -47,23 +45,23 @@ define(function(require) {
      */
 
     /**
-     * Test Chart reusable API class that renders a
-     * simple and configurable test chart.
+     * Row Chart reusable API class that renders a
+     * simple and configurable row chart.
      *
-     * @module Test
-     * @tutorial test
+     * @module Row
+     * @tutorial row
      * @requires d3-array, d3-axis, d3-dispatch, d3-scale, d3-selection
      *
      * @example
-     * var testChart = test();
+     * var rowChart = row();
      *
-     * testChart
+     * rowChart
      *     .height(500)
      *     .width(800);
      *
      * d3Selection.select('.css-selector')
      *     .datum(dataset)
-     *     .call(testChart);
+     *     .call(rowChart);
      *
      */
     return function module() {
@@ -76,7 +74,7 @@ define(function(require) {
             },
             width = 960,
             height = 500,
-            loadingState = test,
+            loadingState = row,
             data,
             dataZeroed,
             chartWidth, chartHeight,
@@ -87,7 +85,7 @@ define(function(require) {
             chartGradientColors = null,
             chartGradient = null,
             chartGradientEl,
-            chartGradientId = uniqueId('test-gradient'),
+            chartGradientId = uniqueId('row-gradient'),
             yTicks = 5,
             xTicks = 5,
             percentageAxisToMaxRatio = 1,
@@ -97,7 +95,7 @@ define(function(require) {
             labelsNumberFormat = NUMBER_FORMAT,
             labelsSuffix = '',
             labelsSize = 12,
-            betweenTestsPadding = 0.1,
+            betweenRowsPadding = 0.1,
             xAxis, yAxis, yAxis2,
             xAxisPadding = {
                 top: 0,
@@ -110,14 +108,14 @@ define(function(require) {
             isHorizontal = false,
             svg,
 
-            hasSingleTestHighlight = true,
+            hasSingleRowHighlight = true,
             isAnimated = false,
             ease = d3Ease.easeQuadInOut,
             animationDuration = 800,
             animationStepRatio = 70,
-            interTestDelay = (d, i) => animationStepRatio * i,
+            interRowDelay = (d, i) => animationStepRatio * i,
 
-            highlightTestFunction = (testSelection) => testSelection.attr('fill', ({name}) => d3Color.color(colorMap(name)).darker()),
+            highlightRowFunction = (rowSelection) => rowSelection.attr('fill', ({name}) => d3Color.color(colorMap(name)).darker()),
             orderingFunction,
 
             valueLabel = 'value',
@@ -147,7 +145,7 @@ define(function(require) {
             _labelsFormatPct = ({pctChange}) => d3Format.format(labelsNumberFormat)(pctChange) + ' ' + labelsSuffix,
 
 
-            // labels per bar, aka XX Complaints
+            // labels per row, aka XX Complaints
             _labelsHorizontalX = ({value}) => xScale(value) + labelsMargin,
             _labelsHorizontalY= ({name}) => yScale(name) + (yScale.bandwidth() / 2) + (labelsSize * (3/8)),
 
@@ -159,7 +157,7 @@ define(function(require) {
          * This function creates the graph using the selection as container
          * @param  {D3Selection} _selection A d3 selection that represents
          *                                  the container(s) where the chart(s) will be rendered
-         * @param {TestChartData} _data The data to attach and generate the chart
+         * @param {RowChartData} _data The data to attach and generate the chart
          */
         function exports(_selection) {
             _selection.each(function(_data) {
@@ -171,7 +169,7 @@ define(function(require) {
                 buildSVG(this);
                 buildGradient();
                 drawGridLines();
-                drawTests();
+                drawRows();
                 drawAxis();
                 if (enableLabels) {
                     drawLabels();
@@ -184,7 +182,6 @@ define(function(require) {
          * @private
          */
         function buildAxis() {
-            console.log('build axis');
             if (isHorizontal) {
                 xAxis = d3Axis.axisBottom(xScale)
                     .ticks(xTicks, numberFormat)
@@ -231,7 +228,6 @@ define(function(require) {
                 .attr('transform', `translate(${-1 * (yAxisPaddingBetweenChart)}, 0)`)
                 .classed('y-axis-group axis', true);
 
-            console.log(yAxisPaddingBetweenChart);
             // labels on the right side
             container
                 .append('g')
@@ -286,17 +282,17 @@ define(function(require) {
                 yScale = d3Scale.scaleBand()
                     .domain(data.map(getName))
                     .rangeRound([chartHeight, 0])
-                    .padding(betweenTestsPadding);
+                    .padding(betweenRowsPadding);
 
                 yScale2 = d3Scale.scaleBand()
                     .domain(data.map(getPctChange))
                     .rangeRound([chartHeight, 0])
-                    .padding(betweenTestsPadding);
+                    .padding(betweenRowsPadding);
             } else {
                 xScale = d3Scale.scaleBand()
                     .domain(data.map(getName))
                     .rangeRound([0, chartWidth])
-                    .padding(betweenTestsPadding);
+                    .padding(betweenRowsPadding);
 
                 yScale = d3Scale.scaleLinear()
                     .domain([0, percentageAxis])
@@ -330,7 +326,7 @@ define(function(require) {
             if (!svg) {
                 svg = d3Selection.select(container)
                     .append('svg')
-                      .classed('britechart test-chart', true);
+                      .classed('britechart row-chart', true);
 
                 buildContainerGroups();
             }
@@ -344,8 +340,8 @@ define(function(require) {
          * Cleaning data casting the values and names to the proper type while keeping
          * the rest of properties on the data
          * It also creates a set of zeroed data (for animation purposes)
-         * @param  {TestChartData} originalData  Raw data as passed to the container
-         * @return  {TestChartData}              Clean data
+         * @param  {RowChartData} originalData  Raw data as passed to the container
+         * @return  {RowChartData}              Clean data
          * @private
          */
         function cleanData(originalData) {
@@ -369,7 +365,7 @@ define(function(require) {
         /**
          * A utility function that checks if custom gradient
          * color map should be applied if specified by the user
-         * @param {String} name - test's data point name
+         * @param {String} name - row's data point name
          * @return {void}
          * @private
          */
@@ -379,8 +375,8 @@ define(function(require) {
 
         /**
          * Sorts data if orderingFunction is specified
-         * @param  {TestChartData}     clean unordered data
-         * @return  {TestChartData}    clean ordered data
+         * @param  {RowChartData}     clean unordered data
+         * @return  {RowChartData}    clean ordered data
          * @private
          */
         function sortData(unorderedData) {
@@ -463,32 +459,32 @@ define(function(require) {
         }
 
         /**
-         * Draws the tests along the x axis
-         * @param  {D3Selection} tests Selection of tests
+         * Draws the rows along the x axis
+         * @param  {D3Selection} rows Selection of rows
          * @return {void}
          */
-        function drawHorizontalTests(tests) {
+        function drawHorizontalRows(rows) {
             // Enter + Update
-            tests.enter()
+            rows.enter()
               .append('rect')
-                .classed('test', true)
+                .classed('row', true)
                 .attr('y', chartHeight)
                 .attr('x', 0)
                 .attr('height', yScale.bandwidth())
                 .attr('width', ({value}) => xScale(value))
-                .on('mouseover', function(d, index, testList) {
-                    handleMouseOver(this, d, testList, chartWidth, chartHeight);
+                .on('mouseover', function(d, index, rowList) {
+                    handleMouseOver(this, d, rowList, chartWidth, chartHeight);
                 })
                 .on('mousemove', function(d) {
                     handleMouseMove(this, d, chartWidth, chartHeight);
                 })
-                .on('mouseout', function(d, index, testList) {
-                    handleMouseOut(this, d, testList, chartWidth, chartHeight);
+                .on('mouseout', function(d, index, rowList) {
+                    handleMouseOut(this, d, rowList, chartWidth, chartHeight);
                 })
                 .on('click', function(d) {
                     handleClick(this, d, chartWidth, chartHeight);
                 })
-              .merge(tests)
+              .merge(rows)
                 .attr('x', 0)
                 .attr('y', ({name}) => yScale(name))
                 .attr('height', yScale.bandwidth())
@@ -497,109 +493,109 @@ define(function(require) {
         }
 
         /**
-         * Draws and animates the tests along the x axis
-         * @param  {D3Selection} tests Selection of tests
+         * Draws and animates the rows along the x axis
+         * @param  {D3Selection} rows Selection of rows
          * @return {void}
          */
-        function drawAnimatedHorizontalTests(tests) {
+        function drawAnimatedHorizontalRows(rows) {
             // Enter + Update
-            tests.enter()
+            rows.enter()
               .append('rect')
-                .classed('test', true)
+                .classed('row', true)
                 .attr('x', 0)
                 .attr('y', chartHeight)
                 .attr('height', yScale.bandwidth())
                 .attr('width', ({value}) => xScale(value))
-                .on('mouseover', function(d, index, testList) {
-                    handleMouseOver(this, d, testList, chartWidth, chartHeight);
+                .on('mouseover', function(d, index, rowList) {
+                    handleMouseOver(this, d, rowList, chartWidth, chartHeight);
                 })
                 .on('mousemove', function(d) {
                     handleMouseMove(this, d, chartWidth, chartHeight);
                 })
-                .on('mouseout', function(d, index, testList) {
-                    handleMouseOut(this, d, testList, chartWidth, chartHeight);
+                .on('mouseout', function(d, index, rowList) {
+                    handleMouseOut(this, d, rowList, chartWidth, chartHeight);
                 })
                 .on('click', function(d) {
                     handleClick(this, d, chartWidth, chartHeight);
                 });
 
-            tests
+            rows
                 .attr('x', 0)
                 .attr('y', ({name}) => yScale(name))
                 .attr('height', yScale.bandwidth())
                 .attr('fill', ({name}) => computeColor(name))
                 .transition()
                 .duration(animationDuration)
-                .delay(interTestDelay)
+                .delay(interRowDelay)
                 .ease(ease)
                 .attr('width', ({value}) => xScale(value));
         }
 
         /**
-         * Draws and animates the tests along the y axis
-         * @param  {D3Selection} tests Selection of tests
+         * Draws and animates the rows along the y axis
+         * @param  {D3Selection} rows Selection of rows
          * @return {void}
          */
-        function drawAnimatedVerticalTests(tests) {
+        function drawAnimatedVerticalRows(rows) {
             // Enter + Update
-            tests.enter()
+            rows.enter()
               .append('rect')
-                .classed('test', true)
+                .classed('row', true)
                 .attr('x', chartWidth)
                 .attr('y', ({value}) => yScale(value))
                 .attr('width', xScale.bandwidth())
                 .attr('height', ({value}) => chartHeight - yScale(value))
-                .on('mouseover', function(d, index, testList) {
-                    handleMouseOver(this, d, testList, chartWidth, chartHeight);
+                .on('mouseover', function(d, index, rowList) {
+                    handleMouseOver(this, d, rowList, chartWidth, chartHeight);
                 })
                 .on('mousemove', function(d) {
                     handleMouseMove(this, d, chartWidth, chartHeight);
                 })
-                .on('mouseout', function(d, index, testList) {
-                    handleMouseOut(this, d, testList, chartWidth, chartHeight);
+                .on('mouseout', function(d, index, rowList) {
+                    handleMouseOut(this, d, rowList, chartWidth, chartHeight);
                 })
                 .on('click', function(d) {
                     handleClick(this, d, chartWidth, chartHeight);
                 })
-              .merge(tests)
+              .merge(rows)
                 .attr('x', ({name}) => xScale(name))
                 .attr('width', xScale.bandwidth())
                 .attr('fill', ({name}) => computeColor(name))
                 .transition()
                 .duration(animationDuration)
-                .delay(interTestDelay)
+                .delay(interRowDelay)
                 .ease(ease)
                 .attr('y', ({value}) => yScale(value))
                 .attr('height', ({value}) => chartHeight - yScale(value));
         }
 
         /**
-         * Draws the tests along the y axis
-         * @param  {D3Selection} tests Selection of tests
+         * Draws the rows along the y axis
+         * @param  {D3Selection} rows Selection of rows
          * @return {void}
          */
-        function drawVerticalTests(tests) {
+        function drawVerticalRows(rows) {
             // Enter + Update
-            tests.enter()
+            rows.enter()
               .append('rect')
-                .classed('test', true)
+                .classed('row', true)
                 .attr('x', chartWidth)
                 .attr('y', ({value}) => yScale(value))
                 .attr('width', xScale.bandwidth())
                 .attr('height', ({value}) => chartHeight - yScale(value))
-                .on('mouseover', function(d, index, testList) {
-                    handleMouseOver(this, d, testList, chartWidth, chartHeight);
+                .on('mouseover', function(d, index, rowList) {
+                    handleMouseOver(this, d, rowList, chartWidth, chartHeight);
                 })
                 .on('mousemove', function(d) {
                     handleMouseMove(this, d, chartWidth, chartHeight);
                 })
-                .on('mouseout', function(d, index, testList) {
-                    handleMouseOut(this, d, testList, chartWidth, chartHeight);
+                .on('mouseout', function(d, index, rowList) {
+                    handleMouseOut(this, d, rowList, chartWidth, chartHeight);
                 })
                 .on('click', function(d) {
                     handleClick(this, d, chartWidth, chartHeight);
                 })
-              .merge(tests)
+              .merge(rows)
                 .attr('x', ({name}) => xScale(name))
                 .attr('y', ({value}) => yScale(value))
                 .attr('width', xScale.bandwidth())
@@ -608,7 +604,7 @@ define(function(require) {
         }
 
         /**
-         * Draws labels at the end of each test
+         * Draws labels at the end of each row
          * @private
          * @return {void}
          */
@@ -619,13 +615,10 @@ define(function(require) {
 
             let text = _labelsFormatValue
 
-            console.log(text);
-
             if (labelEl) {
                 svg.selectAll('.percentage-label-group').remove();
             }
 
-            console.log(data);
             labelEl = svg.select('.metadata-group')
               .append('g')
                 .classed('percentage-label-group', true)
@@ -643,43 +636,43 @@ define(function(require) {
         }
 
         /**
-         * Draws the test elements within the chart group
+         * Draws the row elements within the chart group
          * @private
          */
-        function drawTests() {
-            let tests;
+        function drawRows() {
+            let rows;
 
             if (isAnimated) {
-                tests = svg.select('.chart-group').selectAll('.test')
+                rows = svg.select('.chart-group').selectAll('.row')
                     .data(dataZeroed);
 
                 if (isHorizontal) {
-                    drawHorizontalTests(tests);
+                    drawHorizontalRows(rows);
                 } else {
-                    drawVerticalTests(tests);
+                    drawVerticalRows(rows);
                 }
 
-                tests = svg.select('.chart-group').selectAll('.test')
+                rows = svg.select('.chart-group').selectAll('.row')
                     .data(data);
 
                 if (isHorizontal) {
-                    drawAnimatedHorizontalTests(tests);
+                    drawAnimatedHorizontalRows(rows);
                 } else {
-                    drawAnimatedVerticalTests(tests);
+                    drawAnimatedVerticalRows(rows);
                 }
             } else {
-                tests = svg.select('.chart-group').selectAll('.test')
+                rows = svg.select('.chart-group').selectAll('.row')
                     .data(data);
 
                 if (isHorizontal) {
-                    drawHorizontalTests(tests);
+                    drawHorizontalRows(rows);
                 } else {
-                    drawVerticalTests(tests);
+                    drawVerticalRows(rows);
                 }
             }
 
             // Exit
-            tests.exit()
+            rows.exit()
                 .transition()
                 .style('opacity', 0)
                 .remove();
@@ -702,7 +695,7 @@ define(function(require) {
         }
 
         /**
-         * Draws the grid lines for an horizontal test chart
+         * Draws the grid lines for an horizontal row chart
          * @return {void}
          */
         function drawHorizontalGridLines() {
@@ -738,7 +731,7 @@ define(function(require) {
         }
 
         /**
-         * Draws the grid lines for a vertical test chart
+         * Draws the grid lines for a vertical row chart
          * @return {void}
          */
         function drawVerticalGridLines() {
@@ -778,20 +771,20 @@ define(function(require) {
          * @return {void}
          * @private
          */
-        function handleMouseOver(e, d, testList, chartWidth, chartHeight) {
+        function handleMouseOver(e, d, rowList, chartWidth, chartHeight) {
             dispatcher.call('customMouseOver', e, d, d3Selection.mouse(e), [chartWidth, chartHeight]);
-            highlightTestFunction = highlightTestFunction || function() {};
+            highlightRowFunction = highlightRowFunction || function() {};
 
-            if (hasSingleTestHighlight) {
-                highlightTestFunction(d3Selection.select(e));
+            if (hasSingleRowHighlight) {
+                highlightRowFunction(d3Selection.select(e));
                 return;
             }
 
-            testList.forEach(testRect => {
-                if (testRect === e) {
+            rowList.forEach(rowRect => {
+                if (rowRect === e) {
                     return;
                 }
-                highlightTestFunction(d3Selection.select(testRect));
+                highlightRowFunction(d3Selection.select(rowRect));
             });
         }
 
@@ -809,11 +802,11 @@ define(function(require) {
          * @return {void}
          * @private
          */
-        function handleMouseOut(e, d, testList, chartWidth, chartHeight) {
+        function handleMouseOut(e, d, rowList, chartWidth, chartHeight) {
             dispatcher.call('customMouseOut', e, d, d3Selection.mouse(e), [chartWidth, chartHeight]);
 
-            testList.forEach((testRect) => {
-                d3Selection.select(testRect).attr('fill', ({name}) => colorMap(name));
+            rowList.forEach((rowRect) => {
+                d3Selection.select(rowRect).attr('fill', ({name}) => colorMap(name));
             });
         }
 
@@ -829,7 +822,7 @@ define(function(require) {
         // API
 
         /**
-         * Gets or Sets the gradient colors of a test in the chart
+         * Gets or Sets the gradient colors of a row in the chart
          * @param  {String[]} _x Desired color gradient for the line (array of two hexadecimal numbers)
          * @return {String[] | module} Current color gradient or Line Chart module to chain calls
          * @public
@@ -849,11 +842,11 @@ define(function(require) {
          * @return {padding | module} Current padding or Chart module to chain calls
          * @public
          */
-        exports.betweenTestsPadding = function(_x) {
+        exports.betweenRowsPadding = function(_x) {
             if (!arguments.length) {
-                return betweenTestsPadding;
+                return betweenRowsPadding;
             }
-            betweenTestsPadding = _x;
+            betweenRowsPadding = _x;
 
             return this;
         };
@@ -874,7 +867,7 @@ define(function(require) {
         };
 
         /**
-         * If true, adds labels at the end of the tests
+         * If true, adds labels at the end of the rows
          * @param  {Boolean} [_x=false]
          * @return {Boolean | module}    Current value of enableLabels or Chart module to chain calls
          * @public
@@ -918,21 +911,21 @@ define(function(require) {
         };
 
         /**
-         * Gets or Sets the hasSingleTestHighlight status.
-         * If the value is true (default), only the hovered test is considered to
+         * Gets or Sets the hasSingleRowHighlight status.
+         * If the value is true (default), only the hovered row is considered to
          * be highlighted and will be darkened by default. If the value is false,
-         * all the tests but the hovered test are considered to be highlighted
-         * and will be darkened (by default). To customize the test highlight or
-         * remove it completely, use highlightTestFunction instead.
-         * @param  {boolean} _x        Should highlight the hovered test
-         * @return {boolean | module} Is hasSingleTestHighlight used or Chart module to chain calls
+         * all the rows but the hovered row are considered to be highlighted
+         * and will be darkened (by default). To customize the row highlight or
+         * remove it completely, use highlightRowFunction instead.
+         * @param  {boolean} _x        Should highlight the hovered row
+         * @return {boolean | module} Is hasSingleRowHighlight used or Chart module to chain calls
          * @public
          */
-        exports.hasSingleTestHighlight = function(_x) {
+        exports.hasSingleRowHighlight = function(_x) {
             if (!arguments.length) {
-                return hasSingleTestHighlight;
+                return hasSingleRowHighlight;
             }
-            hasSingleTestHighlight = _x;
+            hasSingleRowHighlight = _x;
 
             return this;
         }
@@ -953,24 +946,24 @@ define(function(require) {
         };
 
         /**
-         * Gets or Sets the highlightTestFunction function. The callback passed to
-         * this function returns a test selection from the test chart. Use this function
-         * if you want to apply a custom behavior to the highlighted test on hover.
-         * When hasSingleTestHighlight is true the highlighted test will be the
-         * one that was hovered by the user. When hasSingleTestHighlight is false
-         * the highlighted tests are all the tests but the hovered one. The default
-         * highlight effect on a test is darkening the highlighted test(s) color.
-         * @param  {Function} _x        Desired operation operation on a hovered test passed through callback
-         * @return {highlightTestFunction | module} Is highlightTestFunction used or Chart module to chain calls
+         * Gets or Sets the highlightRowFunction function. The callback passed to
+         * this function returns a row selection from the row chart. Use this function
+         * if you want to apply a custom behavior to the highlighted row on hover.
+         * When hasSingleRowHighlight is true the highlighted row will be the
+         * one that was hovered by the user. When hasSingleRowHighlight is false
+         * the highlighted rows are all the rows but the hovered one. The default
+         * highlight effect on a row is darkening the highlighted row(s) color.
+         * @param  {Function} _x        Desired operation operation on a hovered row passed through callback
+         * @return {highlightRowFunction | module} Is highlightRowFunction used or Chart module to chain calls
          * @public
-         * @example testChart.highlightTestFunction(test => test.attr('fill', 'blue'))
-         * testChart.highlightTestFunction(null) // will disable the default highlight effect
+         * @example rowChart.highlightRowFunction(row => row.attr('fill', 'blue'))
+         * rowChart.highlightRowFunction(null) // will disable the default highlight effect
          */
-        exports.highlightTestFunction = function(_x) {
+        exports.highlightRowFunction = function(_x) {
             if (!arguments.length) {
-                return highlightTestFunction;
+                return highlightRowFunction;
             }
-            highlightTestFunction = _x;
+            highlightRowFunction = _x;
 
             return this;
         }
@@ -1008,8 +1001,8 @@ define(function(require) {
         };
 
         /**
-         * Offset between end of test and start of the percentage tests
-         * @param  {number} [_x=7] margin offset from end of test
+         * Offset between end of row and start of the percentage rows
+         * @param  {number} [_x=7] margin offset from end of row
          * @return {number | module}    Current offset or Chart module to chain calls
          * @public
          */
@@ -1024,17 +1017,11 @@ define(function(require) {
 
         /**
          * Gets or Sets the labels number format
-         * @param  {string} [_x=",f"] desired label number format for the test chart
+         * @param  {string} [_x=",f"] desired label number format for the row chart
          * @return {string | module} Current labelsNumberFormat or Chart module to chain calls
          * @public
          */
         exports.labelsNumberFormat = function(_x) {
-
-            console.log('labels');
-
-            console.log(_x);
-
-            console.log(arguments);
 
             if (!arguments.length) {
                 return labelsNumberFormat;
@@ -1118,8 +1105,8 @@ define(function(require) {
         };
 
         /**
-         * Gets or Sets the number format of the test chart
-         * @param  {string} _x Desired number format for the test chart
+         * Gets or Sets the number format of the row chart
+         * @param  {string} _x Desired number format for the row chart
          * @return {numberFormat | module} Current numberFormat or Chart module to chain calls
          * @public
          */
@@ -1137,7 +1124,7 @@ define(function(require) {
          * We are going to expose this events:
          * customMouseOver, customMouseMove, customMouseOut, and customClick
          *
-         * @return {module} Test Chart
+         * @return {module} Row Chart
          * @public
          */
         exports.on = function() {

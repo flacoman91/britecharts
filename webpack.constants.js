@@ -2,7 +2,7 @@ const path = require('path');
 
 exports.CHARTS = {
     bar: './src/charts/bar.js',
-    test: './src/charts/test.js',
+    row: './src/charts/row.js',
     donut: './src/charts/donut.js',
     legend: './src/charts/legend.js',
     line: './src/charts/line.js',
@@ -22,7 +22,7 @@ exports.CHARTS = {
 };
 
 exports.DEMOS = {
-    'demo-test': './demos/src/demo-test.js',
+    'demo-row': './demos/src/demo-row.js',
     'demo-line': './demos/src/demo-line.js',
     'demo-stacked-area': './demos/src/demo-stacked-area.js',
     'demo-bar': './demos/src/demo-bar.js',
