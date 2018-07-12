@@ -145,7 +145,7 @@ define(function(require) {
             _labelsFormatValue = ( { value, pctOfSet } ) => {
                 let pctLabel = '';
                 if(pctOfSet){
-                    pctLabel = "  | " + pctOfSet;
+                    pctLabel = "  | " + pctOfSet + '%';
                 }
                 return d3Format.format( labelsNumberFormat )( value ) + ' ' + labelsSuffix + pctLabel;
             },
