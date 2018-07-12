@@ -126,12 +126,11 @@ define(function(require){
                 bottom: 0,
                 right: 0
             },
-            maxBarNumber = 8,
             barOpacity = 0.24,
 
             animationDelayStep = 20,
-            animationDelays = d3Array.range(animationDelayStep, maxBarNumber* animationDelayStep, animationDelayStep),
             animationDuration = 1000,
+            animationDelays,
 
             grid = null,
 
@@ -570,6 +569,8 @@ define(function(require){
             }
 
             let series = svg.select('.chart-group').selectAll('.layer')
+
+            animationDelays = d3Array.range(animationDelayStep, (layers[0].length + 1) * animationDelayStep, animationDelayStep)
 
             if (isHorizontal) {
                 drawHorizontalBars(series)
