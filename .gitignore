@@ -38,5 +38,4 @@ node_modules
 # Demos
 demos/build
 
-dist
 docs
