@@ -91,6 +91,7 @@ define(function(require) {
             percentageAxisToMaxRatio = 1,
             numberFormat = NUMBER_FORMAT,
             enableLabels = false,
+            enableYAxisRight = false,
             labelsMargin = 7,
             labelsNumberFormat = NUMBER_FORMAT,
             labelsSuffix = '',
@@ -197,11 +198,13 @@ define(function(require) {
                 yAxis = d3Axis.axisLeft(yScale);
 
                 //uncomment to show the right labels with arrows
-                // yAxis2 = d3Axis.axisRight(yScale2)
-                //     .ticks(yTicks, numberFormat)
-                //     .tickFormat(function(d, i) {
-                //         return d + '%';
-                //     });
+                if(enableYAxisRight) {
+                    yAxis2 = d3Axis.axisRight(yScale2)
+                        .ticks(yTicks, numberFormat)
+                        .tickFormat(function(d, i) {
+                            return d + '%';
+                        });
+                }
             } else {
                 xAxis = d3Axis.axisBottom(xScale);
 
@@ -423,43 +426,43 @@ define(function(require) {
             svg.select('.y-axis-group.axis')
                 .call(yAxis);
 
-            if (isHorizontal) {
+            if (isHorizontal && enableYAxisRight) {
                 // adding the right Y axis labels,
-                // svg.select( '.y-axis-group.axis-right' )
-                //     .attr('transform', `translate(${ 5 + chartWidth}, 0)`)
-                //     .call( yAxis2 );
+                svg.select( '.y-axis-group.axis-right' )
+                    .attr('transform', `translate(${ 5 + chartWidth}, 0)`)
+                    .call( yAxis2 );
 
                 // shift the labels over to the right a bit
                 // UNCOMMENT this for the percentages
 
-                // svg.selectAll( '.y-axis-group.axis-right .tick text' )
-                //     .attr( 'transform', `translate(5, 0)` )
-                //     .attr('fill-opacity', function(d){
-                //         return isNaN(d) ? 0.0: 1.0;
-                //     })
-                //     .style( 'fill', ( d ) => {
-                //         return d > 0 ? 'green' : 'red';
-                //     });
+                svg.selectAll( '.y-axis-group.axis-right .tick text' )
+                    .attr( 'transform', `translate(5, 0)` )
+                    .attr('fill-opacity', function(d){
+                        return isNaN(d) ? 0.0: 1.0;
+                    })
+                    .style( 'fill', ( d ) => {
+                        return d > 0 ? 'green' : 'red';
+                    });
 
-                // svg.selectAll('.y-axis-group.axis-right .tick')
-                //     .append('polygon')
-                //     .attr( 'transform', function(d) {
-                //         // just hide the percentages if the number is bogus
-                //         return d > 0 ? 'translate(-2, 3)' : 'translate(-2, -3)';
-                //     })
-                //     .attr('points', function(d) {
-                //         return d > 0 ? '0,0 6,-9 12,0' : '0,0 6,9 12,0';
-                //     })
-                //     .style('fill', ( d ) => {
-                //         return d > 0 ? '#20aa3f' : '#D14124';
-                //     })
-                //     .attr('class', function(d){
-                //         return d > 0 ? 'down' : 'up';
-                //     })
-                //     .attr('fill-opacity', function(d){
-                //         console.log(d);
-                //         return isNaN(d) ? 0.0: 1.0;
-                //     });
+                svg.selectAll('.y-axis-group.axis-right .tick')
+                    .append('polygon')
+                    .attr( 'transform', function(d) {
+                        // just hide the percentages if the number is bogus
+                        return d > 0 ? 'translate(-2, 3)' : 'translate(-2, -3)';
+                    })
+                    .attr('points', function(d) {
+                        return d > 0 ? '0,0 6,-9 12,0' : '0,0 6,9 12,0';
+                    })
+                    .style('fill', ( d ) => {
+                        return d > 0 ? '#20aa3f' : '#D14124';
+                    })
+                    .attr('class', function(d){
+                        return d > 0 ? 'down' : 'up';
+                    })
+                    .attr('fill-opacity', function(d){
+                        console.log(d);
+                        return isNaN(d) ? 0.0: 1.0;
+                    });
             }
 
             svg.selectAll('.y-axis-group.axis .tick text')
@@ -885,6 +888,21 @@ define(function(require) {
                 return enableLabels;
             }
             enableLabels = _x;
+
+            return this;
+        };
+
+        /**
+         * If true, adds right axis with the delta change
+         * @param  {Boolean} [_x=false]
+         * @return {Boolean | module}    Current value of enableYAxisRight or Chart module to chain calls
+         * @public
+         */
+        exports.enableYAxisRight = function(_x) {
+            if (!arguments.length) {
+                return enableYAxisRight;
+            }
+            enableYAxisRight = _x;
 
             return this;
         };

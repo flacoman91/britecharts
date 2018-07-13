@@ -51,6 +51,7 @@ function createHorizontalRowChart() {
                 top: 20,
                 bottom: 30
             })
+            .enableYAxisRight(true)
             .enableLabels(true)
             .labelsNumberFormat(',d')
             .labelsSuffix('complaints')
