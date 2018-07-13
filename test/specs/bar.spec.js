@@ -567,12 +567,12 @@ define(['d3', 'bar', 'barChartDataBuilder'], function(d3, chart, dataBuilder) {
 
             it('should override the default values', () => {
                 let previous = barChart.margin(),
-                expected = {
-                    ...previous,
-                    top: 10,
-                    right: 20
-                },
-                actual;
+                    expected = {
+                        ...previous,
+                        top: 10,
+                        right: 20
+                    },
+                    actual;
 
                 barChart.width(expected);
                 actual = barChart.width();

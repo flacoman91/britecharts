@@ -203,8 +203,8 @@ define(function(require) {
         function buildContainerGroups() {
             let container = svg
                 .append('g')
-                  .classed('container-group', true)
-                  .attr('transform', `translate(${margin.left + yAxisPaddingBetweenChart}, ${margin.top})`);
+                .classed('container-group', true)
+                .attr('transform', `translate(${margin.left + yAxisPaddingBetweenChart}, ${margin.top})`);
 
             container
                 .append('g').classed('grid-lines-group', true);
@@ -212,15 +212,15 @@ define(function(require) {
                 .append('g').classed('chart-group', true);
             container
                 .append('g')
-                  .classed('x-axis-group axis', true)
+                .classed('x-axis-group axis', true)
                 .append('g')
-                  .classed('x-axis-label', true);
+                .classed('x-axis-label', true);
             container
                 .append('g')
-                   .attr('transform', `translate(${-1 * (yAxisPaddingBetweenChart)}, 0)`)
-                   .classed('y-axis-group axis', true)
+                .attr('transform', `translate(${-1 * (yAxisPaddingBetweenChart)}, 0)`)
+                .classed('y-axis-group axis', true)
                 .append('g')
-                    .classed('y-axis-label', true);
+                .classed('y-axis-label', true);
             container
                 .append('g').classed('metadata-group', true);
         }
@@ -233,7 +233,7 @@ define(function(require) {
         function buildGradient() {
             if (!chartGradientEl && chartGradientColors) {
                 chartGradientEl = svg.select('.metadata-group')
-                  .append('linearGradient')
+                    .append('linearGradient')
                     .attr('id', chartGradientId)
                     .attr('x1', '0%')
                     .attr('y1', '0%')
@@ -241,14 +241,14 @@ define(function(require) {
                     .attr('y2', '100%')
                     .attr('gradientUnits', 'userSpaceOnUse')
                     .selectAll('stop')
-                     .data([
+                    .data([
                         {offset:'0%', color: chartGradientColors[0]},
                         {offset:'50%', color: chartGradientColors[1]}
                     ])
                     .enter()
-                      .append('stop')
-                        .attr('offset', ({offset}) => offset)
-                        .attr('stop-color', ({color}) => color)
+                    .append('stop')
+                    .attr('offset', ({offset}) => offset)
+                    .attr('stop-color', ({color}) => color)
             }
         }
 
@@ -281,17 +281,17 @@ define(function(require) {
 
             if (shouldReverseColorList) {
                 colorList = data.map(d => d)
-                                .reverse()
-                                .map(({name}, i) => ({
-                                        name,
-                                        color: colorSchema[i % colorSchema.length]}
-                                    ));
+                    .reverse()
+                    .map(({name}, i) => ({
+                            name,
+                            color: colorSchema[i % colorSchema.length]}
+                    ));
             } else {
                 colorList = data.map(d => d)
-                                .map(({name}, i) => ({
-                                        name,
-                                        color: colorSchema[i % colorSchema.length]}
-                                    ));
+                    .map(({name}, i) => ({
+                            name,
+                            color: colorSchema[i % colorSchema.length]}
+                    ));
             }
 
             colorMap = (item) => colorList.filter(({name}) => name === item)[0].color;
@@ -306,7 +306,7 @@ define(function(require) {
             if (!svg) {
                 svg = d3Selection.select(container)
                     .append('svg')
-                      .classed('britechart bar-chart', true);
+                    .classed('britechart bar-chart', true);
 
                 buildContainerGroups();
             }
@@ -407,7 +407,7 @@ define(function(require) {
                     yAxisLabelEl.remove();
                 }
                 yAxisLabelEl = svg.select('.y-axis-label')
-                  .append('text')
+                    .append('text')
                     .classed('y-axis-label-text', true)
                     .attr('x', -chartHeight / 2)
                     .attr('y', yAxisLabelOffset)
@@ -421,7 +421,7 @@ define(function(require) {
                     xAxisLabelEl.remove();
                 }
                 xAxisLabelEl = svg.select('.x-axis-label')
-                  .append('text')
+                    .append('text')
                     .attr('y', xAxisLabelOffset)
                     .attr('text-anchor', 'middle')
                     .classed('x-axis-label-text', true)
@@ -438,7 +438,7 @@ define(function(require) {
         function drawHorizontalBars(bars) {
             // Enter + Update
             bars.enter()
-              .append('rect')
+                .append('rect')
                 .classed('bar', true)
                 .attr('y', chartHeight)
                 .attr('x', 0)
@@ -456,7 +456,7 @@ define(function(require) {
                 .on('click', function(d) {
                     handleClick(this, d, chartWidth, chartHeight);
                 })
-              .merge(bars)
+                .merge(bars)
                 .attr('x', 0)
                 .attr('y', ({name}) => yScale(name))
                 .attr('height', yScale.bandwidth())
@@ -472,7 +472,7 @@ define(function(require) {
         function drawAnimatedHorizontalBars(bars) {
             // Enter + Update
             bars.enter()
-              .append('rect')
+                .append('rect')
                 .classed('bar', true)
                 .attr('x', 0)
                 .attr('y', chartHeight)
@@ -511,7 +511,7 @@ define(function(require) {
         function drawAnimatedVerticalBars(bars) {
             // Enter + Update
             bars.enter()
-              .append('rect')
+                .append('rect')
                 .classed('bar', true)
                 .attr('x', chartWidth)
                 .attr('y', ({value}) => yScale(value))
@@ -529,7 +529,7 @@ define(function(require) {
                 .on('click', function(d) {
                     handleClick(this, d, chartWidth, chartHeight);
                 })
-              .merge(bars)
+                .merge(bars)
                 .attr('x', ({name}) => xScale(name))
                 .attr('width', xScale.bandwidth())
                 .attr('fill', ({name}) => computeColor(name))
@@ -549,7 +549,7 @@ define(function(require) {
         function drawVerticalBars(bars) {
             // Enter + Update
             bars.enter()
-              .append('rect')
+                .append('rect')
                 .classed('bar', true)
                 .attr('x', chartWidth)
                 .attr('y', ({value}) => yScale(value))
@@ -567,7 +567,7 @@ define(function(require) {
                 .on('click', function(d) {
                     handleClick(this, d, chartWidth, chartHeight);
                 })
-              .merge(bars)
+                .merge(bars)
                 .attr('x', ({name}) => xScale(name))
                 .attr('y', ({value}) => yScale(value))
                 .attr('width', xScale.bandwidth())
@@ -590,12 +590,12 @@ define(function(require) {
             }
 
             labelEl = svg.select('.metadata-group')
-              .append('g')
+                .append('g')
                 .classed('percentage-label-group', true)
                 .selectAll('text')
                 .data(data.reverse())
                 .enter()
-              .append('text');
+                .append('text');
 
             labelEl
                 .classed('percentage-label', true)
@@ -673,12 +673,12 @@ define(function(require) {
                 .selectAll('line.vertical-grid-line')
                 .data(xScale.ticks(4))
                 .enter()
-                  .append('line')
-                    .attr('class', 'vertical-grid-line')
-                    .attr('y1', (xAxisPadding.left))
-                    .attr('y2', chartHeight)
-                    .attr('x1', (d) => xScale(d))
-                    .attr('x2', (d) => xScale(d))
+                .append('line')
+                .attr('class', 'vertical-grid-line')
+                .attr('y1', (xAxisPadding.left))
+                .attr('y2', chartHeight)
+                .attr('x1', (d) => xScale(d))
+                .attr('x2', (d) => xScale(d))
 
             drawVerticalExtendedLine();
         }
@@ -692,12 +692,12 @@ define(function(require) {
                 .selectAll('line.extended-y-line')
                 .data([0])
                 .enter()
-                  .append('line')
-                    .attr('class', 'extended-y-line')
-                    .attr('y1', (xAxisPadding.bottom))
-                    .attr('y2', chartHeight)
-                    .attr('x1', 0)
-                    .attr('x2', 0);
+                .append('line')
+                .attr('class', 'extended-y-line')
+                .attr('y1', (xAxisPadding.bottom))
+                .attr('y2', chartHeight)
+                .attr('x1', 0)
+                .attr('x2', 0);
         }
 
         /**
@@ -709,12 +709,12 @@ define(function(require) {
                 .selectAll('line.horizontal-grid-line')
                 .data(yScale.ticks(4))
                 .enter()
-                  .append('line')
-                    .attr('class', 'horizontal-grid-line')
-                    .attr('x1', (xAxisPadding.left))
-                    .attr('x2', chartWidth)
-                    .attr('y1', (d) => yScale(d))
-                    .attr('y2', (d) => yScale(d))
+                .append('line')
+                .attr('class', 'horizontal-grid-line')
+                .attr('x1', (xAxisPadding.left))
+                .attr('x2', chartWidth)
+                .attr('y1', (d) => yScale(d))
+                .attr('y2', (d) => yScale(d))
 
             drawHorizontalExtendedLine();
         }
@@ -728,12 +728,12 @@ define(function(require) {
                 .selectAll('line.extended-x-line')
                 .data([0])
                 .enter()
-                  .append('line')
-                    .attr('class', 'extended-x-line')
-                    .attr('x1', (xAxisPadding.left))
-                    .attr('x2', chartWidth)
-                    .attr('y1', chartHeight)
-                    .attr('y2', chartHeight);
+                .append('line')
+                .attr('class', 'extended-x-line')
+                .attr('x1', (xAxisPadding.left))
+                .attr('x2', chartWidth)
+                .attr('y1', chartHeight)
+                .attr('y2', chartHeight);
         }
 
         /**
