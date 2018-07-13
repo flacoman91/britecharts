@@ -127,8 +127,8 @@ define(['d3', 'row', 'rowChartDataBuilder'], function(d3, chart, dataBuilder) {
 
             it('should darken the original color of the hovered row', () => {
                 let expectedHasRowHighlight = true;
-                let expectedColor = '#7bdcc0';
-                let expectedHoverColor = 'rgb(86, 154, 134)';
+                let expectedColor = '#20aa3f';
+                let expectedHoverColor = 'rgb(22, 119, 44)';
 
                 let actualHasHover = rowChart.hasSingleRowHighlight();
                 let row = containerFixture.selectAll('.row:nth-child(1)');
@@ -145,7 +145,7 @@ define(['d3', 'row', 'rowChartDataBuilder'], function(d3, chart, dataBuilder) {
 
             it('should keep the same hover color of the hovered row', () => {
                 let expectedHasRowHighlight = false;
-                let expectedColor = '#7bdcc0';
+                let expectedColor = '#20aa3f';
 
                 rowChart.hasSingleRowHighlight(false);
                 let actualHasHover = rowChart.hasSingleRowHighlight();
@@ -248,18 +248,6 @@ define(['d3', 'row', 'rowChartDataBuilder'], function(d3, chart, dataBuilder) {
 
                 rowChart.enableLabels(expected);
                 actual = rowChart.enableLabels();
-
-                expect(previous).not.toBe(actual);
-                expect(actual).toBe(expected);
-            });
-
-            it('should provide enable yAxisRight getter and setter', () => {
-                let previous = rowChart.enableYAxisRight(),
-                    expected = true,
-                    actual;
-
-                rowChart.enableYAxisRight(expected);
-                actual = rowChart.enableYAxisRight();
 
                 expect(previous).not.toBe(actual);
                 expect(actual).toBe(expected);
@@ -508,54 +496,6 @@ define(['d3', 'row', 'rowChartDataBuilder'], function(d3, chart, dataBuilder) {
                 expect(previous).not.toBe(expected);
                 expect(actual).toBe(expected);
             });
-
-            it('should provide xAxisLabel getter and setter', () => {
-                let defaultXAxisLabel = 'World',
-                    testXAxisLabel = 'Hello',
-                    newXAxisLabel;
-
-                rowChart.xAxisLabel(testXAxisLabel);
-                newXAxisLabel = rowChart.xAxisLabel();
-
-                expect(defaultXAxisLabel).not.toBe(newXAxisLabel);
-                expect(newXAxisLabel).toBe(testXAxisLabel);
-            });
-
-            it('should provide xAxisLabelOffset getter and setter', () => {
-                let defaultXAxisLabelOffset = 30,
-                    testXAxisLabelOffset = 40,
-                    newXAxisLabelOffset;
-
-                rowChart.xAxisLabelOffset(testXAxisLabelOffset);
-                newXAxisLabelOffset = rowChart.xAxisLabelOffset();
-
-                expect(defaultXAxisLabelOffset).not.toBe(newXAxisLabelOffset);
-                expect(newXAxisLabelOffset).toBe(testXAxisLabelOffset);
-            });
-
-            it('should provide yAxisLabel getter and setter', () => {
-                let defaultYAxisLabel = 'Hello',
-                    testYAxisLabel = 'World',
-                    newYAxisLabel;
-
-                rowChart.yAxisLabel(testYAxisLabel);
-                newYAxisLabel = rowChart.yAxisLabel();
-
-                expect(defaultYAxisLabel).not.toBe(newYAxisLabel);
-                expect(newYAxisLabel).toBe(testYAxisLabel);
-            });
-
-            it('should provide yAxisLabelOffset getter and setter', () => {
-                let defaultYAxisLabelOffset = -40,
-                    testYAxisLabelOffset = -30,
-                    newYAxisLabelOffset;
-
-                rowChart.yAxisLabelOffset(testYAxisLabelOffset);
-                newYAxisLabelOffset = rowChart.yAxisLabelOffset();
-
-                expect(defaultYAxisLabelOffset).not.toBe(newYAxisLabelOffset);
-                expect(newYAxisLabelOffset).toBe(testYAxisLabelOffset);
-            });
         });
 
         describe('when custom gradient color schem is applied', () => {
@@ -579,12 +519,12 @@ define(['d3', 'row', 'rowChartDataBuilder'], function(d3, chart, dataBuilder) {
 
             it('should override the default values', () => {
                 let previous = rowChart.margin(),
-                expected = {
-                    ...previous,
-                    top: 10,
-                    right: 20
-                },
-                actual;
+                    expected = {
+                        ...previous,
+                        top: 10,
+                        right: 20
+                    },
+                    actual;
 
                 rowChart.width(expected);
                 actual = rowChart.width();
@@ -605,43 +545,6 @@ define(['d3', 'row', 'rowChartDataBuilder'], function(d3, chart, dataBuilder) {
 
                 expect(callbackSpy.calls.count()).toBe(1);
                 expect(callbackSpy.calls.allArgs()[0].length).toBe(3);
-            });
-        });
-
-        describe('Row axis labels', () => {
-
-            it('should show custom x axis label and offset', () => {
-                let expectedValue = 'labelValue';
-                let expectedOffset = 20;
-
-                rowChart
-                    .xAxisLabel(expectedValue)
-                    .xAxisLabelOffset(expectedOffset);
-                containerFixture.datum(dataset).call(rowChart);
-
-                let selection = containerFixture.select('.x-axis-label-text');
-                let actualValue = selection.text();
-                let actualOffset = Number(selection.attr('y'));
-
-                expect(actualValue).toBe(expectedValue);
-                expect(actualOffset).toBe(expectedOffset);
-            });
-
-            it('should show custom y axis label and offset', () => {
-                let expectedValue = 'labelValue';
-                let expectedOffset = 20;
-
-                rowChart
-                    .yAxisLabel(expectedValue)
-                    .yAxisLabelOffset(expectedOffset);
-                containerFixture.datum(dataset).call(rowChart);
-
-                let selection = containerFixture.select('.y-axis-label-text');
-                let actualValue = selection.text();
-                let actualOffset = Number(selection.attr('y'));
-
-                expect(actualValue).toBe(expectedValue);
-                expect(actualOffset).toBe(expectedOffset);
             });
         });
 
