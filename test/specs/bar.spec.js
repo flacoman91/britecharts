@@ -127,8 +127,8 @@ define(['d3', 'bar', 'barChartDataBuilder'], function(d3, chart, dataBuilder) {
 
             it('should darken the original color of the hovered bar', () => {
                 let expectedHasBarHighlight = true;
-                let expectedColor = '#7bdcc0';
-                let expectedHoverColor = 'rgb(86, 154, 134)';
+                let expectedColor = '#20aa3f';
+                let expectedHoverColor = 'rgb(22, 119, 44)';
 
                 let actualHasHover = barChart.hasSingleBarHighlight();
                 let bar = containerFixture.selectAll('.bar:nth-child(1)');
@@ -145,7 +145,7 @@ define(['d3', 'bar', 'barChartDataBuilder'], function(d3, chart, dataBuilder) {
 
             it('should keep the same hover color of the hovered bar', () => {
                 let expectedHasBarHighlight = false;
-                let expectedColor = '#7bdcc0';
+                let expectedColor = '#20aa3f';
 
                 barChart.hasSingleBarHighlight(false);
                 let actualHasHover = barChart.hasSingleBarHighlight();
