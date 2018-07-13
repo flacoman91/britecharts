@@ -253,6 +253,18 @@ define(['d3', 'row', 'rowChartDataBuilder'], function(d3, chart, dataBuilder) {
                 expect(actual).toBe(expected);
             });
 
+            it('should provide enable Y axis right getter and setter', () => {
+                let previous = rowChart.enableYAxisRight(),
+                    expected = true,
+                    actual;
+
+                rowChart.enableYAxisRight(expected);
+                actual = rowChart.enableYAxisRight();
+
+                expect(previous).not.toBe(actual);
+                expect(actual).toBe(expected);
+            });
+
             it('should have exportChart defined', () => {
                 expect(rowChart.exportChart).toBeDefined();
             });
