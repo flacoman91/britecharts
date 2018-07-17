@@ -429,15 +429,17 @@ define(function(require) {
             if (isHorizontal && enableYAxisRight) {
                 // adding the right Y axis labels,
                 svg.select( '.y-axis-group.axis-right' )
-                    .attr('transform', `translate(${ 5 + chartWidth}, 0)`)
+                    .attr('transform', `translate(${chartWidth}, 0)`)
                     .call( yAxis2 );
 
                 // shift the labels over to the right a bit
                 // UNCOMMENT this for the percentages
 
                 svg.selectAll( '.y-axis-group.axis-right .tick text' )
-                    .attr( 'transform', `translate(5, 0)` )
-                    .attr('fill-opacity', function(d){
+                    .attr( 'transform', function(d) {
+                        return d > 0 ? 'translate(3, 0)' : 'translate(0, 0)';
+                    })
+                    .attr('fill-opacity', function(d) {
                         return isNaN(d) ? 0.0: 1.0;
                     })
                     .style( 'fill', ( d ) => {
@@ -448,10 +450,10 @@ define(function(require) {
                     .append('polygon')
                     .attr( 'transform', function(d) {
                         // just hide the percentages if the number is bogus
-                        return d > 0 ? 'translate(-2, 3)' : 'translate(-2, -3)';
+                        return d > 0 ? 'translate(40, -8)' : 'translate(50, 8)';
                     })
                     .attr('points', function(d) {
-                        return d > 0 ? '0,0 6,-9 12,0' : '0,0 6,9 12,0';
+                        return d > 0 ? '2,8 2,13 8,13 8,8 10,8 5,0 0,8' : '-2,-8 -2,-13 -8,-13 -8,-8 -10,-8 -5,0 0,-8';
                     })
                     .style('fill', ( d ) => {
                         return d > 0 ? '#20aa3f' : '#D14124';

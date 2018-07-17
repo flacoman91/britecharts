@@ -12,10 +12,3 @@
 .js-horizontal-test-chart-container .test-chart .vertical-grid-line,
 .js-horizontal-test-chart-container .test-chart .horizontal-grid-line {
   display: none; }
-
-.js-horizontal-test-chart-container .test-chart .tooltip-group text {
-  fill: #ffffff !important; }
-
-.js-horizontal-test-chart-container .test-chart .tooltip-group rect {
-  fill: #43484e !important;
-  stroke: #43484e !important; }
