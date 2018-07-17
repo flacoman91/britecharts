@@ -222,7 +222,7 @@ define(function(require) {
             let container = svg
                 .append('g')
                   .classed('container-group', true)
-                  .attr('transform', `translate(${margin.left + yAxisPaddingBetweenChart}, ${margin.top})`);
+                  .attr('transform', `translate(${margin.left + yAxisPaddingBetweenChart}, ${margin.top-2})`);
 
             container
                 .append('g').classed('grid-lines-group', true);
@@ -437,7 +437,7 @@ define(function(require) {
 
                 svg.selectAll( '.y-axis-group.axis-right .tick text' )
                     .attr( 'transform', function(d) {
-                        return d > 0 ? 'translate(3, 0)' : 'translate(0, 0)';
+                        return d > 0 ? 'translate(-3, 0)' : 'translate(-5, 0)';
                     })
                     .attr('fill-opacity', function(d) {
                         return isNaN(d) ? 0.0: 1.0;
@@ -449,8 +449,8 @@ define(function(require) {
                 svg.selectAll('.y-axis-group.axis-right .tick')
                     .append('polygon')
                     .attr( 'transform', function(d) {
-                        // just hide the percentages if the number is bogus
-                        return d > 0 ? 'translate(40, -8)' : 'translate(50, 8)';
+
+                        return d > 0 ? 'translate(42, -8)' : 'translate(52, 8)';
                     })
                     .attr('points', function(d) {
                         return d > 0 ? '2,8 2,13 8,13 8,8 10,8 5,0 0,8' : '-2,-8 -2,-13 -8,-13 -8,-8 -10,-8 -5,0 0,-8';
@@ -461,6 +461,7 @@ define(function(require) {
                     .attr('class', function(d){
                         return d > 0 ? 'down' : 'up';
                     })
+                    // just hide the percentages if the number is bogus
                     .attr('fill-opacity', function(d){
                         console.log(d);
                         return isNaN(d) ? 0.0: 1.0;
