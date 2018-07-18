@@ -203,7 +203,8 @@ define(function(require) {
                         .ticks(yTicks, numberFormat)
                         .tickFormat(function(d, i) {
                             return d + '%';
-                        });
+                        })
+                        .tickSizeOuter(0);
                 }
             } else {
                 xAxis = d3Axis.axisBottom(xScale);
