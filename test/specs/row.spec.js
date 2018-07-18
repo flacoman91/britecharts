@@ -201,6 +201,30 @@ define(['d3', 'row', 'rowChartDataBuilder'], function(d3, chart, dataBuilder) {
 
         describe('API', function() {
 
+            it('should provide backgroundColor getter and setter', () => {
+                let previous = rowChart.backgroundColor(),
+                    expected = '#bebebe',
+                    actual;
+
+                rowChart.backgroundColor(expected);
+                actual = rowChart.colorSchema();
+
+                expect(previous).not.toBe(actual);
+                expect(actual).toBe(expected);
+            });
+
+            it('should provide backgroundWidth getter and setter', () => {
+                let previous = rowChart.backgroundWidth(),
+                    expected = 99,
+                    actual;
+
+                rowChart.backgroundWidth(expected);
+                actual = rowChart.backgroundWidth();
+
+                expect(previous).not.toBe(actual);
+                expect(actual).toBe(expected);
+            });
+
             it('should provide colorSchema getter and setter', () => {
                 let previous = rowChart.colorSchema(),
                     expected = ['#FFFFFF'],

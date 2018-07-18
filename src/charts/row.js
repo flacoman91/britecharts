@@ -114,6 +114,8 @@ define(function(require) {
             ease = d3Ease.easeQuadInOut,
             animationDuration = 800,
             animationStepRatio = 70,
+            backgroundColor = '#bebebe',
+            backgroundWidth = 70,
             interRowDelay = (d, i) => animationStepRatio * i,
 
             highlightRowFunction = (rowSelection) => rowSelection.attr('fill', ({name}) => d3Color.color(colorMap(name)).darker()),
@@ -568,12 +570,12 @@ define(function(require) {
                     .attr('x', 0)
                     .attr('y', ({name}) => yScale(name))
                     .attr('height', yScale.bandwidth())
-                    .attr('fill', '#bebebe')
+                    .attr('fill', backgroundColor)
                     .transition()
                     .duration(animationDuration)
                     .delay(interRowDelay)
                     .ease(ease)
-                    .attr('width', '70%');
+                    .attr('width', backgroundWidth + '%');
             } else {
 
                 rows
@@ -886,6 +888,38 @@ define(function(require) {
         }
 
         // API
+
+        /**
+         * Gets or Sets the background color of a row in the chart, num in
+         * percentage
+         * @param  {string} _x desired color of the bar bg in hex
+         * @return {string} current color
+         * @public
+         */
+        exports.backgroundColor = function(_x) {
+            if (!arguments.length) {
+                return backgroundColor;
+            }
+            backgroundColor = _x;
+
+            return this;
+        }
+
+        /**
+         * Gets or Sets the background width of a row in the chart, num in
+         * percentage
+         * @param  {integer} _x desired width percentage
+         * @return {integer} current percentage
+         * @public
+         */
+        exports.backgroundWidth = function(_x) {
+            if (!arguments.length) {
+                return backgroundWidth;
+            }
+            backgroundWidth = _x;
+
+            return this;
+        }
 
         /**
          * Gets or Sets the gradient colors of a row in the chart
