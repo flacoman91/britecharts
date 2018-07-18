@@ -483,32 +483,53 @@ define(function(require) {
          * @return {void}
          */
         function drawHorizontalRows(rows, bg) {
-            // Enter + Update
-            rows.enter()
-              .append('rect')
-                .classed('row', true)
-                .attr('y', chartHeight)
-                .attr('x', 0)
-                .attr('height', yScale.bandwidth())
-                .attr('width', ({value}) => xScale(value))
-                .on('mouseover', function(d, index, rowList) {
-                    handleMouseOver(this, d, rowList, chartWidth, chartHeight);
-                })
-                .on('mousemove', function(d) {
-                    handleMouseMove(this, d, chartWidth, chartHeight);
-                })
-                .on('mouseout', function(d, index, rowList) {
-                    handleMouseOut(this, d, rowList, chartWidth, chartHeight);
-                })
-                .on('click', function(d) {
-                    handleClick(this, d, chartWidth, chartHeight);
-                })
-              .merge(rows)
-                .attr('x', 0)
-                .attr('y', ({name}) => yScale(name))
-                .attr('height', yScale.bandwidth())
-                .attr('width', ({value}) => xScale(value))
-                .attr('fill', ({name}) => computeColor(name));
+            if (bg) {
+                // Enter + Update
+                rows.enter()
+                    .append( 'rect' )
+                    .classed( 'row', true )
+                    .attr( 'y', chartHeight )
+                    .attr( 'x', 0 )
+                    .attr( 'height', yScale.bandwidth() )
+                    .attr( 'width', ( { value } ) => xScale( value ) )
+                    .on( 'click', function( d ) {
+                        handleClick( this, d, chartWidth, chartHeight );
+                    } )
+                    .merge( rows )
+                    .attr( 'x', 0 )
+                    .attr( 'y', ( { name } ) => yScale( name ) )
+                    .attr( 'height', yScale.bandwidth() )
+                    .attr( 'width', ( { value } ) => xScale( value ) )
+                    .attr( 'fill', ( { name } ) => computeColor( name ) );
+            }
+            else {
+                // Enter + Update
+                rows.enter()
+                    .append( 'rect' )
+                    .classed( 'row', true )
+                    .attr( 'y', chartHeight )
+                    .attr( 'x', 0 )
+                    .attr( 'height', yScale.bandwidth() )
+                    .attr( 'width', ( { value } ) => xScale( value ) )
+                    .on( 'mouseover', function( d, index, rowList ) {
+                        handleMouseOver( this, d, rowList, chartWidth, chartHeight );
+                    } )
+                    .on( 'mousemove', function( d ) {
+                        handleMouseMove( this, d, chartWidth, chartHeight );
+                    } )
+                    .on( 'mouseout', function( d, index, rowList ) {
+                        handleMouseOut( this, d, rowList, chartWidth, chartHeight );
+                    } )
+                    .on( 'click', function( d ) {
+                        handleClick( this, d, chartWidth, chartHeight );
+                    } )
+                    .merge( rows )
+                    .attr( 'x', 0 )
+                    .attr( 'y', ( { name } ) => yScale( name ) )
+                    .attr( 'height', yScale.bandwidth() )
+                    .attr( 'width', ( { value } ) => xScale( value ) )
+                    .attr( 'fill', ( { name } ) => computeColor( name ) );
+            }
         }
 
         /**
