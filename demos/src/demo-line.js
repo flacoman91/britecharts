@@ -262,7 +262,7 @@ function isInRange(d0, d1, d) {
 // Show charts if container available
 if (d3Selection.select('.js-line-chart-container').node()) {
     createLineChart();
-    //createBrushChart();
+    createBrushChart();
     createLineChartWithSingleLine();
     createLineChartWithFixedHeight();
     createLoadingState();
