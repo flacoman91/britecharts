@@ -64,7 +64,7 @@ function createHorizontalRowChart() {
             .height(250)
             .xTicks( 0 )
             .yTicks( 0 )
-            .percentageAxisToMaxRatio(1.3)
+            .percentageAxisToMaxRatio(1.5)
             .on('customMouseOver', tooltip.show)
             .on('customMouseMove', tooltip.update)
             .on('customMouseOut', tooltip.hide);

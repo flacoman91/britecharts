@@ -228,6 +228,9 @@ define(function(require) {
                 .append('g').classed('grid-lines-group', true);
 
             container
+                .append('g').classed('chart-group-background', true);
+
+            container
                 .append('g').classed('chart-group', true);
 
             // labels on the bottom
@@ -475,9 +478,10 @@ define(function(require) {
         /**
          * Draws the rows along the x axis
          * @param  {D3Selection} rows Selection of rows
+         * @param  {boolean} whether we are doing the background layer
          * @return {void}
          */
-        function drawHorizontalRows(rows) {
+        function drawHorizontalRows(rows, bg) {
             // Enter + Update
             rows.enter()
               .append('rect')
@@ -509,40 +513,58 @@ define(function(require) {
         /**
          * Draws and animates the rows along the x axis
          * @param  {D3Selection} rows Selection of rows
+         * @param  {boolean} whether we are doing the background layer
          * @return {void}
          */
-        function drawAnimatedHorizontalRows(rows) {
-            // Enter + Update
-            rows.enter()
-              .append('rect')
-                .classed('row', true)
-                .attr('x', 0)
-                .attr('y', chartHeight)
-                .attr('height', yScale.bandwidth())
-                .attr('width', ({value}) => xScale(value))
-                .on('mouseover', function(d, index, rowList) {
-                    handleMouseOver(this, d, rowList, chartWidth, chartHeight);
-                })
-                .on('mousemove', function(d) {
-                    handleMouseMove(this, d, chartWidth, chartHeight);
-                })
-                .on('mouseout', function(d, index, rowList) {
-                    handleMouseOut(this, d, rowList, chartWidth, chartHeight);
-                })
-                .on('click', function(d) {
-                    handleClick(this, d, chartWidth, chartHeight);
-                });
+        function drawAnimatedHorizontalRows(rows, bg) {
+            if(bg){
 
-            rows
-                .attr('x', 0)
-                .attr('y', ({name}) => yScale(name))
-                .attr('height', yScale.bandwidth())
-                .attr('fill', ({name}) => computeColor(name))
-                .transition()
-                .duration(animationDuration)
-                .delay(interRowDelay)
-                .ease(ease)
-                .attr('width', ({value}) => xScale(value));
+            } else {
+                // Enter + Update
+                rows.enter()
+                    .append( 'rect' )
+                    .classed( 'row', true )
+                    .attr( 'x', 0 )
+                    .attr( 'y', chartHeight )
+                    .attr( 'height', yScale.bandwidth() )
+                    .attr( 'width', ( { value } ) => xScale( value ) )
+                    .on( 'mouseover', function( d, index, rowList ) {
+                        handleMouseOver( this, d, rowList, chartWidth, chartHeight );
+                    } )
+                    .on( 'mousemove', function( d ) {
+                        handleMouseMove( this, d, chartWidth, chartHeight );
+                    } )
+                    .on( 'mouseout', function( d, index, rowList ) {
+                        handleMouseOut( this, d, rowList, chartWidth, chartHeight );
+                    } )
+                    .on( 'click', function( d ) {
+                        handleClick( this, d, chartWidth, chartHeight );
+                    } );
+            }
+            if(bg){
+                rows
+                    .attr('x', 0)
+                    .attr('y', ({name}) => yScale(name))
+                    .attr('height', yScale.bandwidth())
+                    .attr('fill', '#bebebe')
+                    .transition()
+                    .duration(animationDuration)
+                    .delay(interRowDelay)
+                    .ease(ease)
+                    .attr('width', '70%');
+            } else {
+
+                rows
+                    .attr( 'x', 0 )
+                    .attr( 'y', ( { name } ) => yScale( name ) )
+                    .attr( 'height', yScale.bandwidth() )
+                    .attr( 'fill', ( { name } ) => computeColor( name ) )
+                    .transition()
+                    .duration( animationDuration )
+                    .delay( interRowDelay )
+                    .ease( ease )
+                    .attr( 'width', ( { value } ) => xScale( value ) );
+            }
         }
 
         /**
@@ -654,22 +676,30 @@ define(function(require) {
          * @private
          */
         function drawRows() {
-            let rows;
+            let rows, rowsBg;
 
             if (isAnimated) {
                 rows = svg.select('.chart-group').selectAll('.row')
                     .data(dataZeroed);
 
+                rowsBg = svg.select('.chart-group-background').selectAll('.row')
+                    .data(dataZeroed);
+
                 if (isHorizontal) {
+                    drawHorizontalRows(rowsBg, true);
                     drawHorizontalRows(rows);
                 } else {
                     drawVerticalRows(rows);
                 }
 
+                rowsBg = svg.select('.chart-group-background').selectAll('.row')
+                    .data(data);
+
                 rows = svg.select('.chart-group').selectAll('.row')
                     .data(data);
 
                 if (isHorizontal) {
+                    drawAnimatedHorizontalRows(rowsBg, true);
                     drawAnimatedHorizontalRows(rows);
                 } else {
                     drawAnimatedVerticalRows(rows);
