@@ -204,7 +204,7 @@ define(function(require) {
                     yAxis2 = d3Axis.axisRight(yScale2)
                         .ticks(yTicks, numberFormat)
                         .tickFormat(function(d, i) {
-                            return d.replace('-', '') + '%';
+                            return d.toString().replace('-', '') + '%';
                         })
                         .tickSizeOuter(0);
                 }
@@ -469,7 +469,7 @@ define(function(require) {
                     })
                     // just hide the percentages if the number is bogus
                     .attr('fill-opacity', function(d){
-                        //console.log(d);
+                        console.log(d);
                         return isNaN(d) ? 0.0: 1.0;
                     });
             }
