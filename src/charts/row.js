@@ -204,7 +204,7 @@ define(function(require) {
                     yAxis2 = d3Axis.axisRight(yScale2)
                         .ticks(yTicks, numberFormat)
                         .tickFormat(function(d, i) {
-                            return d + '%';
+                            return d.replace('-', '') + '%';
                         })
                         .tickSizeOuter(0);
                 }
@@ -449,7 +449,7 @@ define(function(require) {
                         return isNaN(d) ? 0.0: 1.0;
                     })
                     .style( 'fill', ( d ) => {
-                        return d > 0 ? 'green' : 'red';
+                        return d > 0 ? '#D14124' : '#20aa3f';
                     });
 
                 svg.selectAll('.y-axis-group.axis-right .tick')
@@ -462,7 +462,7 @@ define(function(require) {
                         return d > 0 ? '2,8 2,13 8,13 8,8 10,8 5,0 0,8' : '-2,-8 -2,-13 -8,-13 -8,-8 -10,-8 -5,0 0,-8';
                     })
                     .style('fill', ( d ) => {
-                        return d > 0 ? '#20aa3f' : '#D14124';
+                        return d > 0 ? '#D14124' : '#20aa3f';
                     })
                     .attr('class', function(d){
                         return d > 0 ? 'down' : 'up';
