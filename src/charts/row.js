@@ -148,7 +148,7 @@ define(function(require) {
             _labelsFormatValue = ( { value, pctOfSet } ) => {
                 let pctLabel = '';
                 if(pctOfSet){
-                    pctLabel = "  | " + pctOfSet + '%';
+                    pctLabel = '  | ' + pctOfSet + '%';
                 }
                 return d3Format.format( labelsNumberFormat )( value ) + ' ' + labelsSuffix + pctLabel;
             },
@@ -204,7 +204,8 @@ define(function(require) {
                     yAxis2 = d3Axis.axisRight(yScale2)
                         .ticks(yTicks, numberFormat)
                         .tickFormat(function(d, i) {
-                            return d.toString().replace('-', '') + '%';
+                            const num = d > 0 ? '+' + d : d;
+                            return num + '%';
                         })
                         .tickSizeOuter(0);
                 }
@@ -442,9 +443,6 @@ define(function(require) {
                 // UNCOMMENT this for the percentages
 
                 svg.selectAll( '.y-axis-group.axis-right .tick text' )
-                    .attr( 'transform', function(d) {
-                        return d > 0 ? 'translate(-3, 0)' : 'translate(-5, 0)';
-                    })
                     .attr('fill-opacity', function(d) {
                         return isNaN(d) ? 0.0: 1.0;
                     })
@@ -455,7 +453,6 @@ define(function(require) {
                 svg.selectAll('.y-axis-group.axis-right .tick')
                     .append('polygon')
                     .attr( 'transform', function(d) {
-
                         return d > 0 ? 'translate(42, -8)' : 'translate(52, 8)';
                     })
                     .attr('points', function(d) {
@@ -469,7 +466,6 @@ define(function(require) {
                     })
                     // just hide the percentages if the number is bogus
                     .attr('fill-opacity', function(d){
-                        console.log(d);
                         return isNaN(d) ? 0.0: 1.0;
                     });
             }
@@ -541,9 +537,7 @@ define(function(require) {
          * @return {void}
          */
         function drawAnimatedHorizontalRows(rows, bg) {
-            if(bg){
-
-            } else {
+            if(!bg){
                 // Enter + Update
                 rows.enter()
                     .append( 'rect' )
@@ -565,7 +559,7 @@ define(function(require) {
                         handleClick( this, d, chartWidth, chartHeight );
                     } );
             }
-            if(bg){
+            if(bg) {
                 rows
                     .attr('x', 0)
                     .attr('y', ({name}) => yScale(name))
@@ -575,9 +569,8 @@ define(function(require) {
                     .duration(animationDuration)
                     .delay(interRowDelay)
                     .ease(ease)
-                    .attr('width', backgroundWidth + '%');
+                    .attr('width', ( { value } ) => chartWidth );
             } else {
-
                 rows
                     .attr( 'x', 0 )
                     .attr( 'y', ( { name } ) => yScale( name ) )
@@ -671,9 +664,8 @@ define(function(require) {
         function drawLabels() {
             let labelXPosition = isHorizontal ? _labelsHorizontalX : _labelsVerticalX;
             let labelYPosition = isHorizontal ? _labelsHorizontalY : _labelsVerticalY;
-            let labelYPosition1 = isHorizontal ? _labelsHorizontalY : _labelsVerticalY1;
 
-            let text = _labelsFormatValue
+            let text = _labelsFormatValue;
 
             if (labelEl) {
                 svg.selectAll('.percentage-label-group').remove();
@@ -776,7 +768,7 @@ define(function(require) {
                     .attr('y1', (xAxisPadding.left))
                     .attr('y2', chartHeight)
                     .attr('x1', (d) => xScale(d))
-                    .attr('x2', (d) => xScale(d))
+                    .attr('x2', (d) => xScale(d));
 
             drawVerticalExtendedLine();
         }
@@ -812,7 +804,7 @@ define(function(require) {
                     .attr('x1', (xAxisPadding.left))
                     .attr('x2', chartWidth)
                     .attr('y1', (d) => yScale(d))
-                    .attr('y2', (d) => yScale(d))
+                    .attr('y2', (d) => yScale(d));
 
             drawHorizontalExtendedLine();
         }
