@@ -204,8 +204,12 @@ define(function(require) {
                     yAxis2 = d3Axis.axisRight(yScale2)
                         .ticks(yTicks, numberFormat)
                         .tickFormat(function(d, i) {
-                            const num = d > 0 ? '+' + d : d;
-                            return num + '%';
+                            if(isNaN(d)){
+                                return '-----';
+                            } else {
+                                const num = d > 0 ? '+' + d : d;
+                                return num + '%';
+                            }
                         })
                         .tickSizeOuter(0);
                 }
@@ -439,19 +443,18 @@ define(function(require) {
                     .attr('transform', `translate(${chartWidth}, 0)`)
                     .call( yAxis2 );
 
-                // shift the labels over to the right a bit
-                // UNCOMMENT this for the percentages
-
                 svg.selectAll( '.y-axis-group.axis-right .tick text' )
-                    .attr('fill-opacity', function(d) {
-                        return isNaN(d) ? 0.0: 1.0;
-                    })
+                    .attr('fill-opacity', 1.0)
                     .style( 'fill', ( d ) => {
+                        if(isNaN(d) || d === 0){
+                            return '#919395';
+                        }
                         return d > 0 ? '#D14124' : '#20aa3f';
                     });
 
                 svg.selectAll('.y-axis-group.axis-right .tick')
                     .append('polygon')
+                    // shift the labels over to the right a bit
                     .attr( 'transform', function(d) {
                         return d > 0 ? 'translate(42, -8)' : 'translate(52, 8)';
                     })
@@ -466,7 +469,7 @@ define(function(require) {
                     })
                     // just hide the percentages if the number is bogus
                     .attr('fill-opacity', function(d){
-                        return isNaN(d) ? 0.0: 1.0;
+                        return (isNaN(d) || d === 0) ? 0.0: 1.0;
                     });
             }
 
