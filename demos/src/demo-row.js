@@ -46,8 +46,8 @@ function createHorizontalRowChart() {
             .isHorizontal(true)
             .isAnimated(true)
             .margin({
-                left: 90,
-                right: 40,
+                left: 70,
+                right: 50,
                 top: 20,
                 bottom: 30
             })
