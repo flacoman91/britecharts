@@ -203,14 +203,14 @@ define(['d3', 'row', 'rowChartDataBuilder'], function(d3, chart, dataBuilder) {
 
             it('should provide backgroundColor getter and setter', () => {
                 let previous = rowChart.backgroundColor(),
-                    expected = '#bebebe',
+                    expected = [ '#20aa3f' ],
                     actual;
 
                 rowChart.backgroundColor(expected);
                 actual = rowChart.colorSchema();
 
                 expect(previous).not.toBe(actual);
-                expect(actual).toBe(expected);
+                expect(actual[0]).toBe(expected[0]);
             });
 
             it('should provide backgroundWidth getter and setter', () => {

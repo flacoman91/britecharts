@@ -117,7 +117,7 @@ define(function(require){
             highlightCircleActiveStrokeWidth = 5,
             highlightCircleActiveStrokeOpacity = 0.6,
 
-            areaOpacity = 0.5,
+            areaOpacity = 0.4,
             categoryColorMap,
             order,
             topicsOrder,
