@@ -157,7 +157,8 @@ define(function(require) {
             _labelsFormatPct = ({pctChange}) => {
                 if(isNaN(pctChange))
                     return '----';
-                return d3Format.format(labelsNumberFormat)(pctChange) + '%';
+                const prepend = pctChange > 0 ? '+': '';
+                return prepend + d3Format.format(labelsNumberFormat)(pctChange) + '%';
             },
 
             // labels per row, aka XX Complaints
@@ -648,7 +649,7 @@ define(function(require) {
             if(enableYAxisRight) {
                 labelEl2 = svg.select( '.metadata-group' )
                     .append( 'g' )
-                    .attr( 'transform', `translate(${chartWidth}, 0)` )
+                    .attr( 'transform', `translate(${chartWidth + 10}, 0)` )
                     .classed( 'change-label-group', true )
                     .selectAll( 'g' )
                     .data( data.reverse() )
@@ -658,15 +659,23 @@ define(function(require) {
                 // each group should contain the labels and rows
                 labelEl2.append( 'text' )
                     .attr( 'y', labelYPosition )
+                    .attr('font-size', '10')
+                    .attr('font-family','sans-serif')
+                    .style( 'fill', ( d ) => {
+                        if(d.pctChange === 0 || isNaN(d.pctChange)) {
+                            return '#919395';
+                        }
+                        return d.pctChange > 0 ? '#D14124' : '#20aa3f';
+                    } )
                     .text( pctChangeText );
 
                 labelEl2.append( 'polygon' )
                     .attr( 'transform', ( d ) => {
-                        const yPos = yScale( d.name ) + 20;
-                        return `translate(42, ${yPos})`;
+                        const yPos = yScale( d.name );
+                           return d.pctChange > 0 ? `translate(40, ${yPos+23}) rotate(180)` : `translate(30, ${yPos+7})`;
                     } )
                     .attr( 'points', function( d ) {
-                        return d.pctChange > 0 ? '2,8 2,13 8,13 8,8 10,8 5,0 0,8' : '-2,-8 -2,-13 -8,-13 -8,-8 -10,-8 -5,0 0,-8';
+                        return '2,8 2,13 8,13 8,8 10,8 5,0 0,8';
                     } )
                     .style( 'fill', ( d ) => {
                         return d.pctChange > 0 ? '#D14124' : '#20aa3f';
