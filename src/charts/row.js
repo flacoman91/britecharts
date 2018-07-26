@@ -155,10 +155,14 @@ define(function(require) {
             },
 
             _labelsFormatPct = ({pctChange}) => {
+                const prepend = pctChange > 0 ? '+': '';
                 if(isNaN(pctChange))
                     return '----';
-                const prepend = pctChange > 0 ? '+': '';
                 return prepend + d3Format.format(labelsNumberFormat)(pctChange) + '%';
+
+                if(Math.abs(pctChange) === 999999)
+                    return '';
+                return d3Format.format(labelsNumberFormat)(pctChange) + '%';
             },
 
             // labels per row, aka XX Complaints
@@ -626,7 +630,9 @@ define(function(require) {
             if (labelEl) {
                 svg.selectAll('.percentage-label-group').remove();
             }
-
+            if(labelEl2){
+                svg.selectAll('.change-label-group').remove();
+            }
             labelEl = svg.select('.metadata-group')
               .append('g')
                 .classed('percentage-label-group', true)
