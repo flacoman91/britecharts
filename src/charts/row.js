@@ -157,6 +157,8 @@ define(function(require) {
             _labelsFormatPct = ({pctChange}) => {
                 if(isNaN(pctChange))
                     return '----';
+                if(Math.abs(pctChange) === 999999)
+                    return '';
                 return d3Format.format(labelsNumberFormat)(pctChange) + '%';
             },
 
@@ -625,7 +627,9 @@ define(function(require) {
             if (labelEl) {
                 svg.selectAll('.percentage-label-group').remove();
             }
-
+            if(labelEl2){
+                svg.selectAll('.change-label-group').remove();
+            }
             labelEl = svg.select('.metadata-group')
               .append('g')
                 .classed('percentage-label-group', true)
