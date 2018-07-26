@@ -3,32 +3,38 @@
         {
             "name": "Radiating",
             "value": 2024,
-            "pctChange": -20
+            "pctChange": -20,
+            "pctOfSet": 5
         },
         {
             "name": "Opalescent",
             "value": 4221,
-            "pctChange": 30
+            "pctChange": 11,
+            "pctOfSet": 2
         },
         {
             "name": "Shining",
             "value": 213,
-            "pctChange": 11
+            "pctChange": 0,
+            "pctOfSet": 12
         },
         {
             "name": "Brillian Brillian Brillian BrillianBrillian Brillian",
             "value": 6001,
-            "pctChange": 10
+            "pctChange": 10,
+            "pctOfSet": 3
         },
         {
             "name": "Vivid",
             "value": 613,
-            "pctChange": -9
+            "pctChange": -9,
+            "pctOfSet": 24
         },
         {
             "name": "Brilliant",
             "value": 1900,
-            "pctChange": 1
+            "pctChange": 1,
+            "pctOfSet": 8
         }
     ]
 }
