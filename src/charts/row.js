@@ -78,7 +78,7 @@ define(function(require) {
             data,
             dataZeroed,
             chartWidth, chartHeight,
-            xScale, yScale, yScale2,
+            xScale, yScale,
             colorSchema = colorHelper.singleColors.aloeGreen,
             colorList,
             colorMap,
@@ -97,7 +97,7 @@ define(function(require) {
             labelsSuffix = '',
             labelsSize = 12,
             betweenRowsPadding = 0.1,
-            xAxis, yAxis, yAxis2,
+            xAxis, yAxis,
             xAxisPadding = {
                 top: 0,
                 left: 0,
@@ -126,6 +126,7 @@ define(function(require) {
             pctChangeLabel = 'pctChange',
             pctOfSetLabel = 'pctOfSet',
             labelEl,
+            labelEl2,
 
             baseLine,
             maskGridLines,
@@ -152,17 +153,20 @@ define(function(require) {
                 }
                 return d3Format.format( labelsNumberFormat )( value ) + ' ' + labelsSuffix + pctLabel;
             },
-             _labelsFormatPct = ({pctChange}) => d3Format.format(labelsNumberFormat)(pctChange) + ' ' + labelsSuffix,
 
+            _labelsFormatPct = ({pctChange}) => {
+                if(isNaN(pctChange))
+                    return '----';
+                return d3Format.format(labelsNumberFormat)(pctChange) + '%';
+            },
 
             // labels per row, aka XX Complaints
             _labelsHorizontalX = ({value}) => xScale(value) + labelsMargin,
-            _labelsHorizontalY= ({name}) => yScale(name) + (yScale.bandwidth() / 2) + (labelsSize * (3/8)),
+            _labelsHorizontalY= ({name}) => { return yScale(name) + (yScale.bandwidth() / 2) + (labelsSize * (3/8)); },
 
             // vertical axis labels
             _labelsVerticalX = ({name}) => xScale(name),
-            _labelsVerticalY = ({value}) => yScale(value) - labelsMargin,
-            _labelsVerticalY1 = ({pctChange}) => yScale2(pctChange) - labelsMargin;
+            _labelsVerticalY = ({value}) => yScale(value) - labelsMargin;
         /**
          * This function creates the graph using the selection as container
          * @param  {D3Selection} _selection A d3 selection that represents
@@ -199,20 +203,6 @@ define(function(require) {
 
                 yAxis = d3Axis.axisLeft(yScale);
 
-                //uncomment to show the right labels with arrows
-                if(enableYAxisRight) {
-                    yAxis2 = d3Axis.axisRight(yScale2)
-                        .ticks(yTicks, numberFormat)
-                        .tickFormat(function(d, i) {
-                            if(isNaN(d)){
-                                return '-----';
-                            } else {
-                                const num = d > 0 ? '+' + d : d;
-                                return num + '%';
-                            }
-                        })
-                        .tickSizeOuter(0);
-                }
             } else {
                 xAxis = d3Axis.axisBottom(xScale);
 
@@ -307,10 +297,6 @@ define(function(require) {
                     .rangeRound([chartHeight, 0])
                     .padding(betweenRowsPadding);
 
-                yScale2 = d3Scale.scaleBand()
-                    .domain(data.map(getPctChange))
-                    .rangeRound([chartHeight, 0])
-                    .padding(betweenRowsPadding);
             } else {
                 xScale = d3Scale.scaleBand()
                     .domain(data.map(getName))
@@ -436,42 +422,6 @@ define(function(require) {
 
             svg.select('.y-axis-group.axis')
                 .call(yAxis);
-
-            if (isHorizontal && enableYAxisRight) {
-                // adding the right Y axis labels,
-                svg.select( '.y-axis-group.axis-right' )
-                    .attr('transform', `translate(${chartWidth}, 0)`)
-                    .call( yAxis2 );
-
-                svg.selectAll( '.y-axis-group.axis-right .tick text' )
-                    .attr('fill-opacity', 1.0)
-                    .style( 'fill', ( d ) => {
-                        if(isNaN(d) || d === 0){
-                            return '#919395';
-                        }
-                        return d > 0 ? '#D14124' : '#20aa3f';
-                    });
-
-                svg.selectAll('.y-axis-group.axis-right .tick')
-                    .append('polygon')
-                    // shift the labels over to the right a bit
-                    .attr( 'transform', function(d) {
-                        return d > 0 ? 'translate(42, -8)' : 'translate(52, 8)';
-                    })
-                    .attr('points', function(d) {
-                        return d > 0 ? '2,8 2,13 8,13 8,8 10,8 5,0 0,8' : '-2,-8 -2,-13 -8,-13 -8,-8 -10,-8 -5,0 0,-8';
-                    })
-                    .style('fill', ( d ) => {
-                        return d > 0 ? '#D14124' : '#20aa3f';
-                    })
-                    .attr('class', function(d){
-                        return d > 0 ? 'down' : 'up';
-                    })
-                    // just hide the percentages if the number is bogus
-                    .attr('fill-opacity', function(d){
-                        return (isNaN(d) || d === 0) ? 0.0: 1.0;
-                    });
-            }
 
             svg.selectAll('.y-axis-group.axis .tick text')
                 .call(wrapText, margin.left - yAxisPaddingBetweenChart)
@@ -670,6 +620,8 @@ define(function(require) {
 
             let text = _labelsFormatValue;
 
+            let pctChangeText = _labelsFormatPct;
+
             if (labelEl) {
                 svg.selectAll('.percentage-label-group').remove();
             }
@@ -677,17 +629,57 @@ define(function(require) {
             labelEl = svg.select('.metadata-group')
               .append('g')
                 .classed('percentage-label-group', true)
-                .selectAll('text')
+                .selectAll('g')
                 .data(data.reverse())
                 .enter()
-                .append('text');
+                .append('g');
 
+            // append the 6000 complaints | 3%
             labelEl
+                .append('text')
                 .classed('percentage-label', true)
                 .attr('x', labelXPosition)
                 .attr('y', labelYPosition)
                 .text(text)
-                .attr('font-size', labelsSize + 'px')
+                .attr('font-size', labelsSize + 'px');
+
+            //https://stackoverflow.com/a/20644664
+            // add another group
+            if(enableYAxisRight) {
+                labelEl2 = svg.select( '.metadata-group' )
+                    .append( 'g' )
+                    .attr( 'transform', `translate(${chartWidth}, 0)` )
+                    .classed( 'change-label-group', true )
+                    .selectAll( 'g' )
+                    .data( data.reverse() )
+                    .enter()
+                    .append( 'g' );
+
+                // each group should contain the labels and rows
+                labelEl2.append( 'text' )
+                    .attr( 'y', labelYPosition )
+                    .text( pctChangeText );
+
+                labelEl2.append( 'polygon' )
+                    .attr( 'transform', ( d ) => {
+                        const yPos = yScale( d.name ) + 20;
+                        return `translate(42, ${yPos})`;
+                    } )
+                    .attr( 'points', function( d ) {
+                        return d.pctChange > 0 ? '2,8 2,13 8,13 8,8 10,8 5,0 0,8' : '-2,-8 -2,-13 -8,-13 -8,-8 -10,-8 -5,0 0,-8';
+                    } )
+                    .style( 'fill', ( d ) => {
+                        return d.pctChange > 0 ? '#D14124' : '#20aa3f';
+                    } )
+                    .attr( 'class', function( d ) {
+                        return d.pctChange > 0 ? 'down' : 'up';
+                    } )
+                    // just hide the percentages if the number is bogus
+                    .attr( 'fill-opacity', function( d ) {
+                        const pctChange = d.pctChange;
+                        return ( isNaN( pctChange ) || pctChange === 0 ) ? 0.0 : 1.0;
+                    } );
+            }
         }
 
         /**
