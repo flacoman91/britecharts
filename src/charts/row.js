@@ -679,7 +679,8 @@ define(function(require) {
                     .attr( 'transform', ( d ) => {
                         const yPos = _labelsHorizontalY( d );
 
-                           return d.pctChange > 0 ? `translate(40, ${yPos+5}) rotate(180)` : `translate(30, ${yPos-10})`;
+                           return d.pctChange > 0 ? `translate(40, ${yPos+5}) rotate(180)` : `translate(30, ${yPos - 10})`;
+
                     } )
                     .attr( 'points', function( d ) {
                         return '2,8 2,13 8,13 8,8 10,8 5,0 0,8';
