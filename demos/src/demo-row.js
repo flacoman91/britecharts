@@ -33,6 +33,7 @@ function createSimpleRowChart() {
                 top: 20,
                 bottom: 30
             })
+            .backgroundColor('#f7f8f9')
             .enableYAxisRight(true)
             .enableLabels(true)
             .labelsNumberFormat(',d')
@@ -78,6 +79,7 @@ function createHorizontalRowChart() {
                 top: 20,
                 bottom: 30
             })
+            .backgroundColor('#f7f8f9')
             .enableYAxisRight(true)
             .enableLabels(true)
             .labelsNumberFormat(',d')
@@ -128,6 +130,7 @@ function createRowChartWithTooltip() {
                 top: 20,
                 bottom: 30
             })
+            .backgroundColor('#f7f8f9')
             .enableYAxisRight(true)
             .enableLabels(true)
             .labelsNumberFormat(',d')

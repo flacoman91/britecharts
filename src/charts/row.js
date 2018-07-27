@@ -114,7 +114,7 @@ define(function(require) {
             ease = d3Ease.easeQuadInOut,
             animationDuration = 800,
             animationStepRatio = 70,
-            backgroundColor = '#f7f8f9',
+            backgroundColor = '#bebebe',
             backgroundWidth = 70,
             interRowDelay = (d, i) => animationStepRatio * i,
 
