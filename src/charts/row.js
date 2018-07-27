@@ -155,13 +155,14 @@ define(function(require) {
             },
 
             _labelsFormatPct = ({pctChange}) => {
-                if(isNaN(pctChange))
+                if (isNaN(pctChange))
                     return '----';
 
-                if(Math.abs(pctChange) === 999999)
+                if (Math.abs(pctChange) === 999999)
                     return '';
 
                 const prepend = pctChange > 0 ? '+': '';
+
                 return prepend + d3Format.format(labelsNumberFormat)(pctChange) + '%';
             },
 
@@ -666,7 +667,6 @@ define(function(require) {
                 labelEl2.append( 'text' )
                     .attr( 'y', labelYPosition )
                     .attr('font-size', '10')
-                    .attr('font-family','sans-serif')
                     .style( 'fill', ( d ) => {
                         if(d.pctChange === 0 || isNaN(d.pctChange)) {
                             return '#919395';
@@ -677,8 +677,9 @@ define(function(require) {
 
                 labelEl2.append( 'polygon' )
                     .attr( 'transform', ( d ) => {
-                        const yPos = yScale( d.name );
-                           return d.pctChange > 0 ? `translate(40, ${yPos+23}) rotate(180)` : `translate(30, ${yPos+7})`;
+                        const yPos = _labelsHorizontalY( d );
+
+                           return d.pctChange > 0 ? `translate(40, ${yPos+5}) rotate(180)` : `translate(30, ${yPos-10})`;
                     } )
                     .attr( 'points', function( d ) {
                         return '2,8 2,13 8,13 8,8 10,8 5,0 0,8';
@@ -692,6 +693,7 @@ define(function(require) {
                     // just hide the percentages if the number is bogus
                     .attr( 'fill-opacity', function( d ) {
                         const pctChange = d.pctChange;
+
                         return ( isNaN( pctChange ) || pctChange === 0 ) ? 0.0 : 1.0;
                     } );
             }
@@ -1171,7 +1173,7 @@ define(function(require) {
             labelsSize = _x;
 
             return this;
-        }
+        };
 
         /**
          * Gets or Sets the loading state of the chart
