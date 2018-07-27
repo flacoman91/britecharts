@@ -114,7 +114,7 @@ define(function(require) {
             ease = d3Ease.easeQuadInOut,
             animationDuration = 800,
             animationStepRatio = 70,
-            backgroundColor = '#bebebe',
+            backgroundColor = '#f7f8f9',
             backgroundWidth = 70,
             interRowDelay = (d, i) => animationStepRatio * i,
 
@@ -246,12 +246,6 @@ define(function(require) {
                 .append('g')
                 .attr('transform', `translate(${-1 * (yAxisPaddingBetweenChart)}, 0)`)
                 .classed('y-axis-group axis', true);
-
-            // labels on the right side
-            container
-                .append('g')
-                .attr('transform', `translate(${10 * (yAxisPaddingBetweenChart)}, 0)`)
-                .classed('y-axis-group axis-right', true);
 
 
             // the tooltip and also labels on the right
@@ -698,6 +692,7 @@ define(function(require) {
                         return ( isNaN( pctChange ) || pctChange === 0 ) ? 0.0 : 1.0;
                     } );
             }
+
         }
 
         /**
@@ -716,6 +711,16 @@ define(function(require) {
 
                 if (isHorizontal) {
                     drawHorizontalRows(rowsBg, true);
+
+                    // adding separator line
+                    svg.select('.chart-group-background').append('line')
+                        .attr('y1', 0)
+                        .attr('x1', chartWidth)
+                        .attr('y2', chartHeight - 5)
+                        .attr('x2', chartWidth)
+                        .style('stroke', '#000')
+                        .style('stroke-width', 1);
+
                     drawHorizontalRows(rows);
                 } else {
                     drawVerticalRows(rows);
