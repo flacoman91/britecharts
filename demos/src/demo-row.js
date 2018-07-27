@@ -164,7 +164,7 @@ function createLoadingState() {
         rowContainer = d3Selection.select('.js-loading-container'),
         containerWidth = rowContainer.node() ? rowContainer.node().getBoundingClientRect().width : false,
         dataset = null;
-console.log('loading state');
+
     if (containerWidth) {
         console.log('loading state' + containerWidth);
         rowContainer.html(rowChart.loadingState());

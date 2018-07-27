@@ -213,6 +213,30 @@ define(['d3', 'row', 'rowChartDataBuilder'], function(d3, chart, dataBuilder) {
                 expect(actual[0]).toBe(expected[0]);
             });
 
+            it('should provide upArrowColor getter and setter', () => {
+                let previous = rowChart.upArrowColor(),
+                    expected = '#20aa3f',
+                    actual;
+
+                rowChart.upArrowColor(expected);
+                actual = rowChart.upArrowColor();
+
+                expect(previous).not.toBe(actual);
+                expect(actual).toBe(expected);
+            });
+
+            it('should provide downArrowColor getter and setter', () => {
+                let previous = rowChart.downArrowColor(),
+                    expected = '#20aa3f',
+                    actual;
+
+                rowChart.downArrowColor(expected);
+                actual = rowChart.downArrowColor();
+
+                expect(previous).not.toBe(actual);
+                expect(actual).toBe(expected);
+            });
+
             it('should provide backgroundWidth getter and setter', () => {
                 let previous = rowChart.backgroundWidth(),
                     expected = 99,
