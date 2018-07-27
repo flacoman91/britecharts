@@ -14,20 +14,47 @@ require('./helpers/resizeHelper');
 
 function createSimpleRowChart() {
     let rowChart = row(),
+        tooltip = miniTooltip(),
         rowContainer = d3Selection.select('.js-row-chart-container'),
         containerWidth = rowContainer.node() ? rowContainer.node().getBoundingClientRect().width : false,
+        tooltipContainer,
         dataset;
 
     if (containerWidth) {
-        dataset = aRowDataSet().withLettersFrequency().build();
-        rowChart
-            .width(containerWidth)
-            .hasPercentage(true)
-            .enableLabels(true)
-            .labelsNumberFormat('.0%')
-            .height(300);
+        dataset = aRowDataSet().withColors().build();
+        const dataTarget = dataset.slice(1,2);
 
-        rowContainer.datum(dataset).call(rowChart);
+        rowChart
+            .isHorizontal(true)
+            .isAnimated(true)
+            .margin({
+                left: 70,
+                right: 50,
+                top: 20,
+                bottom: 30
+            })
+            .enableYAxisRight(true)
+            .enableLabels(true)
+            .labelsNumberFormat(',d')
+            .labelsSuffix('complaints')
+            .colorSchema(['#20aa3f'])
+            .width(containerWidth)
+            .yAxisPaddingBetweenChart(5)
+            .orderingFunction(function(a,b){
+                return a.value > b.value;
+            })
+            .height(250)
+            .xTicks( 0 )
+            .yTicks( 0 )
+            .percentageAxisToMaxRatio(1.5)
+            .on('customMouseOver', tooltip.show)
+            .on('customMouseMove', tooltip.update)
+            .on('customMouseOut', tooltip.hide);
+
+        rowContainer.datum(dataTarget).call(rowChart);
+
+        tooltipContainer = d3Selection.select('.js-row-chart-container .row-chart .metadata-group');
+        tooltipContainer.datum([]).call(tooltip);
     }
 }
 
@@ -89,20 +116,40 @@ function createRowChartWithTooltip() {
             rowChart.exportChart('rowchart.png', 'Britecharts Row Chart');
         });
 
-        dataset = aRowDataSet().withLettersFrequency().build();
+        dataset = aRowDataSet().withColors().build();
+        const dataTarget = dataset.slice(0,4);
 
         rowChart
-            .width(containerWidth)
-            .height(300)
+            .isHorizontal(true)
             .isAnimated(true)
+            .margin({
+                left: 70,
+                right: 50,
+                top: 20,
+                bottom: 30
+            })
+            .enableYAxisRight(true)
+            .enableLabels(true)
+            .labelsNumberFormat(',d')
+            .labelsSuffix('complaints')
+            .colorSchema(['#20aa3f'])
+            .width(containerWidth)
+            .yAxisPaddingBetweenChart(5)
+            .orderingFunction(function(a,b){
+                return a.value > b.value;
+            })
+            .height(250)
+            .xTicks( 0 )
+            .yTicks( 0 )
+            .percentageAxisToMaxRatio(1.5)
             .on('customMouseOver', tooltip.show)
             .on('customMouseMove', tooltip.update)
             .on('customMouseOut', tooltip.hide);
 
-        rowContainer.datum(dataset).call(rowChart);
-
+        rowContainer.datum(dataTarget).call(rowChart);
         tooltip
             .numberFormat('.2%')
+
 
         tooltipContainer = d3Selection.select('.row-chart .metadata-group');
         tooltipContainer.datum([]).call(tooltip);
