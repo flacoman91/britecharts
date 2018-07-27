@@ -155,14 +155,14 @@ define(function(require) {
             },
 
             _labelsFormatPct = ({pctChange}) => {
-                const prepend = pctChange > 0 ? '+': '';
                 if(isNaN(pctChange))
                     return '----';
-                return prepend + d3Format.format(labelsNumberFormat)(pctChange) + '%';
 
                 if(Math.abs(pctChange) === 999999)
                     return '';
-                return d3Format.format(labelsNumberFormat)(pctChange) + '%';
+
+                const prepend = pctChange > 0 ? '+': '';
+                return prepend + d3Format.format(labelsNumberFormat)(pctChange) + '%';
             },
 
             // labels per row, aka XX Complaints

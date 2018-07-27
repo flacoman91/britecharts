@@ -15,7 +15,7 @@
         {
             "name": "Shining",
             "value": 213,
-            "pctChange": 0,
+            "pctChange": 1,
             "pctOfSet": 12
         },
         {
@@ -35,6 +35,19 @@
             "value": 1900,
             "pctChange": 1,
             "pctOfSet": 8
+        },
+        {
+            "name": "Increase",
+            "value": 1900,
+            "pctChange": 999999,
+            "pctOfSet": 8
+        },
+        {
+            "name": "Decrease",
+            "value": 1900,
+            "pctChange": -999999,
+            "pctOfSet": 8
         }
+
     ]
 }
