@@ -706,6 +706,8 @@ define(function(require) {
                 rows = svg.select('.chart-group').selectAll('.row')
                     .data(dataZeroed);
 
+                svg.select('.chart-group-background line').remove();
+
                 rowsBg = svg.select('.chart-group-background').selectAll('.row')
                     .data(dataZeroed);
 
