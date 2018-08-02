@@ -645,7 +645,26 @@ define(function(require) {
                 .attr('x', labelXPosition)
                 .attr('y', labelYPosition)
                 .text(text)
-                .attr('font-size', labelsSize + 'px');
+                .attr('font-size', labelsSize + 'px')
+                .attr('fill', (d, i)=>{
+                    const backgroundRows = d3Selection.select('.chart-group-background');
+                    const bgWidth = backgroundRows.node().getBBox().x || backgroundRows.node().getBoundingClientRect().width;
+                    const barWidth = xScale(d.value);
+                    const labels = labelEl.selectAll( 'text' );
+                    const textWidth = labels._groups[i][0].getComputedTextLength() + 10;
+                    return (bgWidth > 0 && bgWidth-barWidth < textWidth) ? '#FFF' : '#000';
+                })
+                .attr( 'transform', ( d, i ) => {
+                    const backgroundRows = d3Selection.select('.chart-group-background');
+                    const bgWidth = backgroundRows.node().getBBox().x || backgroundRows.node().getBoundingClientRect().width;
+                    const barWidth = xScale(d.value);
+                    const labels = labelEl.selectAll( 'text' );
+                    const textWidth = labels._groups[i][0].getComputedTextLength() + 10;
+
+                    if (bgWidth > 0 && bgWidth-barWidth < textWidth) {
+                        return `translate(-${textWidth}, 0)`;
+                    }
+                } );
 
             //https://stackoverflow.com/a/20644664
             // add another group
@@ -705,7 +724,7 @@ define(function(require) {
             if (isAnimated) {
                 rows = svg.select('.chart-group').selectAll('.row')
                     .data(dataZeroed);
-
+                svg.select('.chart-group-background rect').remove();
                 svg.select('.chart-group-background line').remove();
 
                 rowsBg = svg.select('.chart-group-background').selectAll('.row')

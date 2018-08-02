@@ -8,9 +8,9 @@
         },
         {
             "name": "Opalescent",
-            "value": 4221,
+            "value": 7000,
             "pctChange": 11,
-            "pctOfSet": 2
+            "pctOfSet": 100
         },
         {
             "name": "Shining",
@@ -22,7 +22,7 @@
             "name": "Brillian Brillian Brillian BrillianBrillian Brillian",
             "value": 6001,
             "pctChange": "---",
-            "pctOfSet": 3
+            "pctOfSet": 70
         },
         {
             "name": "Vivid",
