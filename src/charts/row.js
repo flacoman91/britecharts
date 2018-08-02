@@ -652,7 +652,7 @@ define(function(require) {
             if(enableYAxisRight) {
                 labelEl2 = svg.select( '.metadata-group' )
                     .append( 'g' )
-                    .attr( 'transform', `translate(${chartWidth + 10}, 0)` )
+                    .attr( 'transform', `translate(${chartWidth + 20}, 0)` )
                     .classed( 'change-label-group', true )
                     .selectAll( 'g' )
                     .data( data.reverse() )
