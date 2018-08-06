@@ -28,11 +28,6 @@ function createBrushChart(optionalColorSchema) {
 
     if (containerWidth) {
         dataset = aTestDataSet().with5Topics().build();
-
-        console.log('brush it!');
-
-        console.log(JSON.stringify(dataset));
-
         brushChart
             .width(containerWidth)
             .height(100)
@@ -72,8 +67,6 @@ function createLineChart(optionalColorSchema, optionalData) {
         });
 
         dataset = aTestDataSet().with5Topics().build();
-        console.log('5 topix');
-        console.log(dataset);
         // LineChart Setup and start
         lineChart1
             .isAnimated(true)
@@ -127,13 +120,6 @@ function createLineChartWithSingleLine() {
 
     if (containerWidth) {
         dataset = aTestDataSet().withOneSource().build();
-
-        console.log('CW =>single');
-
-        console.log(dataset);
-
-        console.log(JSON.stringify(dataset));
-
         lineChart2
             .tooltipThreshold(600)
             .height(300)
@@ -282,10 +268,6 @@ if (d3Selection.select('.js-line-chart-container').node()) {
 
     // Color schema selector
     colorSelectorHelper.createColorSelector('.js-color-selector-container', '.line-chart', function(newSchema) {
-
-        console.log('color me mine');
-        console.log(newSchema);
-
         createLineChart(newSchema);
         d3Selection.selectAll('.brush-chart').remove();
         createBrushChart(newSchema);
