@@ -170,11 +170,8 @@ define(function(require) {
 
             // labels per row, aka XX Complaints
             _labelsHorizontalX = ({value}) => xScale(value) + labelsMargin,
-            _labelsHorizontalY= ({name}) => { return yScale(name) + (yScale.bandwidth() / 2) + (labelsSize * (3/8)); },
+            _labelsHorizontalY= ({name}) => { return yScale(name) + (yScale.bandwidth() / 2) + (labelsSize * (3/8)); };
 
-            // vertical axis labels
-            _labelsVerticalX = ({name}) => xScale(name),
-            _labelsVerticalY = ({value}) => yScale(value) - labelsMargin;
         /**
          * This function creates the graph using the selection as container
          * @param  {D3Selection} _selection A d3 selection that represents
@@ -346,11 +343,7 @@ define(function(require) {
                 return [...acc, d];
             }, []);
 
-            let dataZeroed = data.map((d) => ({
-                pctChange: 0,
-                value: 0,
-                name: String(d[nameLabel])
-            }));
+            const dataZeroed = data.slice();
 
             return { data, dataZeroed };
         }
@@ -439,8 +432,14 @@ define(function(require) {
             else {
                 // Enter + Update
                 rows.enter()
+                    .append('g')
+                    .attr( 'class', function(d){
+                        return 'group main ' + d.name.toLowerCase();
+                    } )
                     .append( 'rect' )
-                    .classed( 'row', true )
+                    .attr( 'class', function(d){
+                        return 'row '+ d.name.toLowerCase();
+                    } )
                     .attr( 'y', chartHeight )
                     .attr( 'x', 0 )
                     .attr( 'height', yScale.bandwidth() )
@@ -520,77 +519,6 @@ define(function(require) {
             }
         }
 
-        /**
-         * Draws and animates the rows along the y axis
-         * @param  {D3Selection} rows Selection of rows
-         * @return {void}
-         */
-        function drawAnimatedVerticalRows(rows) {
-            // Enter + Update
-            rows.enter()
-              .append('rect')
-                .classed('row', true)
-                .attr('x', chartWidth)
-                .attr('y', ({value}) => yScale(value))
-                .attr('width', xScale.bandwidth())
-                .attr('height', ({value}) => chartHeight - yScale(value))
-                .on('mouseover', function(d, index, rowList) {
-                    handleMouseOver(this, d, rowList, chartWidth, chartHeight);
-                })
-                .on('mousemove', function(d) {
-                    handleMouseMove(this, d, chartWidth, chartHeight);
-                })
-                .on('mouseout', function(d, index, rowList) {
-                    handleMouseOut(this, d, rowList, chartWidth, chartHeight);
-                })
-                .on('click', function(d) {
-                    handleClick(this, d, chartWidth, chartHeight);
-                })
-              .merge(rows)
-                .attr('x', ({name}) => xScale(name))
-                .attr('width', xScale.bandwidth())
-                .attr('fill', ({name}) => computeColor(name))
-                .transition()
-                .duration(animationDuration)
-                .delay(interRowDelay)
-                .ease(ease)
-                .attr('y', ({value}) => yScale(value))
-                .attr('height', ({value}) => chartHeight - yScale(value));
-        }
-
-        /**
-         * Draws the rows along the y axis
-         * @param  {D3Selection} rows Selection of rows
-         * @return {void}
-         */
-        function drawVerticalRows(rows) {
-            // Enter + Update
-            rows.enter()
-              .append('rect')
-                .classed('row', true)
-                .attr('x', chartWidth)
-                .attr('y', ({value}) => yScale(value))
-                .attr('width', xScale.bandwidth())
-                .attr('height', ({value}) => chartHeight - yScale(value))
-                .on('mouseover', function(d, index, rowList) {
-                    handleMouseOver(this, d, rowList, chartWidth, chartHeight);
-                })
-                .on('mousemove', function(d) {
-                    handleMouseMove(this, d, chartWidth, chartHeight);
-                })
-                .on('mouseout', function(d, index, rowList) {
-                    handleMouseOut(this, d, rowList, chartWidth, chartHeight);
-                })
-                .on('click', function(d) {
-                    handleClick(this, d, chartWidth, chartHeight);
-                })
-              .merge(rows)
-                .attr('x', ({name}) => xScale(name))
-                .attr('y', ({value}) => yScale(value))
-                .attr('width', xScale.bandwidth())
-                .attr('height', ({value}) => chartHeight - yScale(value))
-                .attr('fill', ({name}) => computeColor(name));
-        }
 
         /**
          * Draws labels at the end of each row
