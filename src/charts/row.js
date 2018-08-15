@@ -222,8 +222,8 @@ define(function(require) {
             container
                 .append('g').classed('grid-lines-group', true);
 
-            container
-                .append('g').classed('chart-group-background', true);
+            // container
+            //     .append('g').classed('chart-group-background', true);
 
             container
                 .append('g').classed('chart-group', true);
@@ -410,59 +410,59 @@ define(function(require) {
          * @return {void}
          */
         function drawHorizontalRows(rows, bg) {
-            if (bg) {
-                // Enter + Update
-                rows.enter()
-                    .append( 'rect' )
-                    .classed( 'row', true )
-                    .attr( 'y', chartHeight )
-                    .attr( 'x', 0 )
-                    .attr( 'height', yScale.bandwidth() )
-                    .attr( 'width', ( { value } ) => xScale( value ) )
-                    .on( 'click', function( d ) {
-                        handleClick( this, d, chartWidth, chartHeight );
-                    } )
-                    .merge( rows )
-                    .attr( 'x', 0 )
-                    .attr( 'y', ( { name } ) => yScale( name ) )
-                    .attr( 'height', yScale.bandwidth() )
-                    .attr( 'width', ( { value } ) => xScale( value ) )
-                    .attr( 'fill', ( { name } ) => computeColor( name ) );
-            }
-            else {
-                // Enter + Update
-                rows.enter()
-                    .append('g')
-                    .attr( 'class', function(d){
-                        return 'group main ' + d.name.toLowerCase();
-                    } )
-                    .append( 'rect' )
-                    .attr( 'class', function(d){
-                        return 'row '+ d.name.toLowerCase();
-                    } )
-                    .attr( 'y', chartHeight )
-                    .attr( 'x', 0 )
-                    .attr( 'height', yScale.bandwidth() )
-                    .attr( 'width', ( { value } ) => xScale( value ) )
-                    .on( 'mouseover', function( d, index, rowList ) {
-                        handleMouseOver( this, d, rowList, chartWidth, chartHeight );
-                    } )
-                    .on( 'mousemove', function( d ) {
-                        handleMouseMove( this, d, chartWidth, chartHeight );
-                    } )
-                    .on( 'mouseout', function( d, index, rowList ) {
-                        handleMouseOut( this, d, rowList, chartWidth, chartHeight );
-                    } )
-                    .on( 'click', function( d ) {
-                        handleClick( this, d, chartWidth, chartHeight );
-                    } )
-                    .merge( rows )
-                    .attr( 'x', 0 )
-                    .attr( 'y', ( { name } ) => yScale( name ) )
-                    .attr( 'height', yScale.bandwidth() )
-                    .attr( 'width', ( { value } ) => xScale( value ) )
-                    .attr( 'fill', ( { name } ) => computeColor( name ) );
-            }
+            // Enter + Update
+            // add background bars first
+            const bargroups = rows.enter()
+                .append('g')
+                .attr( 'class', function(d){
+                    return 'group main ' + d.name.toLowerCase();
+                } );
+
+            bargroups.append( 'rect' )
+                .classed( 'row bg', true )
+                .attr( 'y', chartHeight )
+                .attr( 'x', 0 )
+                // .attr( 'height', yScale.bandwidth() )
+                // .attr( 'width', chartWidth )
+                .on( 'click', function( d ) {
+                    handleClick( this, d, chartWidth, chartHeight );
+                } )
+                .merge( rows )
+                .attr( 'x', 0 )
+                .attr( 'y', ( { name } ) => yScale( name ) )
+                .attr( 'height', yScale.bandwidth() )
+                .attr( 'width', chartWidth )
+                .attr( 'fill', 'yellow');
+
+            // now add the actual bars to what we got
+            bargroups
+                .append( 'rect' )
+                .attr( 'class', function(d){
+                    return 'row '+ d.name.toLowerCase();
+                } )
+                .attr( 'y', chartHeight )
+                .attr( 'x', 0 )
+                .attr( 'height', yScale.bandwidth() )
+                .attr( 'width', ( { value } ) => xScale( value ) )
+                .on( 'mouseover', function( d, index, rowList ) {
+                    handleMouseOver( this, d, rowList, chartWidth, chartHeight );
+                } )
+                .on( 'mousemove', function( d ) {
+                    handleMouseMove( this, d, chartWidth, chartHeight );
+                } )
+                .on( 'mouseout', function( d, index, rowList ) {
+                    handleMouseOut( this, d, rowList, chartWidth, chartHeight );
+                } )
+                .on( 'click', function( d ) {
+                    handleClick( this, d, chartWidth, chartHeight );
+                } )
+                .merge( rows )
+                .attr( 'x', 0 )
+                .attr( 'y', ( { name } ) => yScale( name ) )
+                .attr( 'height', yScale.bandwidth() )
+                .attr( 'width', ( { value } ) => xScale( value ) )
+                .attr( 'fill', ( { name } ) => computeColor( name ) );
+            
         }
 
         /**
@@ -556,7 +556,7 @@ define(function(require) {
                 .text(text)
                 .attr('font-size', labelsSize + 'px')
                 .attr('fill', (d, i)=>{
-                    const backgroundRows = d3Selection.select('.chart-group-background');
+                    const backgroundRows = d3Selection.select('.chart-group');
                     const bgWidth = backgroundRows.node().getBBox().x || backgroundRows.node().getBoundingClientRect().width;
                     const barWidth = xScale(d.value);
                     const labels = labelEl.selectAll( 'text' );
@@ -564,7 +564,7 @@ define(function(require) {
                     return (bgWidth > 0 && bgWidth-barWidth < textWidth) ? '#FFF' : '#000';
                 })
                 .attr( 'transform', ( d, i ) => {
-                    const backgroundRows = d3Selection.select('.chart-group-background');
+                    const backgroundRows = d3Selection.select('.chart-group');
                     const bgWidth = backgroundRows.node().getBBox().x || backgroundRows.node().getBoundingClientRect().width;
                     const barWidth = xScale(d.value);
                     const labels = labelEl.selectAll( 'text' );
@@ -630,45 +630,42 @@ define(function(require) {
         function drawRows() {
             let rows, rowsBg;
 
-            if (isAnimated) {
-                rows = svg.select('.chart-group').selectAll('.row')
-                    .data(dataZeroed);
-                svg.select('.chart-group-background rect').remove();
-                svg.select('.chart-group-background line').remove();
-
-                rowsBg = svg.select('.chart-group-background').selectAll('.row')
-                    .data(dataZeroed);
-
-
-                drawHorizontalRows(rowsBg, true);
-
-                // adding separator line
-                svg.select('.chart-group-background').append('line')
-                    .attr('y1', 0)
-                    .attr('x1', chartWidth)
-                    .attr('y2', chartHeight - 5)
-                    .attr('x2', chartWidth)
-                    .style('stroke', '#000')
-                    .style('stroke-width', 1);
-
-                drawHorizontalRows(rows);
-
-
-                rowsBg = svg.select('.chart-group-background').selectAll('.row')
-                    .data(data);
-
-                rows = svg.select('.chart-group').selectAll('.row')
-                    .data(data);
-
-
-                    drawAnimatedHorizontalRows(rowsBg, true);
-                    drawAnimatedHorizontalRows(rows);
-            } else {
+            // if (isAnimated) {
+            //     rows = svg.select('.chart-group').selectAll('.row')
+            //         .data(dataZeroed);
+            //     svg.select('.chart-group rect').remove();
+            //     svg.select('.chart-group line').remove();
+            //
+            //     // rowsBg = svg.select('.chart-group-background').selectAll('.row')
+            //     //     .data(dataZeroed);
+            //
+            //     drawHorizontalRows(rows, true);
+            //
+            //     // adding separator line
+            //     svg.select('.chart-group').append('line')
+            //         .attr('y1', 0)
+            //         .attr('x1', chartWidth)
+            //         .attr('y2', chartHeight - 5)
+            //         .attr('x2', chartWidth)
+            //         .style('stroke', '#000')
+            //         .style('stroke-width', 1);
+            //
+            //     drawHorizontalRows(rows);
+            //
+            //     // rowsBg = svg.select('.chart-group-background').selectAll('.row')
+            //     //     .data(data);
+            //
+            //     rows = svg.select('.chart-group').selectAll('.row')
+            //         .data(data);
+            //
+            //         drawAnimatedHorizontalRows(rows, true);
+            //         drawAnimatedHorizontalRows(rows);
+            // } else {
                 rows = svg.select('.chart-group').selectAll('.row')
                     .data(data);
 
                 drawHorizontalRows(rows);
-            }
+          //  }
 
             // Exit
             rows.exit()
