@@ -798,42 +798,6 @@ define(function(require) {
         }
 
         /**
-         * Draws the grid lines for a vertical row chart
-         * @return {void}
-         */
-        function drawVerticalGridLines() {
-            maskGridLines = svg.select('.grid-lines-group')
-                .selectAll('line.horizontal-grid-line')
-                .data(yScale.ticks(4))
-                .enter()
-                  .append('line')
-                    .attr('class', 'horizontal-grid-line')
-                    .attr('x1', (xAxisPadding.left))
-                    .attr('x2', chartWidth)
-                    .attr('y1', (d) => yScale(d))
-                    .attr('y2', (d) => yScale(d));
-
-            drawHorizontalExtendedLine();
-        }
-
-        /**
-         * Draws a vertical line to extend x-axis till the edges
-         * @return {void}
-         */
-        function drawHorizontalExtendedLine() {
-            baseLine = svg.select('.grid-lines-group')
-                .selectAll('line.extended-x-line')
-                .data([0])
-                .enter()
-                  .append('line')
-                    .attr('class', 'extended-x-line')
-                    .attr('x1', (xAxisPadding.left))
-                    .attr('x2', chartWidth)
-                    .attr('y1', chartHeight)
-                    .attr('y2', chartHeight);
-        }
-
-        /**
          * Custom OnMouseOver event handler
          * @return {void}
          * @private
