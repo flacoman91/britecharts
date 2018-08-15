@@ -127,7 +127,6 @@ define(function(require) {
             nameLabel = 'name',
             pctChangeLabel = 'pctChange',
             pctOfSetLabel = 'pctOfSet',
-            labelEl,
             labelEl2,
 
             baseLine,
@@ -460,6 +459,31 @@ define(function(require) {
                 .attr( 'width', ( { value } ) => xScale( value ) )
                 .attr( 'fill', ( { name } ) => computeColor( name ) );
 
+            bargroups.append('text')
+                .classed('percentage-label', true)
+                .attr('x', _labelsHorizontalX)
+                .attr('y', _labelsHorizontalY)
+                .text(_labelsFormatValue)
+                .attr('font-size', labelsSize + 'px')
+                .attr('fill', (d, i)=>{
+                    const backgroundRows = d3Selection.select('.chart-group');
+                    const bgWidth = backgroundRows.node().getBBox().x || backgroundRows.node().getBoundingClientRect().width;
+                    const barWidth = xScale(d.value);
+                    const labels = bargroups.selectAll( 'text' );
+                    const textWidth = labels._groups[i][0].getComputedTextLength() + 10;
+                    return (bgWidth > 0 && bgWidth-barWidth < textWidth) ? '#FFF' : '#000';
+                })
+                .attr( 'transform', ( d, i ) => {
+                    const backgroundRows = d3Selection.select('.chart-group');
+                    const bgWidth = backgroundRows.node().getBBox().x || backgroundRows.node().getBoundingClientRect().width;
+                    const barWidth = xScale(d.value);
+                    const labels = bargroups.selectAll( 'text' );
+                    const textWidth = labels._groups[i][0].getComputedTextLength() + 10;
+
+                    if (bgWidth > 0 && bgWidth-barWidth < textWidth) {
+                        return `translate(-${textWidth}, 0)`;
+                    }
+                } );
         }
 
         /**
@@ -491,51 +515,12 @@ define(function(require) {
             let labelXPosition = _labelsHorizontalX;
             let labelYPosition = _labelsHorizontalY;
 
-            let text = _labelsFormatValue;
 
             let pctChangeText = _labelsFormatPct;
 
-            if (labelEl) {
-                svg.selectAll('.percentage-label-group').remove();
-            }
             if(labelEl2){
                 svg.selectAll('.change-label-group').remove();
             }
-            labelEl = svg.select('.metadata-group')
-              .append('g')
-                .classed('percentage-label-group', true)
-                .selectAll('g')
-                .data(data.reverse())
-                .enter()
-                .append('g');
-
-            // append the 6000 complaints | 3%
-            labelEl
-                .append('text')
-                .classed('percentage-label', true)
-                .attr('x', labelXPosition)
-                .attr('y', labelYPosition)
-                .text(text)
-                .attr('font-size', labelsSize + 'px')
-                .attr('fill', (d, i)=>{
-                    const backgroundRows = d3Selection.select('.chart-group');
-                    const bgWidth = backgroundRows.node().getBBox().x || backgroundRows.node().getBoundingClientRect().width;
-                    const barWidth = xScale(d.value);
-                    const labels = labelEl.selectAll( 'text' );
-                    const textWidth = labels._groups[i][0].getComputedTextLength() + 10;
-                    return (bgWidth > 0 && bgWidth-barWidth < textWidth) ? '#FFF' : '#000';
-                })
-                .attr( 'transform', ( d, i ) => {
-                    const backgroundRows = d3Selection.select('.chart-group');
-                    const bgWidth = backgroundRows.node().getBBox().x || backgroundRows.node().getBoundingClientRect().width;
-                    const barWidth = xScale(d.value);
-                    const labels = labelEl.selectAll( 'text' );
-                    const textWidth = labels._groups[i][0].getComputedTextLength() + 10;
-
-                    if (bgWidth > 0 && bgWidth-barWidth < textWidth) {
-                        return `translate(-${textWidth}, 0)`;
-                    }
-                } );
 
             //https://stackoverflow.com/a/20644664
             // add another group
