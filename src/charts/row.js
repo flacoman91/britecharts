@@ -406,24 +406,21 @@ define(function(require) {
         /**
          * Draws the rows along the x axis
          * @param  {D3Selection} rows Selection of rows
-         * @param  {boolean} whether we are doing the background layer
          * @return {void}
          */
-        function drawHorizontalRows(rows, bg) {
+        function drawHorizontalRows(rows) {
             // Enter + Update
             // add background bars first
             const bargroups = rows.enter()
                 .append('g')
                 .attr( 'class', function(d){
-                    return 'group main ' + d.name.toLowerCase();
+                    return 'row ' + d.name.toLowerCase();
                 } );
 
             bargroups.append( 'rect' )
-                .classed( 'row bg', true )
+                .classed( 'bg', true )
                 .attr( 'y', chartHeight )
                 .attr( 'x', 0 )
-                // .attr( 'height', yScale.bandwidth() )
-                // .attr( 'width', chartWidth )
                 .on( 'click', function( d ) {
                     handleClick( this, d, chartWidth, chartHeight );
                 } )
@@ -432,13 +429,13 @@ define(function(require) {
                 .attr( 'y', ( { name } ) => yScale( name ) )
                 .attr( 'height', yScale.bandwidth() )
                 .attr( 'width', chartWidth )
-                .attr( 'fill', 'yellow');
+                .attr( 'fill', backgroundColor);
 
             // now add the actual bars to what we got
             bargroups
                 .append( 'rect' )
                 .attr( 'class', function(d){
-                    return 'row '+ d.name.toLowerCase();
+                    return 'pct '+ d.name.toLowerCase();
                 } )
                 .attr( 'y', chartHeight )
                 .attr( 'x', 0 )
@@ -462,7 +459,7 @@ define(function(require) {
                 .attr( 'height', yScale.bandwidth() )
                 .attr( 'width', ( { value } ) => xScale( value ) )
                 .attr( 'fill', ( { name } ) => computeColor( name ) );
-            
+
         }
 
         /**
@@ -471,7 +468,7 @@ define(function(require) {
          * @param  {boolean} whether we are doing the background layer
          * @return {void}
          */
-        function drawAnimatedHorizontalRows(rows, bg) {
+        function drawAnimatedHorizontalRows(rows) {
             if(!bg){
                 // Enter + Update
                 rows.enter()
@@ -628,7 +625,7 @@ define(function(require) {
          * @private
          */
         function drawRows() {
-            let rows, rowsBg;
+            let rows;
 
             // if (isAnimated) {
             //     rows = svg.select('.chart-group').selectAll('.row')
@@ -636,8 +633,6 @@ define(function(require) {
             //     svg.select('.chart-group rect').remove();
             //     svg.select('.chart-group line').remove();
             //
-            //     // rowsBg = svg.select('.chart-group-background').selectAll('.row')
-            //     //     .data(dataZeroed);
             //
             //     drawHorizontalRows(rows, true);
             //
@@ -652,8 +647,6 @@ define(function(require) {
             //
             //     drawHorizontalRows(rows);
             //
-            //     // rowsBg = svg.select('.chart-group-background').selectAll('.row')
-            //     //     .data(data);
             //
             //     rows = svg.select('.chart-group').selectAll('.row')
             //         .data(data);
