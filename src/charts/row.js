@@ -189,9 +189,6 @@ define(function(require) {
                 drawGridLines();
                 drawRows();
                 drawAxis();
-                if (enableLabels) {
-                    drawLabels();
-                }
             });
         }
 
@@ -459,31 +456,73 @@ define(function(require) {
                 .attr( 'width', ( { value } ) => xScale( value ) )
                 .attr( 'fill', ( { name } ) => computeColor( name ) );
 
-            bargroups.append('text')
-                .classed('percentage-label', true)
-                .attr('x', _labelsHorizontalX)
-                .attr('y', _labelsHorizontalY)
-                .text(_labelsFormatValue)
-                .attr('font-size', labelsSize + 'px')
-                .attr('fill', (d, i)=>{
-                    const backgroundRows = d3Selection.select('.chart-group');
-                    const bgWidth = backgroundRows.node().getBBox().x || backgroundRows.node().getBoundingClientRect().width;
-                    const barWidth = xScale(d.value);
-                    const labels = bargroups.selectAll( 'text' );
-                    const textWidth = labels._groups[i][0].getComputedTextLength() + 10;
-                    return (bgWidth > 0 && bgWidth-barWidth < textWidth) ? '#FFF' : '#000';
-                })
-                .attr( 'transform', ( d, i ) => {
-                    const backgroundRows = d3Selection.select('.chart-group');
-                    const bgWidth = backgroundRows.node().getBBox().x || backgroundRows.node().getBoundingClientRect().width;
-                    const barWidth = xScale(d.value);
-                    const labels = bargroups.selectAll( 'text' );
-                    const textWidth = labels._groups[i][0].getComputedTextLength() + 10;
+            if(enableLabels) {
+                bargroups.append( 'text' )
+                    .classed( 'percentage-label', true )
+                    .attr( 'x', _labelsHorizontalX )
+                    .attr( 'y', _labelsHorizontalY )
+                    .text( _labelsFormatValue )
+                    .attr( 'font-size', labelsSize + 'px' )
+                    .attr( 'fill', ( d, i ) => {
+                        const backgroundRows = d3Selection.select( '.chart-group' );
+                        const bgWidth = backgroundRows.node().getBBox().x || backgroundRows.node().getBoundingClientRect().width;
+                        const barWidth = xScale( d.value );
+                        const labels = bargroups.selectAll( 'text' );
+                        const textWidth = labels._groups[ i ][ 0 ].getComputedTextLength() + 10;
+                        return ( bgWidth > 0 && bgWidth - barWidth < textWidth ) ? '#FFF' : '#000';
+                    } )
+                    .attr( 'transform', ( d, i ) => {
+                        const backgroundRows = d3Selection.select( '.chart-group' );
+                        const bgWidth = backgroundRows.node().getBBox().x || backgroundRows.node().getBoundingClientRect().width;
+                        const barWidth = xScale( d.value );
+                        const labels = bargroups.selectAll( 'text' );
+                        const textWidth = labels._groups[ i ][ 0 ].getComputedTextLength() + 10;
 
-                    if (bgWidth > 0 && bgWidth-barWidth < textWidth) {
-                        return `translate(-${textWidth}, 0)`;
-                    }
-                } );
+                        if ( bgWidth > 0 && bgWidth - barWidth < textWidth ) {
+                            return `translate(-${textWidth}, 0)`;
+                        }
+                    } );
+            }
+
+            if(enableYAxisRight && enableLabels) {
+                const gunit  = bargroups
+                    .append( 'g' )
+                    .attr( 'transform', `translate(${chartWidth + 10}, 0)` )
+                    .classed( 'change-label-group', true );
+
+                // each group should contain the labels and rows
+                gunit.append( 'text' )
+                    .attr( 'y', _labelsHorizontalY )
+                    .attr('font-size', '10')
+                    .attr('font-weight', '600')
+                    .style( 'fill', ( d ) => {
+                        if(d.pctChange === 0 || isNaN(d.pctChange)) {
+                            return '#919395';
+                        }
+                        return d.pctChange > 0 ? upArrowColor : downArrowColor;
+                    } )
+                    .text( _labelsFormatPct );
+
+                gunit.append( 'polygon' )
+                    .attr( 'transform', ( d ) => {
+                        const yPos = _labelsHorizontalY( d );
+                        return d.pctChange < 0 ? `translate(40, ${yPos+5}) rotate(180)` : `translate(30, ${yPos - 10})`;
+                    } )
+                    .attr( 'points', function( d ) {
+                        return '2,8 2,13 8,13 8,8 10,8 5,0 0,8';
+                    } )
+                    .style( 'fill', ( d ) => {
+                        return d.pctChange > 0 ? upArrowColor : downArrowColor;
+                    } )
+                    .attr( 'class', function( d ) {
+                        return d.pctChange < 0 ? 'down' : 'up';
+                    } )
+                    // just hide the percentages if the number is bogus
+                    .attr( 'fill-opacity', function( d ) {
+                        const pctChange = d.pctChange;
+                        return ( isNaN( pctChange ) || pctChange === 0 ) ? 0.0 : 1.0;
+                    } );
+            }
         }
 
         /**
@@ -524,49 +563,7 @@ define(function(require) {
 
             //https://stackoverflow.com/a/20644664
             // add another group
-            if(enableYAxisRight) {
-                labelEl2 = svg.select( '.metadata-group' )
-                    .append( 'g' )
-                    .attr( 'transform', `translate(${chartWidth + 10}, 0)` )
-                    .classed( 'change-label-group', true )
-                    .selectAll( 'g' )
-                    .data( data.reverse() )
-                    .enter()
-                    .append( 'g' );
 
-                // each group should contain the labels and rows
-                labelEl2.append( 'text' )
-                    .attr( 'y', labelYPosition )
-                    .attr('font-size', '10')
-                    .attr('font-weight', '600')
-                    .style( 'fill', ( d ) => {
-                        if(d.pctChange === 0 || isNaN(d.pctChange)) {
-                            return '#919395';
-                        }
-                        return d.pctChange > 0 ? upArrowColor : downArrowColor;
-                    } )
-                    .text( pctChangeText );
-
-                labelEl2.append( 'polygon' )
-                    .attr( 'transform', ( d ) => {
-                        const yPos = _labelsHorizontalY( d );
-                        return d.pctChange < 0 ? `translate(40, ${yPos+5}) rotate(180)` : `translate(30, ${yPos - 10})`;
-                    } )
-                    .attr( 'points', function( d ) {
-                        return '2,8 2,13 8,13 8,8 10,8 5,0 0,8';
-                    } )
-                    .style( 'fill', ( d ) => {
-                        return d.pctChange > 0 ? upArrowColor : downArrowColor;
-                    } )
-                    .attr( 'class', function( d ) {
-                        return d.pctChange < 0 ? 'down' : 'up';
-                    } )
-                    // just hide the percentages if the number is bogus
-                    .attr( 'fill-opacity', function( d ) {
-                        const pctChange = d.pctChange;
-                        return ( isNaN( pctChange ) || pctChange === 0 ) ? 0.0 : 1.0;
-                    } );
-            }
 
         }
 
