@@ -112,7 +112,7 @@ define(function(require) {
             hasSingleRowHighlight = true,
             isAnimated = false,
             ease = d3Ease.easeQuadInOut,
-            animationDuration = 10000,
+            animationDuration = 800,
             animationStepRatio = 70,
             backgroundColor = '#bebebe',
             backgroundWidth = 70,
@@ -468,51 +468,17 @@ define(function(require) {
          * @return {void}
          */
         function drawAnimatedHorizontalRows(rows) {
-            // if(!bg){
-            //     // Enter + Update
-            //     rows.enter()
-            //         .append( 'rect' )
-            //         .classed( 'row', true )
-            //         .attr( 'x', 0 )
-            //         .attr( 'y', chartHeight )
-            //         .attr( 'height', yScale.bandwidth() )
-            //         .attr( 'width', ( { value } ) => xScale( value ) )
-            //         .on( 'mouseover', function( d, index, rowList ) {
-            //             handleMouseOver( this, d, rowList, chartWidth, chartHeight );
-            //         } )
-            //         .on( 'mousemove', function( d ) {
-            //             handleMouseMove( this, d, chartWidth, chartHeight );
-            //         } )
-            //         .on( 'mouseout', function( d, index, rowList ) {
-            //             handleMouseOut( this, d, rowList, chartWidth, chartHeight );
-            //         } )
-            //         .on( 'click', function( d ) {
-            //             handleClick( this, d, chartWidth, chartHeight );
-            //         } );
-            // }
-            // if(bg) {
-            //     rows
-            //         .attr('x', 0)
-            //         .attr('y', ({name}) => yScale(name))
-            //         .attr('height', yScale.bandwidth())
-            //         .attr('fill', backgroundColor)
-            //         .transition()
-            //         .duration(animationDuration)
-            //         .delay(interRowDelay)
-            //         .ease(ease)
-            //         .attr('width', ( { value } ) => chartWidth );
-            // } else {
-                rows
-                    .attr( 'x', 0 )
-                    .attr( 'y', ( { name } ) => yScale( name ) )
-                    .attr( 'height', yScale.bandwidth() )
-                    .attr( 'fill', ( { name } ) => computeColor( name ) )
-                    .transition()
-                    .duration( 10000 )
-                    .delay( interRowDelay )
-                    .ease( ease )
-                    .attr( 'width', ( { value } ) => xScale( value ) );
-            // }
+            rows
+                .attr( 'x', 0 )
+                .attr( 'y', ( { name } ) => yScale( name ) )
+                .attr( 'height', yScale.bandwidth() )
+                .attr( 'fill', ( { name } ) => computeColor( name ) )
+                .attr('width', 0)
+                .transition()
+                .duration( animationDuration )
+                .delay( interRowDelay )
+                .ease( ease )
+                .attr( 'width', ( { value } ) => xScale( value ) );
         }
 
 
@@ -626,33 +592,33 @@ define(function(require) {
         function drawRows() {
             let rows;
 
-            // if (isAnimated) {
-            //     rows = svg.select('.chart-group').selectAll('.row')
-            //         .data(dataZeroed);
-            //     svg.select('.chart-group rect').remove();
-            //     svg.select('.chart-group line').remove();
-            //
-            //     drawHorizontalRows(rows);
-            //
-            //     // adding separator line
-            //     svg.select('.chart-group').append('line')
-            //         .attr('y1', 0)
-            //         .attr('x1', chartWidth)
-            //         .attr('y2', chartHeight - 5)
-            //         .attr('x2', chartWidth)
-            //         .style('stroke', '#000')
-            //         .style('stroke-width', 1);
-            //
-            //     rows = svg.select('.chart-group').selectAll('.row .pct')
-            //         .data(data);
-            //
-            //         drawAnimatedHorizontalRows(rows);
-            // } else {
+            if (isAnimated) {
+                rows = svg.select('.chart-group').selectAll('.row')
+                    .data(dataZeroed);
+                svg.select('.chart-group rect').remove();
+                svg.select('.chart-group line').remove();
+
+                drawHorizontalRows(rows);
+
+                // adding separator line
+                svg.select('.chart-group').append('line')
+                    .attr('y1', 0)
+                    .attr('x1', chartWidth)
+                    .attr('y2', chartHeight - 5)
+                    .attr('x2', chartWidth)
+                    .style('stroke', '#000')
+                    .style('stroke-width', 1);
+
+                rows = svg.select('.chart-group').selectAll('.row rect.pct')
+                    .data(data);
+
+                    drawAnimatedHorizontalRows(rows);
+            } else {
                 rows = svg.select('.chart-group').selectAll('rect')
                     .data(data);
 
                 drawHorizontalRows(rows);
-            //}
+            }
 
             // Exit
             rows.exit()
