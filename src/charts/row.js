@@ -112,7 +112,7 @@ define(function(require) {
             hasSingleRowHighlight = true,
             isAnimated = false,
             ease = d3Ease.easeQuadInOut,
-            animationDuration = 2000,
+            animationDuration = 10000,
             animationStepRatio = 70,
             backgroundColor = '#bebebe',
             backgroundWidth = 70,
@@ -626,33 +626,33 @@ define(function(require) {
         function drawRows() {
             let rows;
 
-            if (isAnimated) {
-                rows = svg.select('.chart-group').selectAll('.row')
-                    .data(dataZeroed);
-                svg.select('.chart-group rect').remove();
-                svg.select('.chart-group line').remove();
-
-                drawHorizontalRows(rows);
-
-                // adding separator line
-                svg.select('.chart-group').append('line')
-                    .attr('y1', 0)
-                    .attr('x1', chartWidth)
-                    .attr('y2', chartHeight - 5)
-                    .attr('x2', chartWidth)
-                    .style('stroke', '#000')
-                    .style('stroke-width', 1);
-
-                rows = svg.select('.chart-group').selectAll('.row')
+            // if (isAnimated) {
+            //     rows = svg.select('.chart-group').selectAll('.row')
+            //         .data(dataZeroed);
+            //     svg.select('.chart-group rect').remove();
+            //     svg.select('.chart-group line').remove();
+            //
+            //     drawHorizontalRows(rows);
+            //
+            //     // adding separator line
+            //     svg.select('.chart-group').append('line')
+            //         .attr('y1', 0)
+            //         .attr('x1', chartWidth)
+            //         .attr('y2', chartHeight - 5)
+            //         .attr('x2', chartWidth)
+            //         .style('stroke', '#000')
+            //         .style('stroke-width', 1);
+            //
+            //     rows = svg.select('.chart-group').selectAll('.row .pct')
+            //         .data(data);
+            //
+            //         drawAnimatedHorizontalRows(rows);
+            // } else {
+                rows = svg.select('.chart-group').selectAll('rect')
                     .data(data);
 
-                    drawAnimatedHorizontalRows(rows);
-            } else {
-                rows = svg.select('.chart-group').selectAll('.row')
-                    .data(data);
-
                 drawHorizontalRows(rows);
-            }
+            //}
 
             // Exit
             rows.exit()
