@@ -204,19 +204,11 @@ define(function(require) {
          * @private
          */
         function buildAxis() {
-            if (isHorizontal) {
-                xAxis = d3Axis.axisBottom(xScale)
-                    .ticks(xTicks, numberFormat)
-                    .tickSizeInner([-chartHeight]);
+            xAxis = d3Axis.axisBottom(xScale)
+                .ticks(xTicks, numberFormat)
+                .tickSizeInner([-chartHeight]);
 
-                yAxis = d3Axis.axisLeft(yScale);
-
-            } else {
-                xAxis = d3Axis.axisBottom(xScale);
-
-                yAxis = d3Axis.axisLeft(yScale)
-                    .ticks(yTicks, numberFormat)
-            }
+            yAxis = d3Axis.axisLeft(yScale);
         }
 
         /**
@@ -289,26 +281,15 @@ define(function(require) {
         function buildScales() {
             let percentageAxis = Math.min(percentageAxisToMaxRatio * d3Array.max(data, getValue))
 
-            if (isHorizontal) {
-                xScale = d3Scale.scaleLinear()
-                    .domain([0, percentageAxis])
-                    .rangeRound([0, chartWidth]);
+            xScale = d3Scale.scaleLinear()
+                .domain([0, percentageAxis])
+                .rangeRound([0, chartWidth]);
 
-                yScale = d3Scale.scaleBand()
-                    .domain(data.map(getName))
-                    .rangeRound([chartHeight, 0])
-                    .padding(betweenRowsPadding);
+            yScale = d3Scale.scaleBand()
+                .domain(data.map(getName))
+                .rangeRound([chartHeight, 0])
+                .padding(betweenRowsPadding);
 
-            } else {
-                xScale = d3Scale.scaleBand()
-                    .domain(data.map(getName))
-                    .rangeRound([0, chartWidth])
-                    .padding(betweenRowsPadding);
-
-                yScale = d3Scale.scaleLinear()
-                    .domain([0, percentageAxis])
-                    .rangeRound([chartHeight, 0]);
-            }
 
             if (shouldReverseColorList) {
                 colorList = data.map(d => d)
@@ -617,8 +598,8 @@ define(function(require) {
          * @return {void}
          */
         function drawLabels() {
-            let labelXPosition = isHorizontal ? _labelsHorizontalX : _labelsVerticalX;
-            let labelYPosition = isHorizontal ? _labelsHorizontalY : _labelsVerticalY;
+            let labelXPosition = _labelsHorizontalX;
+            let labelYPosition = _labelsHorizontalY;
 
             let text = _labelsFormatValue;
 
@@ -730,22 +711,20 @@ define(function(require) {
                 rowsBg = svg.select('.chart-group-background').selectAll('.row')
                     .data(dataZeroed);
 
-                if (isHorizontal) {
-                    drawHorizontalRows(rowsBg, true);
 
-                    // adding separator line
-                    svg.select('.chart-group-background').append('line')
-                        .attr('y1', 0)
-                        .attr('x1', chartWidth)
-                        .attr('y2', chartHeight - 5)
-                        .attr('x2', chartWidth)
-                        .style('stroke', '#000')
-                        .style('stroke-width', 1);
+                drawHorizontalRows(rowsBg, true);
 
-                    drawHorizontalRows(rows);
-                } else {
-                    drawVerticalRows(rows);
-                }
+                // adding separator line
+                svg.select('.chart-group-background').append('line')
+                    .attr('y1', 0)
+                    .attr('x1', chartWidth)
+                    .attr('y2', chartHeight - 5)
+                    .attr('x2', chartWidth)
+                    .style('stroke', '#000')
+                    .style('stroke-width', 1);
+
+                drawHorizontalRows(rows);
+
 
                 rowsBg = svg.select('.chart-group-background').selectAll('.row')
                     .data(data);
@@ -753,21 +732,14 @@ define(function(require) {
                 rows = svg.select('.chart-group').selectAll('.row')
                     .data(data);
 
-                if (isHorizontal) {
+
                     drawAnimatedHorizontalRows(rowsBg, true);
                     drawAnimatedHorizontalRows(rows);
-                } else {
-                    drawAnimatedVerticalRows(rows);
-                }
             } else {
                 rows = svg.select('.chart-group').selectAll('.row')
                     .data(data);
 
-                if (isHorizontal) {
-                    drawHorizontalRows(rows);
-                } else {
-                    drawVerticalRows(rows);
-                }
+                drawHorizontalRows(rows);
             }
 
             // Exit
@@ -786,11 +758,7 @@ define(function(require) {
                 .selectAll('line')
                 .remove();
 
-            if (isHorizontal) {
-                drawHorizontalGridLines();
-            } else {
-                drawVerticalGridLines();
-            }
+            drawHorizontalGridLines();
         }
 
         /**
