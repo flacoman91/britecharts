@@ -410,7 +410,7 @@ define(function(require) {
             const bargroups = rows.enter()
                 .append('g')
                 .attr( 'class', function(d){
-                    return 'row ' + d.name.toLowerCase();
+                    return 'row';// + d.name.toLowerCase();
                 } );
 
             bargroups.append( 'rect' )
@@ -431,7 +431,7 @@ define(function(require) {
             bargroups
                 .append( 'rect' )
                 .attr( 'class', function(d){
-                    return 'pct '+ d.name.toLowerCase();
+                    return 'pct';//+ d.name.toLowerCase();
                 } )
                 .attr( 'y', chartHeight )
                 .attr( 'x', 0 )
@@ -457,6 +457,9 @@ define(function(require) {
                 .attr( 'fill', ( { name } ) => computeColor( name ) );
 
             if(enableLabels) {
+                const backgroundRows = d3Selection.select( '.chart-group .bg' );
+                const bgWidth = backgroundRows.node().getBBox().x || backgroundRows.node().getBoundingClientRect().width;
+
                 bargroups.append( 'text' )
                     .classed( 'percentage-label', true )
                     .attr( 'x', _labelsHorizontalX )
@@ -464,20 +467,15 @@ define(function(require) {
                     .text( _labelsFormatValue )
                     .attr( 'font-size', labelsSize + 'px' )
                     .attr( 'fill', ( d, i ) => {
-                        const backgroundRows = d3Selection.select( '.chart-group' );
-                        const bgWidth = backgroundRows.node().getBBox().x || backgroundRows.node().getBoundingClientRect().width;
                         const barWidth = xScale( d.value );
                         const labels = bargroups.selectAll( 'text' );
                         const textWidth = labels._groups[ i ][ 0 ].getComputedTextLength() + 10;
                         return ( bgWidth > 0 && bgWidth - barWidth < textWidth ) ? '#FFF' : '#000';
                     } )
                     .attr( 'transform', ( d, i ) => {
-                        const backgroundRows = d3Selection.select( '.chart-group' );
-                        const bgWidth = backgroundRows.node().getBBox().x || backgroundRows.node().getBoundingClientRect().width;
                         const barWidth = xScale( d.value );
                         const labels = bargroups.selectAll( 'text' );
                         const textWidth = labels._groups[ i ][ 0 ].getComputedTextLength() + 10;
-
                         if ( bgWidth > 0 && bgWidth - barWidth < textWidth ) {
                             return `translate(-${textWidth}, 0)`;
                         }
@@ -544,29 +542,6 @@ define(function(require) {
                 .attr( 'width', ( { value } ) => xScale( value ) );
         }
 
-
-        /**
-         * Draws labels at the end of each row
-         * @private
-         * @return {void}
-         */
-        function drawLabels() {
-            let labelXPosition = _labelsHorizontalX;
-            let labelYPosition = _labelsHorizontalY;
-
-
-            let pctChangeText = _labelsFormatPct;
-
-            if(labelEl2){
-                svg.selectAll('.change-label-group').remove();
-            }
-
-            //https://stackoverflow.com/a/20644664
-            // add another group
-
-
-        }
-
         /**
          * Draws the row elements within the chart group
          * @private
@@ -577,8 +552,6 @@ define(function(require) {
             if (isAnimated) {
                 rows = svg.select('.chart-group').selectAll('.row')
                     .data(dataZeroed);
-                svg.select('.chart-group rect').remove();
-                svg.select('.chart-group line').remove();
 
                 drawHorizontalRows(rows);
 
