@@ -66,6 +66,7 @@
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
     d3.csv("data.tsv", type, function (error, data) {
+        console.log(data);
         var a = alpha(data, v),	  //scale factor between value and bar width
             mid = Midi(data, v, a),	//mid-point displacement of bar i
             w = Wi(data, v, a);		  //width of bar i
@@ -75,7 +76,7 @@
         x.domain(data.map(function (d) {
             return d.name;
         }));
-        y.domain([0, d3.max(data, ww)]);
+        y.domain([0, d3.max(data, v)]);
 
         svg.append("text")
             .attr("class", "title")
@@ -102,17 +103,18 @@
             .enter().append("rect")
             .attr("class", "bar")
             .attr("x", function (d, i) {
-                return x(d.name) - a * d.value/2;	//center the bar on the tick
+                return x(d.name) - a * d.wwww/2;	//center the bar on the tick
             })
             //using x.range sets x.rangeBands to zero, compute width as a function of value
             .attr("width", x.rangeBand() || function (d) {
-                return a * d.value;	//`a` already accounts for both types of padding
+                return a * d.wwww;
+                //`a` already accounts for both types of padding
             })
             .attr("y", function (d) {
-                return y(d.wwww);
+                return y(d.value);
             })
             .attr("height", function (d) {
-                return height - y(d.wwww);
+                return height - y(d.value);
             });
     });
 
@@ -147,15 +149,9 @@
         d.wwww = +d.wwww;
         return d;
     }
-
     function v(d) {
         return +d.value;
     }
-
-    function ww(d) {
-        return +d.wwww;
-    }
-
     function alpha(values, value) {
         var n = values.length, total = d3.sum(values, value);
         return (width - (n - 1) * padding * width / n - 2 * outerPadding * width / n) / total
