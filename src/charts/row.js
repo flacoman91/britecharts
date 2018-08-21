@@ -96,7 +96,9 @@ define(function(require) {
             labelsNumberFormat = NUMBER_FORMAT,
             labelsSuffix = '',
             labelsSize = 12,
+            padding = 0.1,
             betweenRowsPadding = 0.1,
+            outerPadding = 0.3,
             xAxis, yAxis,
             xAxisPadding = {
                 top: 0,
@@ -170,7 +172,7 @@ define(function(require) {
 
             // labels per row, aka XX Complaints
             _labelsHorizontalX = ({value}) => xScale(value) + labelsMargin,
-            _labelsHorizontalY= ({name}) => { return yScale(name) + (yScale.bandwidth() / 2) + (labelsSize * (3/8)); };
+            _labelsHorizontalY= ({name}) => { return yScale(name); + (yScale.bandwidth() / 2) + (labelsSize * (3/8)); };
 
         /**
          * This function creates the graph using the selection as container
@@ -188,7 +190,7 @@ define(function(require) {
                 buildSVG(this);
                 buildGradient();
                 drawGridLines();
-                drawRows();
+                // drawRows();
                 drawAxis();
             });
         }
@@ -265,21 +267,51 @@ define(function(require) {
             }
         }
 
+        function v(d) {
+            return +d.width;
+        }
+
+        function ww(d) {
+            return +d.value;
+        }
+
+        function alpha(values, value) {
+            var n = values.length, total = d3.sum(values, value);
+            return (chartHeight - (n - 1) * padding * chartHeight / n - 2 * outerPadding * chartHeight / n) / total
+        }
+        function Wi(values, value, alpha) {
+            return function (i) {
+                return value(values[i]) * alpha
+            }
+        }
+
+        function Midi(values, value, alpha) {
+            var w = Wi(values, value, alpha), n = values.length;
+            return function (_, i) {
+                var op = outerPadding * chartHeight / n, p = padding * chartHeight / n;
+                return op + d3.sum(values.slice(0, i), value) * alpha + i * p + w(i) / 2;
+            }
+        }
+
         /**
          * Creates the x and y scales of the graph
          * @private
          */
         function buildScales() {
+            let a = alpha(data, v),	  //scale factor between value and bar width
+                mid = Midi(data, v, a),	//mid-point displacement of bar i
+                w = Wi(data, v, a);		  //width of bar i
+
             let percentageAxis = Math.min(percentageAxisToMaxRatio * d3Array.max(data, getValue))
 
             xScale = d3Scale.scaleLinear()
                 .domain([0, percentageAxis])
                 .rangeRound([0, chartWidth]);
 
-            yScale = d3Scale.scaleBand()
+            yScale = d3Scale.scaleOrdinal()
                 .domain(data.map(getName))
-                .rangeRound([chartHeight, 0])
-                .padding(betweenRowsPadding);
+                .range(data.map(mid)); //force irregular intervals based on
+            // value
 
 
             if (shouldReverseColorList) {
@@ -333,6 +365,7 @@ define(function(require) {
                 d.pctChange = +d[pctChangeLabel];
                 d.value = +d[valueLabel];
                 d.name = String(d[nameLabel]);
+                d.width = +d.width;
 
                 return [...acc, d];
             }, []);
@@ -535,7 +568,13 @@ define(function(require) {
                 .attr( 'x', 0 )
                 .attr( 'y', ( { name } ) => yScale( name ) )
                 .attr( 'height', yScale.bandwidth() )
-                .attr( 'fill', ( { name } ) => computeColor( name ) )
+                // .attr( 'fill', ( { name } ) => computeColor( name ) )
+                .attr( 'fill', ( d ) => {
+                    if ( d.parent )
+                        return 'yellow';
+
+                    return computeColor( d.name );
+                } )
                 .attr('width', 0)
                 .transition()
                 .duration( animationDuration )
