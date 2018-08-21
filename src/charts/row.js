@@ -127,7 +127,6 @@ define(function(require) {
             nameLabel = 'name',
             pctChangeLabel = 'pctChange',
             pctOfSetLabel = 'pctOfSet',
-            labelEl2,
 
             baseLine,
             maskGridLines,
@@ -219,9 +218,6 @@ define(function(require) {
 
             container
                 .append('g').classed('grid-lines-group', true);
-
-            // container
-            //     .append('g').classed('chart-group-background', true);
 
             container
                 .append('g').classed('chart-group', true);
