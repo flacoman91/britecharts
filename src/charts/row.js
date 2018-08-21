@@ -172,8 +172,8 @@ define(function(require) {
 
             // labels per row, aka XX Complaints
             _labelsHorizontalX = ({value}) => xScale(value) + labelsMargin,
-            _labelsHorizontalY= ({name}) => { return yScale(name); + (yScale.bandwidth() / 2) + (labelsSize * (3/8)); };
-
+            _labelsHorizontalY= ({name}) => { return yScale(name) + (labelsSize * (3/8)); };
+        
         /**
          * This function creates the graph using the selection as container
          * @param  {D3Selection} _selection A d3 selection that represents
@@ -190,7 +190,7 @@ define(function(require) {
                 buildSVG(this);
                 buildGradient();
                 drawGridLines();
-                // drawRows();
+                drawRows();
                 drawAxis();
             });
         }
@@ -292,13 +292,14 @@ define(function(require) {
                 return op + d3.sum(values.slice(0, i), value) * alpha + i * p + w(i) / 2;
             }
         }
+        let a, mid, w;
 
         /**
          * Creates the x and y scales of the graph
          * @private
          */
         function buildScales() {
-            let a = alpha(data, v),	  //scale factor between value and bar width
+            a = alpha(data, v),	  //scale factor between value and bar width
                 mid = Midi(data, v, a),	//mid-point displacement of bar i
                 w = Wi(data, v, a);		  //width of bar i
 
@@ -361,10 +362,10 @@ define(function(require) {
          */
         function cleanData(originalData) {
             let data = originalData.reduce((acc, d) => {
+                d.name = String(d[nameLabel]);
                 d.pctOfSet = +d[pctOfSetLabel];
                 d.pctChange = +d[pctChangeLabel];
                 d.value = +d[valueLabel];
-                d.name = String(d[nameLabel]);
                 d.width = +d.width;
 
                 return [...acc, d];
@@ -453,8 +454,13 @@ define(function(require) {
                 } )
                 .merge( rows )
                 .attr( 'x', 0 )
-                .attr( 'y', ( { name } ) => yScale( name ) )
-                .attr( 'height', yScale.bandwidth() )
+                // .attr( 'y', ( { name } ) => yScale( name ) )
+                .attr("y", function (d, i) {
+                    return yScale(d.name) - a * d.width/2;	//center the bar on the tick
+                })
+                .attr( 'height', function (d) {
+                    return a * d.width;	//`a` already accounts for both types of padding
+                } )
                 .attr( 'width', chartWidth )
                 .attr( 'fill', backgroundColor);
 
@@ -466,7 +472,9 @@ define(function(require) {
                 } )
                 .attr( 'y', chartHeight )
                 .attr( 'x', 0 )
-                .attr( 'height', yScale.bandwidth() )
+                .attr( 'height', function (d) {
+                    return a * d.width;	//`a` already accounts for both types of padding
+                } )
                 .attr( 'width', ( { value } ) => xScale( value ) )
                 .on( 'mouseover', function( d, index, rowList ) {
                     handleMouseOver( this, d, rowList, chartWidth, chartHeight );
@@ -482,8 +490,13 @@ define(function(require) {
                 } )
                 .merge( rows )
                 .attr( 'x', 0 )
-                .attr( 'y', ( { name } ) => yScale( name ) )
-                .attr( 'height', yScale.bandwidth() )
+                .attr( 'y', function (d, i) {
+                    return yScale(d.name) - a * d.width/2;
+                    //center the bar on the tick
+                })
+                .attr( 'height',function (d) {
+                    return a * d.width;	//`a` already accounts for both types of padding
+                } )
                 .attr( 'width', ( { value } ) => xScale( value ) )
                 .attr( 'fill', ( d ) => {
                     if ( d.parent )
@@ -541,7 +554,7 @@ define(function(require) {
                         const yPos = _labelsHorizontalY( d );
                         return d.pctChange < 0 ? `translate(40, ${yPos+5}) rotate(180)` : `translate(30, ${yPos - 10})`;
                     } )
-                    .attr( 'points', function( d ) {
+                    .attr( 'poinxts', function( d ) {
                         return '2,8 2,13 8,13 8,8 10,8 5,0 0,8';
                     } )
                     .style( 'fill', ( d ) => {
@@ -566,8 +579,13 @@ define(function(require) {
         function drawAnimatedHorizontalRows(rows) {
             rows
                 .attr( 'x', 0 )
-                .attr( 'y', ( { name } ) => yScale( name ) )
-                .attr( 'height', yScale.bandwidth() )
+                .attr( 'y', function (d, i) {
+                    return yScale(d.name) - a * d.width/2;
+                    //center the bar on the tick
+                })
+                .attr( 'height', function (d) {
+                    return a * d.width;	//`a` already accounts for both types of padding
+                })
                 // .attr( 'fill', ( { name } ) => computeColor( name ) )
                 .attr( 'fill', ( d ) => {
                     if ( d.parent )

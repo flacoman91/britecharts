@@ -44,7 +44,7 @@ function createSimpleRowChart() {
             .orderingFunction(function(a,b){
                 return a.value > b.value;
             })
-            .height(250)
+            .height(dataTarget.length * 37)
             .xTicks( 0 )
             .yTicks( 0 )
             .percentageAxisToMaxRatio(1)
@@ -90,7 +90,7 @@ function createHorizontalRowChart() {
             .orderingFunction(function(a,b){
                 return a.value > b.value;
             })
-            .height(250)
+            .height(dataset.length * 37)
             .xTicks( 0 )
             .yTicks( 0 )
             .percentageAxisToMaxRatio(1)
@@ -141,7 +141,7 @@ function createRowChartWithTooltip() {
             .orderingFunction(function(a,b){
                 return a.value > b.value;
             })
-            .height(250)
+            .height(dataTarget.length * 37)
             .xTicks( 0 )
             .yTicks( 0 )
             .percentageAxisToMaxRatio(1.5)

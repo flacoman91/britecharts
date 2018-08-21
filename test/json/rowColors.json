@@ -27,7 +27,7 @@
             "parent": "Shining",
             "pctChange": "---",
             "pctOfSet": 70,
-            "width": ".25"
+            "width": ".4"
         },
         {
             "name": "Vivid",
@@ -35,7 +35,7 @@
             "parent": "Shining",
             "pctChange": -9,
             "pctOfSet": 24,
-            "width": ".25"
+            "width": ".4"
         },
         {
             "name": "Brilliant",
@@ -47,16 +47,18 @@
         {
             "name": "Increase",
             "value": 1900,
+            "parent": "Brilliant",
             "pctChange": 999999,
             "pctOfSet": 8,
-            "width": ".25"
+            "width": ".4"
         },
         {
             "name": "Decrease",
             "value": 1900,
+            "parent": "Brilliant",
             "pctChange": -999999,
             "pctOfSet": 8,
-            "width": ".25"
+            "width": ".4"
         }
 
     ]
