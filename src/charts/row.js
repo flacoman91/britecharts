@@ -173,7 +173,7 @@ define(function(require) {
             // labels per row, aka XX Complaints
             _labelsHorizontalX = ({value}) => xScale(value) + labelsMargin,
             _labelsHorizontalY= ({name}) => { return yScale(name) + (labelsSize * (3/8)); };
-        
+
         /**
          * This function creates the graph using the selection as container
          * @param  {D3Selection} _selection A d3 selection that represents
@@ -554,7 +554,7 @@ define(function(require) {
                         const yPos = _labelsHorizontalY( d );
                         return d.pctChange < 0 ? `translate(40, ${yPos+5}) rotate(180)` : `translate(30, ${yPos - 10})`;
                     } )
-                    .attr( 'poinxts', function( d ) {
+                    .attr( 'points', function( d ) {
                         return '2,8 2,13 8,13 8,8 10,8 5,0 0,8';
                     } )
                     .style( 'fill', ( d ) => {
