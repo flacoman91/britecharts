@@ -147,9 +147,11 @@ define(function(require) {
             getPctChange = ({pctChange}) => pctChange,
             getValue = ({value}) => value,
 
-            _labelsFormatValue = ( { value, pctOfSet } ) => {
+            _labelsFormatValue = ( { pctOfSet, parent, value } ) => {
                 let pctLabel = '';
-                if(pctOfSet){
+                // don't include this label on child elements (hasparent)
+                // elements
+                if ( pctOfSet && !parent ) {
                     pctLabel = '  | ' + pctOfSet + '%';
                 }
                 return d3Format.format( labelsNumberFormat )( value ) + ' ' + labelsSuffix + pctLabel;
@@ -454,8 +456,12 @@ define(function(require) {
                 .attr( 'y', ( { name } ) => yScale( name ) )
                 .attr( 'height', yScale.bandwidth() )
                 .attr( 'width', ( { value } ) => xScale( value ) )
-                .attr( 'fill', ( { name } ) => computeColor( name ) );
+                .attr( 'fill', ( d ) => {
+                    if ( d.parent )
+                        return 'yellow';
 
+                    return computeColor( d.name );
+                } );
             if(enableLabels) {
                 const backgroundRows = d3Selection.select( '.chart-group .bg' );
                 const bgWidth = backgroundRows.node().getBBox().x || backgroundRows.node().getBoundingClientRect().width;
