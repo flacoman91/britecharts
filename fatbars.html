@@ -36,27 +36,29 @@
     </style>
 </head>
 <body>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>-->
+<script src="https://d3js.org/d3.v5.min.js"></script>
+
 <script>
 
     var margin = {top: 80, right: 180, bottom: 80, left: 180},
         width = 960 - margin.left - margin.right,
         height = 500 - margin.top - margin.bottom;
 
+    console.log(width);
     var padding = 0.1, outerPadding = 0.3,
-        x = d3.scale.ordinal()
-            .rangeRoundBands([0, width], padding, outerPadding);
+        x = d3.scaleOrdinal();
+            // .rangeRound([0, width])
+            // .padding(padding);
 
-    var y = d3.scale.linear()
+    var y = d3.scaleLinear()
         .range([height, 0]);
 
-    var xAxis = d3.svg.axis()
-        .scale(x)
-        .orient("bottom");
+    var xAxis = d3.axisBottom()
+        .scale(x);
 
-    var yAxis = d3.svg.axis()
+    var yAxis = d3.axisLeft()
         .scale(y)
-        .orient("left")
         .ticks(8, "%");
 
     var svg = d3.select("body").append("svg")
@@ -65,7 +67,7 @@
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-    d3.csv("data.tsv", type, function (error, data) {
+    d3.csv("data.tsv", type).then(function (data) {
         var a = alpha(data, v),	  //scale factor between value and bar width
             mid = Midi(data, v, a),	//mid-point displacement of bar i
             w = Wi(data, v, a);		  //width of bar i
@@ -75,6 +77,7 @@
         x.domain(data.map(function (d) {
             return d.name;
         }));
+
         y.domain([0, d3.max(data, ww)]);
 
         svg.append("text")
@@ -105,7 +108,7 @@
                 return x(d.name) - a * d.value/2;	//center the bar on the tick
             })
             //using x.range sets x.rangeBands to zero, compute width as a function of value
-            .attr("width", x.rangeBand() || function (d) {
+            .attr("width", function (d) {
                 return a * d.value;	//`a` already accounts for both types of padding
             })
             .attr("y", function (d) {
