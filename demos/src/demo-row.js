@@ -41,9 +41,6 @@ function createSimpleRowChart() {
             .colorSchema(['#20aa3f'])
             .width(containerWidth)
             .yAxisPaddingBetweenChart(5)
-            .orderingFunction(function(a,b){
-                return a.value > b.value;
-            })
             .height(dataTarget.length * 37)
             .xTicks( 0 )
             .yTicks( 0 )
@@ -87,9 +84,6 @@ function createHorizontalRowChart() {
             .colorSchema(['#20aa3f'])
             .width(containerWidth)
             .yAxisPaddingBetweenChart(5)
-            .orderingFunction(function(a,b){
-                return a.value > b.value;
-            })
             .height(dataset.length * 37)
             .xTicks( 0 )
             .yTicks( 0 )
@@ -138,9 +132,6 @@ function createRowChartWithTooltip() {
             .colorSchema(['#20aa3f'])
             .width(containerWidth)
             .yAxisPaddingBetweenChart(5)
-            .orderingFunction(function(a,b){
-                return a.value > b.value;
-            })
             .height(dataTarget.length * 37)
             .xTicks( 0 )
             .yTicks( 0 )

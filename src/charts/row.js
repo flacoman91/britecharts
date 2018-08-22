@@ -596,7 +596,6 @@ define(function(require) {
                 .attr('width', 0)
                 .transition()
                 .duration( animationDuration )
-                .delay( interRowDelay )
                 .ease( ease )
                 .attr( 'width', ( { value } ) => xScale( value ) );
         }
