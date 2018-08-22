@@ -182,7 +182,7 @@ define(function(require) {
          */
         function exports(_selection) {
             _selection.each(function(_data) {
-                chartWidth = width - margin.left - margin.right - (yAxisPaddingBetweenChart * 1.2);
+                chartWidth = width - margin.left - margin.right - (yAxisPaddingBetweenChart * 1.2) - 50;
                 chartHeight = height - margin.top - margin.bottom;
                 ({data, dataZeroed} = sortData(cleanData(_data)));
                 buildScales();
