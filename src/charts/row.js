@@ -428,6 +428,12 @@ define(function(require) {
                 .call(yAxis);
 
             svg.selectAll('.y-axis-group.axis .tick text')
+                .classed('child', function(d){
+                    // lets us know it's a child element
+                    return data.find((o)=>{
+                        return o.name === d;
+                    }).parent;
+                })
                 .call(wrapText, margin.left - yAxisPaddingBetweenChart)
         }
 
