@@ -428,6 +428,12 @@ define(function(require) {
                 .call(yAxis);
 
             svg.selectAll('.y-axis-group.axis .tick text')
+                .classed('parent', function(d){
+                    // lets us know it's a parent element
+                    return data.find((o)=>{
+                        return o.parent === d;
+                    });
+                })
                 .classed('child', function(d){
                     // lets us know it's a child element
                     return data.find((o)=>{
