@@ -16,6 +16,7 @@
         },
         {
             "name": "Shining",
+            "isParent": true,
             "value": 213,
             "pctChange": 1,
             "pctOfSet": 12,
@@ -39,6 +40,7 @@
         },
         {
             "name": "Brilliant",
+            "isParent": true,
             "value": 1900,
             "pctChange": 1,
             "pctOfSet": 8,

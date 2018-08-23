@@ -414,6 +414,31 @@ define(function(require) {
             textHelper.wrapTextWithEllipses(text, containerWidth, 0, yAxisLineWrapLimit)
         }
 
+
+        function addExpandToggle(elem){
+            elem.each( function() {
+                elem = d3Selection.select( this );
+                elem.append( 'polygon' )
+                    .attr( 'transform', ( d ) => {
+                        return `translate(0, -5)`;
+                    } )
+                    .attr( 'points', function( d ) {
+                        return '0,0 10,0 5,10';
+                    } )
+                    .style( 'fill', ( d ) => {
+                        return 'blue';
+                    } )
+                    .style( 'fill-opacity', ( d ) => {
+                        // if there are no children, make this transparent
+                        console.log(d);
+                        const e = data.find((o)=>{
+                            return o.name === d && o.isParent
+                        });
+
+                        return e ? 1 : 0;
+                    } );
+            } );
+        }
         /**
          * Draws the x and y axis on the svg object within their
          * respective groups
@@ -440,7 +465,12 @@ define(function(require) {
                         return o.name === d;
                     }).parent;
                 })
-                .call(wrapText, margin.left - yAxisPaddingBetweenChart)
+                .call(wrapText, margin.left - yAxisPaddingBetweenChart);
+
+            // adding the down arrow for parent elements
+            svg.selectAll('.y-axis-group.axis .tick')
+                .call(addExpandToggle);
+
         }
 
         /**
@@ -466,7 +496,6 @@ define(function(require) {
                 } )
                 .merge( rows )
                 .attr( 'x', 0 )
-                // .attr( 'y', ( { name } ) => yScale( name ) )
                 .attr("y", function (d, i) {
                     return yScale(d.name) - a * d.width/2;	//center the bar on the tick
                 })
