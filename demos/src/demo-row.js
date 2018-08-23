@@ -41,7 +41,7 @@ function createSimpleRowChart() {
             .colorSchema(['#20aa3f'])
             .width(containerWidth)
             .yAxisPaddingBetweenChart(5)
-            .height(dataTarget.length * 37)
+            .height(dataTarget.length * 100)
             .xTicks( 0 )
             .yTicks( 0 )
             .percentageAxisToMaxRatio(1)
