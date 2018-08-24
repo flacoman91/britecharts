@@ -23,7 +23,9 @@ function createSimpleRowChart() {
     if (containerWidth) {
         dataset = aRowDataSet().withColors().build();
         const dataTarget = dataset.slice(1,2);
-
+        const colorScheme = dataTarget.map((o)=>{
+            return o.parent ? '#20aa3f' : '#eeeeee';
+        });
         rowChart
             .isHorizontal(true)
             .isAnimated(true)
@@ -38,7 +40,7 @@ function createSimpleRowChart() {
             .enableLabels(true)
             .labelsNumberFormat(',d')
             .labelsSuffix('complaints')
-            .colorSchema(['#20aa3f'])
+            .colorSchema(colorScheme)
             .width(containerWidth)
             .yAxisPaddingBetweenChart(10)
             .height(dataTarget.length * 100)
@@ -67,6 +69,9 @@ function createHorizontalRowChart() {
     if (containerWidth) {
         dataset = aRowDataSet().withColors().build();
 
+        const colorScheme = dataset.map((o)=>{
+            return o.parent ? '#20aa3f' : '#eeeeee';
+        });
         rowChart
             .isHorizontal(true)
             .isAnimated(true)
@@ -81,7 +86,7 @@ function createHorizontalRowChart() {
             .enableLabels(true)
             .labelsNumberFormat(',d')
             .labelsSuffix('complaints')
-            .colorSchema(['#20aa3f'])
+            .colorSchema(colorScheme)
             .width(containerWidth)
             .yAxisPaddingBetweenChart(10)
             .height(dataset.length * 37)
@@ -115,6 +120,9 @@ function createRowChartWithTooltip() {
         dataset = aRowDataSet().withColors().build();
         const dataTarget = dataset.slice(0,4);
 
+        const colorScheme = dataTarget.map((o)=>{
+            return o.parent ? '#20aa3f' : '#eeeeee';
+        });
         rowChart
             .isHorizontal(true)
             .isAnimated(true)
@@ -129,7 +137,7 @@ function createRowChartWithTooltip() {
             .enableLabels(true)
             .labelsNumberFormat(',d')
             .labelsSuffix('complaints')
-            .colorSchema(['#20aa3f'])
+            .colorSchema(colorScheme)
             .width(containerWidth)
             .yAxisPaddingBetweenChart(10)
             .height(dataTarget.length * 37)
