@@ -426,15 +426,14 @@ define(function(require) {
                         const e = data.find((o)=>{
                             return o.parent === d
                         });
-
-                        return e ? `translate(0, -5)` : 'translate(10, 5)' +
+                        return e ? `translate(${yAxisPaddingBetweenChart-15}, -2.5)` : `translate(${yAxisPaddingBetweenChart-5}, 2.5)` +
                             ' rotate(180)';
                     } )
                     .attr( 'points', function( d ) {
-                        return '0,0 10,0 5,10';
+                        return '0,0 10,0 5,5';
                     } )
                     .style( 'fill', ( d ) => {
-                        return 'blue';
+                        return '#0072ce';
                     } )
                     .style( 'fill-opacity', ( d ) => {
                         // if there are no children, make this transparent
