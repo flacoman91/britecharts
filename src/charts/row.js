@@ -419,6 +419,12 @@ define(function(require) {
             elem.each( function() {
                 d3Selection.select( this ).selectAll('polygon').remove();
                 elem = d3Selection.select( this );
+                elem.classed('expandable', (d) => {
+                    const e = data.find((o)=>{
+                        return o.parent === d
+                    });
+                    return e;
+                });
                 elem.append( 'polygon' )
                     .attr( 'transform', ( d ) => {
                         // determine if it is open
