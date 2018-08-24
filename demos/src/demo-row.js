@@ -24,7 +24,7 @@ function createSimpleRowChart() {
         dataset = aRowDataSet().withColors().build();
         const dataTarget = dataset.slice(1,2);
         const colorScheme = dataTarget.map((o)=>{
-            return o.parent ? '#20aa3f' : '#eeeeee';
+            return o.parent ? '#addc91' : '#20aa3f';
         });
         rowChart
             .isHorizontal(true)
