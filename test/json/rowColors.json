@@ -4,49 +4,64 @@
             "name": "Radiating",
             "value": 2024,
             "pctChange": -20,
-            "pctOfSet": 5
+            "pctOfSet": 5,
+            "width": ".5"
         },
         {
             "name": "Opalescent",
+            "isParent": true,
             "value": 7000,
             "pctChange": 11,
-            "pctOfSet": 100
+            "pctOfSet": 100,
+            "width": ".5"
         },
         {
             "name": "Shining",
+            "isParent": true,
             "value": 213,
             "pctChange": 1,
-            "pctOfSet": 12
+            "pctOfSet": 12,
+            "width": ".5"
         },
         {
             "name": "Brillian Brillian Brillian BrillianBrillian Brillian",
             "value": 6001,
+            "parent": "Shining",
             "pctChange": "---",
-            "pctOfSet": 70
+            "pctOfSet": 70,
+            "width": ".4"
         },
         {
             "name": "Vivid",
             "value": 613,
+            "parent": "Shining",
             "pctChange": -9,
-            "pctOfSet": 24
+            "pctOfSet": 24,
+            "width": ".4"
         },
         {
             "name": "Brilliant",
+            "isParent": true,
             "value": 1900,
             "pctChange": 1,
-            "pctOfSet": 8
+            "pctOfSet": 8,
+            "width": ".5"
         },
         {
             "name": "Increase",
             "value": 1900,
+            "parent": "Brilliant",
             "pctChange": 999999,
-            "pctOfSet": 8
+            "pctOfSet": 8,
+            "width": ".4"
         },
         {
             "name": "Decrease",
             "value": 1900,
+            "parent": "Brilliant",
             "pctChange": -999999,
-            "pctOfSet": 8
+            "pctOfSet": 8,
+            "width": ".4"
         }
 
     ]

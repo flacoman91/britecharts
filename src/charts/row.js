@@ -96,7 +96,9 @@ define(function(require) {
             labelsNumberFormat = NUMBER_FORMAT,
             labelsSuffix = '',
             labelsSize = 12,
+            padding = 0.1,
             betweenRowsPadding = 0.1,
+            outerPadding = 0.3,
             xAxis, yAxis,
             xAxisPadding = {
                 top: 0,
@@ -127,8 +129,6 @@ define(function(require) {
             nameLabel = 'name',
             pctChangeLabel = 'pctChange',
             pctOfSetLabel = 'pctOfSet',
-            labelEl,
-            labelEl2,
 
             baseLine,
             maskGridLines,
@@ -148,9 +148,11 @@ define(function(require) {
             getPctChange = ({pctChange}) => pctChange,
             getValue = ({value}) => value,
 
-            _labelsFormatValue = ( { value, pctOfSet } ) => {
+            _labelsFormatValue = ( { pctOfSet, parent, value } ) => {
                 let pctLabel = '';
-                if(pctOfSet){
+                // don't include this label on child elements (hasparent)
+                // elements
+                if ( pctOfSet && !parent ) {
                     pctLabel = '  | ' + pctOfSet + '%';
                 }
                 return d3Format.format( labelsNumberFormat )( value ) + ' ' + labelsSuffix + pctLabel;
@@ -170,11 +172,8 @@ define(function(require) {
 
             // labels per row, aka XX Complaints
             _labelsHorizontalX = ({value}) => xScale(value) + labelsMargin,
-            _labelsHorizontalY= ({name}) => { return yScale(name) + (yScale.bandwidth() / 2) + (labelsSize * (3/8)); },
+            _labelsHorizontalY= ({name}) => { return yScale(name) + (labelsSize * (3/8)); };
 
-            // vertical axis labels
-            _labelsVerticalX = ({name}) => xScale(name),
-            _labelsVerticalY = ({value}) => yScale(value) - labelsMargin;
         /**
          * This function creates the graph using the selection as container
          * @param  {D3Selection} _selection A d3 selection that represents
@@ -183,7 +182,7 @@ define(function(require) {
          */
         function exports(_selection) {
             _selection.each(function(_data) {
-                chartWidth = width - margin.left - margin.right - (yAxisPaddingBetweenChart * 1.2);
+                chartWidth = width - margin.left - margin.right - (yAxisPaddingBetweenChart * 1.2) - 50;
                 chartHeight = height - margin.top - margin.bottom;
                 ({data, dataZeroed} = sortData(cleanData(_data)));
                 buildScales();
@@ -193,9 +192,6 @@ define(function(require) {
                 drawGridLines();
                 drawRows();
                 drawAxis();
-                if (enableLabels) {
-                    drawLabels();
-                }
             });
         }
 
@@ -204,19 +200,11 @@ define(function(require) {
          * @private
          */
         function buildAxis() {
-            if (isHorizontal) {
-                xAxis = d3Axis.axisBottom(xScale)
-                    .ticks(xTicks, numberFormat)
-                    .tickSizeInner([-chartHeight]);
+            xAxis = d3Axis.axisBottom(xScale)
+                .ticks(xTicks, numberFormat)
+                .tickSizeInner([-chartHeight]);
 
-                yAxis = d3Axis.axisLeft(yScale);
-
-            } else {
-                xAxis = d3Axis.axisBottom(xScale);
-
-                yAxis = d3Axis.axisLeft(yScale)
-                    .ticks(yTicks, numberFormat)
-            }
+            yAxis = d3Axis.axisLeft(yScale);
         }
 
         /**
@@ -232,9 +220,6 @@ define(function(require) {
 
             container
                 .append('g').classed('grid-lines-group', true);
-
-            container
-                .append('g').classed('chart-group-background', true);
 
             container
                 .append('g').classed('chart-group', true);
@@ -282,33 +267,53 @@ define(function(require) {
             }
         }
 
+        function v(d) {
+            return +d.width;
+        }
+
+        function ww(d) {
+            return +d.value;
+        }
+
+        function alpha(values, value) {
+            var n = values.length, total = d3.sum(values, value);
+            return (chartHeight - (n - 1) * padding * chartHeight / n - 2 * outerPadding * chartHeight / n) / total
+        }
+        function Wi(values, value, alpha) {
+            return function (i) {
+                return value(values[i]) * alpha
+            }
+        }
+
+        function Midi(values, value, alpha) {
+            var w = Wi(values, value, alpha), n = values.length;
+            return function (_, i) {
+                var op = outerPadding * chartHeight / n, p = padding * chartHeight / n;
+                return op + d3.sum(values.slice(0, i), value) * alpha + i * p + w(i) / 2;
+            }
+        }
+        let a, mid, w;
+
         /**
          * Creates the x and y scales of the graph
          * @private
          */
         function buildScales() {
+            a = alpha(data, v),	  //scale factor between value and bar width
+                mid = Midi(data, v, a),	//mid-point displacement of bar i
+                w = Wi(data, v, a);		  //width of bar i
+
             let percentageAxis = Math.min(percentageAxisToMaxRatio * d3Array.max(data, getValue))
 
-            if (isHorizontal) {
-                xScale = d3Scale.scaleLinear()
-                    .domain([0, percentageAxis])
-                    .rangeRound([0, chartWidth]);
+            xScale = d3Scale.scaleLinear()
+                .domain([0, percentageAxis])
+                .rangeRound([0, chartWidth]);
 
-                yScale = d3Scale.scaleBand()
-                    .domain(data.map(getName))
-                    .rangeRound([chartHeight, 0])
-                    .padding(betweenRowsPadding);
+            yScale = d3Scale.scaleOrdinal()
+                .domain(data.map(getName))
+                .range(data.map(mid)); //force irregular intervals based on
+            // value
 
-            } else {
-                xScale = d3Scale.scaleBand()
-                    .domain(data.map(getName))
-                    .rangeRound([0, chartWidth])
-                    .padding(betweenRowsPadding);
-
-                yScale = d3Scale.scaleLinear()
-                    .domain([0, percentageAxis])
-                    .rangeRound([chartHeight, 0]);
-            }
 
             if (shouldReverseColorList) {
                 colorList = data.map(d => d)
@@ -357,19 +362,16 @@ define(function(require) {
          */
         function cleanData(originalData) {
             let data = originalData.reduce((acc, d) => {
+                d.name = String(d[nameLabel]);
                 d.pctOfSet = +d[pctOfSetLabel];
                 d.pctChange = +d[pctChangeLabel];
                 d.value = +d[valueLabel];
-                d.name = String(d[nameLabel]);
+                d.width = +d.width;
 
                 return [...acc, d];
             }, []);
 
-            let dataZeroed = data.map((d) => ({
-                pctChange: 0,
-                value: 0,
-                name: String(d[nameLabel])
-            }));
+            const dataZeroed = data.slice();
 
             return { data, dataZeroed };
         }
@@ -412,6 +414,37 @@ define(function(require) {
             textHelper.wrapTextWithEllipses(text, containerWidth, 0, yAxisLineWrapLimit)
         }
 
+
+        function addExpandToggle(elem){
+            elem.each( function() {
+                d3Selection.select( this ).selectAll('polygon').remove();
+                elem = d3Selection.select( this );
+                elem.append( 'polygon' )
+                    .attr( 'transform', ( d ) => {
+                        // determine if it is open
+                        // if there are no children we rotate it
+                        const e = data.find((o)=>{
+                            return o.parent === d
+                        });
+                        return e ? `translate(${yAxisPaddingBetweenChart-15}, -2.5)` : `translate(${yAxisPaddingBetweenChart-5}, 2.5)` +
+                            ' rotate(180)';
+                    } )
+                    .attr( 'points', function( d ) {
+                        return '0,0 10,0 5,5';
+                    } )
+                    .style( 'fill', ( d ) => {
+                        return '#0072ce';
+                    } )
+                    .style( 'fill-opacity', ( d ) => {
+                        // if there are no children, make this transparent
+                        const e = data.find((o)=>{
+                            return o.name === d && o.isParent
+                        });
+
+                        return e ? 1 : 0;
+                    } );
+            } );
+        }
         /**
          * Draws the x and y axis on the svg object within their
          * respective groups
@@ -426,261 +459,131 @@ define(function(require) {
                 .call(yAxis);
 
             svg.selectAll('.y-axis-group.axis .tick text')
-                .call(wrapText, margin.left - yAxisPaddingBetweenChart)
+                .classed('parent', function(d){
+                    // lets us know it's a parent element
+                    return data.find((o)=>{
+                        return o.parent === d;
+                    });
+                })
+                .classed('child', function(d){
+                    // lets us know it's a child element
+                    return data.find((o)=>{
+                        return o.name === d;
+                    }).parent;
+                })
+                .call(wrapText, margin.left - yAxisPaddingBetweenChart);
+
+            // adding the down arrow for parent elements
+            svg.selectAll('.y-axis-group.axis .tick')
+                .call(addExpandToggle);
+
         }
 
         /**
          * Draws the rows along the x axis
          * @param  {D3Selection} rows Selection of rows
-         * @param  {boolean} whether we are doing the background layer
          * @return {void}
          */
-        function drawHorizontalRows(rows, bg) {
-            if (bg) {
-                // Enter + Update
-                rows.enter()
-                    .append( 'rect' )
-                    .classed( 'row', true )
-                    .attr( 'y', chartHeight )
-                    .attr( 'x', 0 )
-                    .attr( 'height', yScale.bandwidth() )
-                    .attr( 'width', ( { value } ) => xScale( value ) )
-                    .on( 'click', function( d ) {
-                        handleClick( this, d, chartWidth, chartHeight );
-                    } )
-                    .merge( rows )
-                    .attr( 'x', 0 )
-                    .attr( 'y', ( { name } ) => yScale( name ) )
-                    .attr( 'height', yScale.bandwidth() )
-                    .attr( 'width', ( { value } ) => xScale( value ) )
-                    .attr( 'fill', ( { name } ) => computeColor( name ) );
-            }
-            else {
-                // Enter + Update
-                rows.enter()
-                    .append( 'rect' )
-                    .classed( 'row', true )
-                    .attr( 'y', chartHeight )
-                    .attr( 'x', 0 )
-                    .attr( 'height', yScale.bandwidth() )
-                    .attr( 'width', ( { value } ) => xScale( value ) )
-                    .on( 'mouseover', function( d, index, rowList ) {
-                        handleMouseOver( this, d, rowList, chartWidth, chartHeight );
-                    } )
-                    .on( 'mousemove', function( d ) {
-                        handleMouseMove( this, d, chartWidth, chartHeight );
-                    } )
-                    .on( 'mouseout', function( d, index, rowList ) {
-                        handleMouseOut( this, d, rowList, chartWidth, chartHeight );
-                    } )
-                    .on( 'click', function( d ) {
-                        handleClick( this, d, chartWidth, chartHeight );
-                    } )
-                    .merge( rows )
-                    .attr( 'x', 0 )
-                    .attr( 'y', ( { name } ) => yScale( name ) )
-                    .attr( 'height', yScale.bandwidth() )
-                    .attr( 'width', ( { value } ) => xScale( value ) )
-                    .attr( 'fill', ( { name } ) => computeColor( name ) );
-            }
-        }
-
-        /**
-         * Draws and animates the rows along the x axis
-         * @param  {D3Selection} rows Selection of rows
-         * @param  {boolean} whether we are doing the background layer
-         * @return {void}
-         */
-        function drawAnimatedHorizontalRows(rows, bg) {
-            if(!bg){
-                // Enter + Update
-                rows.enter()
-                    .append( 'rect' )
-                    .classed( 'row', true )
-                    .attr( 'x', 0 )
-                    .attr( 'y', chartHeight )
-                    .attr( 'height', yScale.bandwidth() )
-                    .attr( 'width', ( { value } ) => xScale( value ) )
-                    .on( 'mouseover', function( d, index, rowList ) {
-                        handleMouseOver( this, d, rowList, chartWidth, chartHeight );
-                    } )
-                    .on( 'mousemove', function( d ) {
-                        handleMouseMove( this, d, chartWidth, chartHeight );
-                    } )
-                    .on( 'mouseout', function( d, index, rowList ) {
-                        handleMouseOut( this, d, rowList, chartWidth, chartHeight );
-                    } )
-                    .on( 'click', function( d ) {
-                        handleClick( this, d, chartWidth, chartHeight );
-                    } );
-            }
-            if(bg) {
-                rows
-                    .attr('x', 0)
-                    .attr('y', ({name}) => yScale(name))
-                    .attr('height', yScale.bandwidth())
-                    .attr('fill', backgroundColor)
-                    .transition()
-                    .duration(animationDuration)
-                    .delay(interRowDelay)
-                    .ease(ease)
-                    .attr('width', ( { value } ) => chartWidth );
-            } else {
-                rows
-                    .attr( 'x', 0 )
-                    .attr( 'y', ( { name } ) => yScale( name ) )
-                    .attr( 'height', yScale.bandwidth() )
-                    .attr( 'fill', ( { name } ) => computeColor( name ) )
-                    .transition()
-                    .duration( animationDuration )
-                    .delay( interRowDelay )
-                    .ease( ease )
-                    .attr( 'width', ( { value } ) => xScale( value ) );
-            }
-        }
-
-        /**
-         * Draws and animates the rows along the y axis
-         * @param  {D3Selection} rows Selection of rows
-         * @return {void}
-         */
-        function drawAnimatedVerticalRows(rows) {
+        function drawHorizontalRows(rows) {
             // Enter + Update
-            rows.enter()
-              .append('rect')
-                .classed('row', true)
-                .attr('x', chartWidth)
-                .attr('y', ({value}) => yScale(value))
-                .attr('width', xScale.bandwidth())
-                .attr('height', ({value}) => chartHeight - yScale(value))
-                .on('mouseover', function(d, index, rowList) {
-                    handleMouseOver(this, d, rowList, chartWidth, chartHeight);
-                })
-                .on('mousemove', function(d) {
-                    handleMouseMove(this, d, chartWidth, chartHeight);
-                })
-                .on('mouseout', function(d, index, rowList) {
-                    handleMouseOut(this, d, rowList, chartWidth, chartHeight);
-                })
-                .on('click', function(d) {
-                    handleClick(this, d, chartWidth, chartHeight);
-                })
-              .merge(rows)
-                .attr('x', ({name}) => xScale(name))
-                .attr('width', xScale.bandwidth())
-                .attr('fill', ({name}) => computeColor(name))
-                .transition()
-                .duration(animationDuration)
-                .delay(interRowDelay)
-                .ease(ease)
-                .attr('y', ({value}) => yScale(value))
-                .attr('height', ({value}) => chartHeight - yScale(value));
-        }
-
-        /**
-         * Draws the rows along the y axis
-         * @param  {D3Selection} rows Selection of rows
-         * @return {void}
-         */
-        function drawVerticalRows(rows) {
-            // Enter + Update
-            rows.enter()
-              .append('rect')
-                .classed('row', true)
-                .attr('x', chartWidth)
-                .attr('y', ({value}) => yScale(value))
-                .attr('width', xScale.bandwidth())
-                .attr('height', ({value}) => chartHeight - yScale(value))
-                .on('mouseover', function(d, index, rowList) {
-                    handleMouseOver(this, d, rowList, chartWidth, chartHeight);
-                })
-                .on('mousemove', function(d) {
-                    handleMouseMove(this, d, chartWidth, chartHeight);
-                })
-                .on('mouseout', function(d, index, rowList) {
-                    handleMouseOut(this, d, rowList, chartWidth, chartHeight);
-                })
-                .on('click', function(d) {
-                    handleClick(this, d, chartWidth, chartHeight);
-                })
-              .merge(rows)
-                .attr('x', ({name}) => xScale(name))
-                .attr('y', ({value}) => yScale(value))
-                .attr('width', xScale.bandwidth())
-                .attr('height', ({value}) => chartHeight - yScale(value))
-                .attr('fill', ({name}) => computeColor(name));
-        }
-
-        /**
-         * Draws labels at the end of each row
-         * @private
-         * @return {void}
-         */
-        function drawLabels() {
-            let labelXPosition = isHorizontal ? _labelsHorizontalX : _labelsVerticalX;
-            let labelYPosition = isHorizontal ? _labelsHorizontalY : _labelsVerticalY;
-
-            let text = _labelsFormatValue;
-
-            let pctChangeText = _labelsFormatPct;
-
-            if (labelEl) {
-                svg.selectAll('.percentage-label-group').remove();
-            }
-            if(labelEl2){
-                svg.selectAll('.change-label-group').remove();
-            }
-            labelEl = svg.select('.metadata-group')
-              .append('g')
-                .classed('percentage-label-group', true)
-                .selectAll('g')
-                .data(data.reverse())
-                .enter()
-                .append('g');
-
-            // append the 6000 complaints | 3%
-            labelEl
-                .append('text')
-                .classed('percentage-label', true)
-                .attr('x', labelXPosition)
-                .attr('y', labelYPosition)
-                .text(text)
-                .attr('font-size', labelsSize + 'px')
-                .attr('fill', (d, i)=>{
-                    const backgroundRows = d3Selection.select('.chart-group-background');
-                    const bgWidth = backgroundRows.node().getBBox().x || backgroundRows.node().getBoundingClientRect().width;
-                    const barWidth = xScale(d.value);
-                    const labels = labelEl.selectAll( 'text' );
-                    const textWidth = labels._groups[i][0].getComputedTextLength() + 10;
-                    return (bgWidth > 0 && bgWidth-barWidth < textWidth) ? '#FFF' : '#000';
-                })
-                .attr( 'transform', ( d, i ) => {
-                    const backgroundRows = d3Selection.select('.chart-group-background');
-                    const bgWidth = backgroundRows.node().getBBox().x || backgroundRows.node().getBoundingClientRect().width;
-                    const barWidth = xScale(d.value);
-                    const labels = labelEl.selectAll( 'text' );
-                    const textWidth = labels._groups[i][0].getComputedTextLength() + 10;
-
-                    if (bgWidth > 0 && bgWidth-barWidth < textWidth) {
-                        return `translate(-${textWidth}, 0)`;
-                    }
+            // add background bars first
+            const bargroups = rows.enter()
+                .append('g')
+                .attr( 'class', function(d){
+                    return 'row';// + d.name.toLowerCase();
                 } );
 
-            //https://stackoverflow.com/a/20644664
-            // add another group
-            if(enableYAxisRight) {
-                labelEl2 = svg.select( '.metadata-group' )
+            bargroups.append( 'rect' )
+                .classed( 'bg', true )
+                .attr( 'y', chartHeight )
+                .attr( 'x', 0 )
+                .on( 'click', function( d ) {
+                    handleClick( this, d, chartWidth, chartHeight );
+                } )
+                .merge( rows )
+                .attr( 'x', 0 )
+                .attr("y", function (d, i) {
+                    return yScale(d.name) - a * d.width/2;	//center the bar on the tick
+                })
+                .attr( 'height', function (d) {
+                    return a * d.width;	//`a` already accounts for both types of padding
+                } )
+                .attr( 'width', chartWidth )
+                .attr( 'fill', backgroundColor);
+
+            // now add the actual bars to what we got
+            bargroups
+                .append( 'rect' )
+                .attr( 'class', function(d){
+                    return 'pct';//+ d.name.toLowerCase();
+                } )
+                .attr( 'y', chartHeight )
+                .attr( 'x', 0 )
+                .attr( 'height', function (d) {
+                    return a * d.width;	//`a` already accounts for both types of padding
+                } )
+                .attr( 'width', ( { value } ) => xScale( value ) )
+                .on( 'mouseover', function( d, index, rowList ) {
+                    handleMouseOver( this, d, rowList, chartWidth, chartHeight );
+                } )
+                .on( 'mousemove', function( d ) {
+                    handleMouseMove( this, d, chartWidth, chartHeight );
+                } )
+                .on( 'mouseout', function( d, index, rowList ) {
+                    handleMouseOut( this, d, rowList, chartWidth, chartHeight );
+                } )
+                .on( 'click', function( d ) {
+                    handleClick( this, d, chartWidth, chartHeight );
+                } )
+                .merge( rows )
+                .attr( 'x', 0 )
+                .attr( 'y', function (d, i) {
+                    return yScale(d.name) - a * d.width/2;
+                    //center the bar on the tick
+                })
+                .attr( 'height',function (d) {
+                    return a * d.width;	//`a` already accounts for both types of padding
+                } )
+                .attr( 'width', ( { value } ) => xScale( value ) )
+                .attr( 'fill', ( d ) => {
+
+                    return computeColor( d.name );
+                } );
+            if(enableLabels) {
+                const backgroundRows = d3Selection.select( '.chart-group .bg' );
+                const bgWidth = backgroundRows.node().getBBox().x || backgroundRows.node().getBoundingClientRect().width;
+
+                bargroups.append( 'text' )
+                    .classed( 'percentage-label', true )
+                    .attr( 'x', _labelsHorizontalX )
+                    .attr( 'y', _labelsHorizontalY )
+                    .text( _labelsFormatValue )
+                    .attr( 'font-size', labelsSize + 'px' )
+                    .attr( 'fill', ( d, i ) => {
+                        const barWidth = xScale( d.value );
+                        const labels = bargroups.selectAll( 'text' );
+                        const textWidth = labels._groups[ i ][ 0 ].getComputedTextLength() + 10;
+                        return ( bgWidth > 0 && bgWidth - barWidth < textWidth ) ? '#FFF' : '#000';
+                    } )
+                    .attr( 'transform', ( d, i ) => {
+                        const barWidth = xScale( d.value );
+                        const labels = bargroups.selectAll( 'text' );
+                        const textWidth = labels._groups[ i ][ 0 ].getComputedTextLength() + 10;
+                        if ( bgWidth > 0 && bgWidth - barWidth < textWidth ) {
+                            return `translate(-${textWidth}, 0)`;
+                        }
+                    } );
+            }
+
+            if(enableYAxisRight && enableLabels) {
+                const gunit  = bargroups
                     .append( 'g' )
                     .attr( 'transform', `translate(${chartWidth + 10}, 0)` )
-                    .classed( 'change-label-group', true )
-                    .selectAll( 'g' )
-                    .data( data.reverse() )
-                    .enter()
-                    .append( 'g' );
+                    .classed( 'change-label-group', true );
 
                 // each group should contain the labels and rows
-                labelEl2.append( 'text' )
-                    .attr( 'y', labelYPosition )
+                gunit.append( 'text' )
+                    .attr( 'y', _labelsHorizontalY )
                     .attr('font-size', '10')
                     .attr('font-weight', '600')
                     .style( 'fill', ( d ) => {
@@ -689,9 +592,9 @@ define(function(require) {
                         }
                         return d.pctChange > 0 ? upArrowColor : downArrowColor;
                     } )
-                    .text( pctChangeText );
+                    .text( _labelsFormatPct );
 
-                labelEl2.append( 'polygon' )
+                gunit.append( 'polygon' )
                     .attr( 'transform', ( d ) => {
                         const yPos = _labelsHorizontalY( d );
                         return d.pctChange < 0 ? `translate(40, ${yPos+5}) rotate(180)` : `translate(30, ${yPos - 10})`;
@@ -711,7 +614,32 @@ define(function(require) {
                         return ( isNaN( pctChange ) || pctChange === 0 ) ? 0.0 : 1.0;
                     } );
             }
+        }
 
+        /**
+         * Draws and animates the rows along the x axis
+         * @param  {D3Selection} rows Selection of rows
+         * @return {void}
+         */
+        function drawAnimatedHorizontalRows(rows) {
+            rows
+                .attr( 'x', 0 )
+                .attr( 'y', function (d, i) {
+                    return yScale(d.name) - a * d.width/2;
+                    //center the bar on the tick
+                })
+                .attr( 'height', function (d) {
+                    return a * d.width;	//`a` already accounts for both types of padding
+                })
+                // .attr( 'fill', ( { name } ) => computeColor( name ) )
+                .attr( 'fill', ( d ) => {
+                    return computeColor( d.name );
+                } )
+                .attr('width', 0)
+                .transition()
+                .duration( animationDuration )
+                .ease( ease )
+                .attr( 'width', ( { value } ) => xScale( value ) );
         }
 
         /**
@@ -719,55 +647,32 @@ define(function(require) {
          * @private
          */
         function drawRows() {
-            let rows, rowsBg;
+            let rows;
 
             if (isAnimated) {
                 rows = svg.select('.chart-group').selectAll('.row')
                     .data(dataZeroed);
-                svg.select('.chart-group-background rect').remove();
-                svg.select('.chart-group-background line').remove();
 
-                rowsBg = svg.select('.chart-group-background').selectAll('.row')
-                    .data(dataZeroed);
+                drawHorizontalRows(rows);
 
-                if (isHorizontal) {
-                    drawHorizontalRows(rowsBg, true);
+                // adding separator line
+                svg.select('.chart-group').append('line')
+                    .attr('y1', 0)
+                    .attr('x1', chartWidth)
+                    .attr('y2', chartHeight - 5)
+                    .attr('x2', chartWidth)
+                    .style('stroke', '#000')
+                    .style('stroke-width', 1);
 
-                    // adding separator line
-                    svg.select('.chart-group-background').append('line')
-                        .attr('y1', 0)
-                        .attr('x1', chartWidth)
-                        .attr('y2', chartHeight - 5)
-                        .attr('x2', chartWidth)
-                        .style('stroke', '#000')
-                        .style('stroke-width', 1);
-
-                    drawHorizontalRows(rows);
-                } else {
-                    drawVerticalRows(rows);
-                }
-
-                rowsBg = svg.select('.chart-group-background').selectAll('.row')
+                rows = svg.select('.chart-group').selectAll('.row rect.pct')
                     .data(data);
 
-                rows = svg.select('.chart-group').selectAll('.row')
-                    .data(data);
-
-                if (isHorizontal) {
-                    drawAnimatedHorizontalRows(rowsBg, true);
                     drawAnimatedHorizontalRows(rows);
-                } else {
-                    drawAnimatedVerticalRows(rows);
-                }
             } else {
-                rows = svg.select('.chart-group').selectAll('.row')
+                rows = svg.select('.chart-group').selectAll('rect')
                     .data(data);
 
-                if (isHorizontal) {
-                    drawHorizontalRows(rows);
-                } else {
-                    drawVerticalRows(rows);
-                }
+                drawHorizontalRows(rows);
             }
 
             // Exit
@@ -786,11 +691,7 @@ define(function(require) {
                 .selectAll('line')
                 .remove();
 
-            if (isHorizontal) {
-                drawHorizontalGridLines();
-            } else {
-                drawVerticalGridLines();
-            }
+            drawHorizontalGridLines();
         }
 
         /**
@@ -827,42 +728,6 @@ define(function(require) {
                     .attr('y2', chartHeight)
                     .attr('x1', 0)
                     .attr('x2', 0);
-        }
-
-        /**
-         * Draws the grid lines for a vertical row chart
-         * @return {void}
-         */
-        function drawVerticalGridLines() {
-            maskGridLines = svg.select('.grid-lines-group')
-                .selectAll('line.horizontal-grid-line')
-                .data(yScale.ticks(4))
-                .enter()
-                  .append('line')
-                    .attr('class', 'horizontal-grid-line')
-                    .attr('x1', (xAxisPadding.left))
-                    .attr('x2', chartWidth)
-                    .attr('y1', (d) => yScale(d))
-                    .attr('y2', (d) => yScale(d));
-
-            drawHorizontalExtendedLine();
-        }
-
-        /**
-         * Draws a vertical line to extend x-axis till the edges
-         * @return {void}
-         */
-        function drawHorizontalExtendedLine() {
-            baseLine = svg.select('.grid-lines-group')
-                .selectAll('line.extended-x-line')
-                .data([0])
-                .enter()
-                  .append('line')
-                    .attr('class', 'extended-x-line')
-                    .attr('x1', (xAxisPadding.left))
-                    .attr('x2', chartWidth)
-                    .attr('y1', chartHeight)
-                    .attr('y2', chartHeight);
         }
 
         /**
