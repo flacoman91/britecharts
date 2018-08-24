@@ -9,6 +9,7 @@
         },
         {
             "name": "Opalescent",
+            "isParent": true,
             "value": 7000,
             "pctChange": 11,
             "pctOfSet": 100,

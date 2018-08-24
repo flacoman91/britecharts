@@ -417,10 +417,18 @@ define(function(require) {
 
         function addExpandToggle(elem){
             elem.each( function() {
+                d3Selection.select( this ).selectAll('polygon').remove();
                 elem = d3Selection.select( this );
                 elem.append( 'polygon' )
                     .attr( 'transform', ( d ) => {
-                        return `translate(0, -5)`;
+                        // determine if it is open
+                        // if there are no children we rotate it
+                        const e = data.find((o)=>{
+                            return o.parent === d
+                        });
+
+                        return e ? `translate(0, -5)` : 'translate(10, 5)' +
+                            ' rotate(180)';
                     } )
                     .attr( 'points', function( d ) {
                         return '0,0 10,0 5,10';
@@ -430,7 +438,6 @@ define(function(require) {
                     } )
                     .style( 'fill-opacity', ( d ) => {
                         // if there are no children, make this transparent
-                        console.log(d);
                         const e = data.find((o)=>{
                             return o.name === d && o.isParent
                         });
