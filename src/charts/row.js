@@ -546,8 +546,6 @@ define(function(require) {
                 } )
                 .attr( 'width', ( { value } ) => xScale( value ) )
                 .attr( 'fill', ( d ) => {
-                    if ( d.parent )
-                        return 'yellow';
 
                     return computeColor( d.name );
                 } );
@@ -635,9 +633,6 @@ define(function(require) {
                 })
                 // .attr( 'fill', ( { name } ) => computeColor( name ) )
                 .attr( 'fill', ( d ) => {
-                    if ( d.parent )
-                        return 'yellow';
-
                     return computeColor( d.name );
                 } )
                 .attr('width', 0)
