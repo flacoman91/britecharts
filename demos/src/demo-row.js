@@ -23,7 +23,9 @@ function createSimpleRowChart() {
     if (containerWidth) {
         dataset = aRowDataSet().withColors().build();
         const dataTarget = dataset.slice(1,2);
-
+        const colorScheme = dataTarget.map((o)=>{
+            return o.parent ? '#addc91' : '#20aa3f';
+        });
         rowChart
             .isHorizontal(true)
             .isAnimated(true)
@@ -66,6 +68,10 @@ function createHorizontalRowChart() {
 
     if (containerWidth) {
         dataset = aRowDataSet().withColors().build();
+
+        const colorScheme = dataset.map((o)=>{
+            return o.parent ? '#20aa3f' : '#eeeeee';
+        });
 
         rowChart
             .isHorizontal(true)
@@ -114,7 +120,9 @@ function createRowChartWithTooltip() {
 
         dataset = aRowDataSet().withColors().build();
         const dataTarget = dataset.slice(0,4);
-
+        const colorScheme = dataTarget.map((o)=>{
+            return o.parent ? '#20aa3f' : '#eeeeee';
+        });
         rowChart
             .isHorizontal(true)
             .isAnimated(true)
