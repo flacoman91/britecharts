@@ -30,7 +30,7 @@ function createSimpleRowChart() {
             .isHorizontal(true)
             .isAnimated(true)
             .margin({
-                left: 100,
+                left: 140,
                 right: 50,
                 top: 20,
                 bottom: 30
@@ -42,7 +42,6 @@ function createSimpleRowChart() {
             .labelsSuffix('complaints')
             .colorSchema(colorScheme)
             .width(containerWidth)
-            .yAxisPaddingBetweenChart(15)
             .height(dataTarget.length * 100)
             .xTicks( 0 )
             .yTicks( 0 )
@@ -89,7 +88,6 @@ function createHorizontalRowChart() {
             .labelsSuffix('complaints')
             .colorSchema(colorScheme)
             .width(containerWidth)
-            .yAxisPaddingBetweenChart(20)
             .height(dataset.length * 37)
             .xTicks( 0 )
             .yTicks( 0 )
@@ -127,7 +125,7 @@ function createRowChartWithTooltip() {
             .isHorizontal(true)
             .isAnimated(true)
             .margin({
-                left: 100,
+                left: 140,
                 right: 50,
                 top: 20,
                 bottom: 30
@@ -139,7 +137,6 @@ function createRowChartWithTooltip() {
             .labelsSuffix('complaints')
             .colorSchema(colorScheme)
             .width(containerWidth)
-            .yAxisPaddingBetweenChart(20)
             .height(dataTarget.length * 37)
             .xTicks( 0 )
             .yTicks( 0 )
