@@ -426,7 +426,7 @@ define(function(require) {
                 elem = d3Selection.select( this );
                 let textHgt = elem.node().getBBox().height/2;
                 let group = elem.append('svg')
-                    .attr('x', -margin.left)
+                    .attr('x', -(margin.left-5))
                     .attr('y', -textHgt)
                     .attr('width', '15')
                     .attr('height', '15')
