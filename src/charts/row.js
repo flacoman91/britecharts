@@ -426,13 +426,13 @@ define(function(require) {
                 elem = d3Selection.select( this );
                 let textHgt = elem.node().getBBox().height/2;
                 let group = elem.append('svg')
-                    .attr('x', -200 + 'px')
-                    .attr('y', -textHgt + 'px')
-                    .attr('width', '15px')
-                    .attr('height', '15px')
+                    .attr('x', -margin.left)
+                    .attr('y', -textHgt)
+                    .attr('width', '15')
+                    .attr('height', '15')
                     .attr('viewBox', '0 0 932.15 932.15')
                     .attr('fill', '#0072ce')
-                        .append('g');
+                    .append('g');
 
                 group.append( 'path' )
                     .attr('d', 'M466.075,161.525c-205.6,0-382.8,121.2-464.2,296.1c-2.5,5.3-2.5,11.5,0,16.9c81.4,174.899,258.601,296.1,464.2,296.1 ' +
