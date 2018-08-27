@@ -148,13 +148,19 @@ define(function(require) {
             getPctChange = ({pctChange}) => pctChange,
             getValue = ({value}) => value,
 
-            _labelsFormatValue = ( { pctOfSet, parent, value } ) => {
+            _labelsFormatValue = ( { isNotFilter, pctOfSet, parent, value } ) => {
                 let pctLabel = '';
+
+                // exclude this on NOT filters
+                if ( isNotFilter )
+                    return '';
+
                 // don't include this label on child elements (hasparent)
                 // elements
                 if ( pctOfSet && !parent ) {
                     pctLabel = '  | ' + pctOfSet + '%';
                 }
+
                 return d3Format.format( labelsNumberFormat )( value ) + ' ' + labelsSuffix + pctLabel;
             },
 

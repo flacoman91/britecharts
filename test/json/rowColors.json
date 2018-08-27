@@ -57,6 +57,7 @@
         },
         {
             "name": "Decrease",
+            "isNotFilter": true,
             "value": 1900,
             "parent": "Brilliant",
             "pctChange": -999999,
