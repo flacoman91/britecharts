@@ -426,7 +426,7 @@ define(function(require) {
                 elem = d3Selection.select( this );
 
                 let group = elem.append('svg')
-                    .attr('x', '-100px')
+                    .attr('x', '-130px')
                     .attr('y', '-12px')
                     .attr('width', '25px')
                     .attr('height', '25px')
@@ -502,7 +502,8 @@ define(function(require) {
                         return o.name === d;
                     }).parent;
                 })
-                .call(wrapText, margin.left - yAxisPaddingBetweenChart);
+                // move text right so we have room for the eyeballs
+                .call(wrapText, margin.left - yAxisPaddingBetweenChart - 10);
 
             // adding the down arrow for parent elements
             svg.selectAll('.y-axis-group.axis .tick')

@@ -4,9 +4,6 @@
 .row-chart .y-axis-group .tick text {
   font-size: 14px; }
 
-.row-chart .axis path {
-  display: none; }
-
 .row-chart .tick line {
   display: none; }
 
