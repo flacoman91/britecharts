@@ -148,13 +148,19 @@ define(function(require) {
             getPctChange = ({pctChange}) => pctChange,
             getValue = ({value}) => value,
 
-            _labelsFormatValue = ( { pctOfSet, parent, value } ) => {
+            _labelsFormatValue = ( { isNotFilter, pctOfSet, parent, value } ) => {
                 let pctLabel = '';
+
+                // exclude this on NOT filters
+                if ( isNotFilter )
+                    return '';
+
                 // don't include this label on child elements (hasparent)
                 // elements
                 if ( pctOfSet && !parent ) {
                     pctLabel = '  | ' + pctOfSet + '%';
                 }
+
                 return d3Format.format( labelsNumberFormat )( value ) + ' ' + labelsSuffix + pctLabel;
             },
 
@@ -419,12 +425,6 @@ define(function(require) {
             elem.each( function() {
                 d3Selection.select( this ).selectAll('polygon').remove();
                 elem = d3Selection.select( this );
-                elem.classed('expandable', (d) => {
-                    const e = data.find((o)=>{
-                        return o.name === d
-                    });
-                    return e;
-                });
                 elem.append( 'polygon' )
                     .attr( 'transform', ( d ) => {
                         // determine if it is open
@@ -432,8 +432,7 @@ define(function(require) {
                         const e = data.find((o)=>{
                             return o.parent === d
                         });
-                        return e ? `translate(${yAxisPaddingBetweenChart-15}, -2.5)` :
-                            `translate(${yAxisPaddingBetweenChart-5}, 2.5)` +
+                        return e ? `translate(${yAxisPaddingBetweenChart-15}, -2.5)` : `translate(${yAxisPaddingBetweenChart-5}, 2.5)` +
                             ' rotate(180)';
                     } )
                     .attr( 'points', function( d ) {
@@ -466,12 +465,6 @@ define(function(require) {
                 .call(yAxis);
 
             svg.selectAll('.y-axis-group.axis .tick text')
-                .classed('parent', function(d){
-                    // lets us know it's a parent element
-                    return data.find((o)=>{
-                        return o.parent === d;
-                    });
-                })
                 .classed('child', function(d){
                     // lets us know it's a child element
                     return data.find((o)=>{
@@ -482,10 +475,11 @@ define(function(require) {
 
             // adding the down arrow for parent elements
             svg.selectAll('.y-axis-group.axis .tick')
-                .classed('expandable', function(d) {
+                .classed('expandable', function(d){
+                    // lets us know it's a parent element
                     return data.find((o)=>{
-                        return o.parent === d;
-                    });
+                        return o.name === d;
+                    }).isParent;
                 })
                 .call(addExpandToggle);
 
