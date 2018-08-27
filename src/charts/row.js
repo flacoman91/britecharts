@@ -106,7 +106,7 @@ define(function(require) {
                 bottom: 0,
                 right: 0
             },
-            yAxisPaddingBetweenChart = 10,
+            yAxisPaddingBetweenChart = 20,
             yAxisLineWrapLimit = 1,
             isHorizontal = false,
             svg,
@@ -425,8 +425,9 @@ define(function(require) {
                 // d3Selection.select( this ).selectAll('polygon').remove();
                 elem = d3Selection.select( this );
 
+                console.log(width);
                 let group = elem.append('svg')
-                    .attr('x', '-130px')
+                    .attr('x', -margin.left)
                     .attr('y', '-12px')
                     .attr('width', '25px')
                     .attr('height', '25px')
@@ -527,9 +528,24 @@ define(function(require) {
             // add background bars first
             const bargroups = rows.enter()
                 .append('g')
-                .attr( 'class', function(d){
-                    return 'row';// + d.name.toLowerCase();
+                .attr( 'class', function(d, i){
+                    return `row ${i}`;
                 } );
+
+            bargroups.append( 'rect' )
+                .classed( 'bg-hover', true )
+                .attr( 'y', chartHeight )
+                .attr( 'x', 0 )
+                .merge( rows )
+                .attr( 'x',  -margin.left - 30)
+                .attr( 'y', function (d, i) {
+                    return yScale(d.name) - a * d.width/2;	//center the bar on the tick
+                })
+                .attr( 'height', function (d) {
+                    return a * d.width;	//`a` already accounts for both types of padding
+                } )
+                .attr( 'width', width )
+                .attr( 'fill', '#d6e8fa');
 
             bargroups.append( 'rect' )
                 .classed( 'bg', true )
