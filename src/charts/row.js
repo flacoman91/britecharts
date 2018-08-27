@@ -421,7 +421,7 @@ define(function(require) {
                 elem = d3Selection.select( this );
                 elem.classed('expandable', (d) => {
                     const e = data.find((o)=>{
-                        return o.parent === d
+                        return o.name === d
                     });
                     return e;
                 });
@@ -432,7 +432,8 @@ define(function(require) {
                         const e = data.find((o)=>{
                             return o.parent === d
                         });
-                        return e ? `translate(${yAxisPaddingBetweenChart-15}, -2.5)` : `translate(${yAxisPaddingBetweenChart-5}, 2.5)` +
+                        return e ? `translate(${yAxisPaddingBetweenChart-15}, -2.5)` :
+                            `translate(${yAxisPaddingBetweenChart-5}, 2.5)` +
                             ' rotate(180)';
                     } )
                     .attr( 'points', function( d ) {
@@ -481,6 +482,11 @@ define(function(require) {
 
             // adding the down arrow for parent elements
             svg.selectAll('.y-axis-group.axis .tick')
+                .classed('expandable', function(d) {
+                    return data.find((o)=>{
+                        return o.parent === d;
+                    });
+                })
                 .call(addExpandToggle);
 
         }
