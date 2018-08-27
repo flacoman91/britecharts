@@ -425,8 +425,6 @@ define(function(require) {
                 // d3Selection.select( this ).selectAll('polygon').remove();
                 elem = d3Selection.select( this );
                 let textHgt = elem.node().getBBox().height/2;
-                console.log(elem.node().getBBox());
-                console.log(elem.node().getBoundingClientRect());
                 let group = elem.append('svg')
                     .attr('x', -200 + 'px')
                     .attr('y', -textHgt + 'px')
