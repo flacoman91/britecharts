@@ -30,7 +30,7 @@ function createSimpleRowChart() {
             .isHorizontal(true)
             .isAnimated(true)
             .margin({
-                left: 70,
+                left: 100,
                 right: 50,
                 top: 20,
                 bottom: 30
@@ -77,7 +77,7 @@ function createHorizontalRowChart() {
             .isHorizontal(true)
             .isAnimated(true)
             .margin({
-                left: 70,
+                left: 100,
                 right: 50,
                 top: 20,
                 bottom: 30
@@ -127,7 +127,7 @@ function createRowChartWithTooltip() {
             .isHorizontal(true)
             .isAnimated(true)
             .margin({
-                left: 70,
+                left: 100,
                 right: 50,
                 top: 20,
                 bottom: 30
