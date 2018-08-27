@@ -422,18 +422,16 @@ define(function(require) {
 
         function addVisibilityToggle(elem){
             elem.each( function() {
-                // d3Selection.select( this ).selectAll('polygon').remove();
                 elem = d3Selection.select( this );
-
-                console.log(width);
+                let textHgt = elem.node().getBBox().height/2;
                 let group = elem.append('svg')
                     .attr('x', -margin.left)
-                    .attr('y', '-12px')
-                    .attr('width', '25px')
-                    .attr('height', '25px')
+                    .attr('y', -textHgt)
+                    .attr('width', '15')
+                    .attr('height', '15')
                     .attr('viewBox', '0 0 932.15 932.15')
-                    .attr('fill', 'grey')
-                        .append('g');
+                    .attr('fill', '#0072ce')
+                    .append('g');
 
                 group.append( 'path' )
                     .attr('d', 'M466.075,161.525c-205.6,0-382.8,121.2-464.2,296.1c-2.5,5.3-2.5,11.5,0,16.9c81.4,174.899,258.601,296.1,464.2,296.1 ' +
@@ -504,7 +502,7 @@ define(function(require) {
                     }).parent;
                 })
                 // move text right so we have room for the eyeballs
-                .call(wrapText, margin.left - yAxisPaddingBetweenChart - 10);
+                .call(wrapText, margin.left - yAxisPaddingBetweenChart - 30);
 
             // adding the down arrow for parent elements
             svg.selectAll('.y-axis-group.axis .tick')
