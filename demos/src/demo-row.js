@@ -77,7 +77,7 @@ function createHorizontalRowChart() {
             .isHorizontal(true)
             .isAnimated(true)
             .margin({
-                left: 100,
+                left: 200,
                 right: 50,
                 top: 20,
                 bottom: 30
@@ -89,7 +89,7 @@ function createHorizontalRowChart() {
             .labelsSuffix('complaints')
             .colorSchema(colorScheme)
             .width(containerWidth)
-            .yAxisPaddingBetweenChart(10)
+            .yAxisPaddingBetweenChart(20)
             .height(dataset.length * 37)
             .xTicks( 0 )
             .yTicks( 0 )

@@ -20,7 +20,7 @@ $row-stroke-width: 0;
 
     // Axes
     .axis {
-        path {
+        path.domain {
             display: none;
         }
     }
