@@ -844,6 +844,7 @@ define(function(require) {
             // we should find the index of the currently hovered over row
             const ind = d.name ? getIndex(d.name) : getIndex(d);
             d3Selection.select(containerRoot).select('.tick svg.visibility-' + ind).attr('fill-opacity', 1);
+            d3Selection.select(containerRoot).select('g.row_' + ind + ' .bg-hover').attr('fill-opacity', 1);
         }
 
         function rowHoverOut(d) {
@@ -851,6 +852,7 @@ define(function(require) {
             // we should find the index of the currently hovered over row
             const ind = d.name ? getIndex(d.name) : getIndex(d);
             d3Selection.select(containerRoot).select('.tick svg.visibility-' + ind).attr('fill-opacity', 0);
+            d3Selection.select(containerRoot).select('g.row_' + ind + ' .bg-hover').attr('fill-opacity', 0);
         }
 
         function getIndex(name){
