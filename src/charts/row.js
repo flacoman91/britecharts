@@ -527,8 +527,26 @@ define(function(require) {
             const bargroups = rows.enter()
                 .append('g')
                 .attr( 'class', function(d, i){
-                    return `row ${i}`;
+                    return `row_${i}`;
                 } );
+
+            bargroups.append( 'rect' )
+                .classed( 'bg', true )
+                .attr( 'y', chartHeight )
+                .attr( 'x', 0 )
+                .on( 'click', function( d ) {
+                    handleClick( this, d, chartWidth, chartHeight );
+                } )
+                .merge( rows )
+                .attr( 'x', 0 )
+                .attr( 'y', function (d, i) {
+                    return yScale(d.name) - a * d.width/2;	//center the bar on the tick
+                })
+                .attr( 'height', function (d) {
+                    return a * d.width;	//`a` already accounts for both types of padding
+                } )
+                .attr( 'width', chartWidth )
+                .attr( 'fill', backgroundColor);
 
             bargroups.append( 'rect' )
                 .classed( 'bg-hover', true )
@@ -543,25 +561,10 @@ define(function(require) {
                     return a * d.width;	//`a` already accounts for both types of padding
                 } )
                 .attr( 'width', width )
-                .attr( 'fill', '#d6e8fa');
+                .attr( 'fill', '#d6e8fa')
+                .attr( 'fill-opacity', 0);
 
-            bargroups.append( 'rect' )
-                .classed( 'bg', true )
-                .attr( 'y', chartHeight )
-                .attr( 'x', 0 )
-                .on( 'click', function( d ) {
-                    handleClick( this, d, chartWidth, chartHeight );
-                } )
-                .merge( rows )
-                .attr( 'x', 0 )
-                .attr("y", function (d, i) {
-                    return yScale(d.name) - a * d.width/2;	//center the bar on the tick
-                })
-                .attr( 'height', function (d) {
-                    return a * d.width;	//`a` already accounts for both types of padding
-                } )
-                .attr( 'width', chartWidth )
-                .attr( 'fill', backgroundColor);
+
 
             // now add the actual bars to what we got
             bargroups
