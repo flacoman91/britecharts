@@ -425,12 +425,14 @@ define(function(require) {
                 elem = d3Selection.select( this );
                 let textHgt = elem.node().getBBox().height/2;
                 let group = elem.append('svg')
+                    // .attr('class', (d,i) => 'visibility-' + i)
                     .attr('x', -(margin.left-5))
                     .attr('y', -textHgt)
                     .attr('width', '15')
                     .attr('height', '15')
                     .attr('viewBox', '0 0 932.15 932.15')
                     .attr('fill', '#0072ce')
+                    // .attr('fill-opacity', 0)
                     .append('g');
 
                 group.append( 'path' )
@@ -563,7 +565,6 @@ define(function(require) {
                 .attr( 'width', width )
                 .attr( 'fill', '#d6e8fa')
                 .attr( 'fill-opacity', 0);
-
 
 
             // now add the actual bars to what we got
