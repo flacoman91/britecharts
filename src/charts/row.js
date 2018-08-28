@@ -437,6 +437,12 @@ define(function(require) {
                     .attr('viewBox', '0 0 932.15 932.15')
                     .attr('fill', '#0072ce')
                     .attr('fill-opacity', 0)
+                    .on( 'mouseover', function( d ) {
+                        rowHoverOver(d);
+                    } )
+                    .on('mouseout', function(d) {
+                        rowHoverOut(d);
+                    })
                     .append('g');
 
                 group.append( 'path' )
@@ -506,6 +512,12 @@ define(function(require) {
                     return data.find((o)=>{
                         return o.name === d;
                     }).parent;
+                })
+                .on( 'mouseover', function( d ) {
+                    rowHoverOver(d);
+                } )
+                .on('mouseout', function(d) {
+                    rowHoverOut(d);
                 })
                 // move text right so we have room for the eyeballs
                 .call(wrapText, margin.left - yAxisPaddingBetweenChart - 30);
@@ -830,16 +842,14 @@ define(function(require) {
         function rowHoverOver(d) {
             // eyeball fill-opacity 1
             // we should find the index of the currently hovered over row
-            const ind = getIndex(d.name);
-
+            const ind = d.name ? getIndex(d.name) : getIndex(d);
             d3Selection.select(containerRoot).select('.tick svg.visibility-' + ind).attr('fill-opacity', 1);
         }
 
         function rowHoverOut(d) {
             // eyeball fill-opacity 0
             // we should find the index of the currently hovered over row
-            const ind = getIndex(d.name);
-
+            const ind = d.name ? getIndex(d.name) : getIndex(d);
             d3Selection.select(containerRoot).select('.tick svg.visibility-' + ind).attr('fill-opacity', 0);
         }
 
