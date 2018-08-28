@@ -566,6 +566,12 @@ define(function(require) {
                 .attr( 'height', function (d) {
                     return a * d.width;	//`a` already accounts for both types of padding
                 } )
+                .on( 'mouseover', function( d ) {
+                    rowHoverOver(d);
+                } )
+                .on('mouseout', function(d) {
+                   rowHoverOut(d);
+                })
                 .attr( 'width', width )
                 .attr( 'fill', '#d6e8fa')
                 .attr( 'fill-opacity', 0);
@@ -632,7 +638,13 @@ define(function(require) {
                         if ( bgWidth > 0 && bgWidth - barWidth < textWidth ) {
                             return `translate(-${textWidth}, 0)`;
                         }
-                    } );
+                    } )
+                    .on( 'mouseover', function( d ) {
+                        rowHoverOver(d);
+                     } )
+                    .on('mouseout', function(d) {
+                        rowHoverOut(d);
+                    });
             }
 
             if(enableYAxisRight && enableLabels) {
@@ -799,10 +811,8 @@ define(function(require) {
             dispatcher.call('customMouseOver', e, d, d3Selection.mouse(e), [chartWidth, chartHeight]);
             highlightRowFunction = highlightRowFunction || function() {};
 
-            // eyeball fill
-            // we should find the index of the currently hovered over row
-            const ind = getIndex(d.name);
-            d3Selection.select(containerRoot).select('.tick svg.visibility-' + ind).attr('fill-opacity', 1);
+            // eyeball fill-opacity
+            rowHoverOver(d);
 
             if (hasSingleRowHighlight) {
                 highlightRowFunction(d3Selection.select(e));
@@ -815,6 +825,22 @@ define(function(require) {
                 }
                 highlightRowFunction(d3Selection.select(rowRect));
             });
+        }
+
+        function rowHoverOver(d) {
+            // eyeball fill-opacity 1
+            // we should find the index of the currently hovered over row
+            const ind = getIndex(d.name);
+
+            d3Selection.select(containerRoot).select('.tick svg.visibility-' + ind).attr('fill-opacity', 1);
+        }
+
+        function rowHoverOut(d) {
+            // eyeball fill-opacity 0
+            // we should find the index of the currently hovered over row
+            const ind = getIndex(d.name);
+
+            d3Selection.select(containerRoot).select('.tick svg.visibility-' + ind).attr('fill-opacity', 0);
         }
 
         function getIndex(name){
@@ -839,11 +865,8 @@ define(function(require) {
         function handleMouseOut(e, d, rowList, chartWidth, chartHeight) {
             dispatcher.call('customMouseOut', e, d, d3Selection.mouse(e), [chartWidth, chartHeight]);
 
-            // eyeball fill remove
-            // we should find the index of the currently hovered over row
-            const ind = getIndex(d.name);
-            d3Selection.select(containerRoot).select('.tick svg.visibility-' + ind).attr('fill-opacity', 0);
-
+            // eyeball fill-opacity 0
+            rowHoverOut(d);
 
             rowList.forEach((rowRect) => {
                 d3Selection.select(rowRect).attr('fill', ({name}) => colorMap(name));
