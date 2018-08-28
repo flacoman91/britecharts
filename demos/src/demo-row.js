@@ -23,12 +23,14 @@ function createSimpleRowChart() {
     if (containerWidth) {
         dataset = aRowDataSet().withColors().build();
         const dataTarget = dataset.slice(1,2);
-
+        const colorScheme = dataTarget.map((o)=>{
+            return o.parent ? '#addc91' : '#20aa3f';
+        });
         rowChart
             .isHorizontal(true)
             .isAnimated(true)
             .margin({
-                left: 70,
+                left: 140,
                 right: 50,
                 top: 20,
                 bottom: 30
@@ -38,13 +40,9 @@ function createSimpleRowChart() {
             .enableLabels(true)
             .labelsNumberFormat(',d')
             .labelsSuffix('complaints')
-            .colorSchema(['#20aa3f'])
+            .colorSchema(colorScheme)
             .width(containerWidth)
-            .yAxisPaddingBetweenChart(5)
-            .orderingFunction(function(a,b){
-                return a.value > b.value;
-            })
-            .height(250)
+            .height(dataTarget.length * 100)
             .xTicks( 0 )
             .yTicks( 0 )
             .percentageAxisToMaxRatio(1)
@@ -70,11 +68,15 @@ function createHorizontalRowChart() {
     if (containerWidth) {
         dataset = aRowDataSet().withColors().build();
 
+        const colorScheme = dataset.map((o)=>{
+            return o.parent ? '#20aa3f' : '#eeeeee';
+        });
+
         rowChart
             .isHorizontal(true)
             .isAnimated(true)
             .margin({
-                left: 70,
+                left: 200,
                 right: 50,
                 top: 20,
                 bottom: 30
@@ -84,13 +86,9 @@ function createHorizontalRowChart() {
             .enableLabels(true)
             .labelsNumberFormat(',d')
             .labelsSuffix('complaints')
-            .colorSchema(['#20aa3f'])
+            .colorSchema(colorScheme)
             .width(containerWidth)
-            .yAxisPaddingBetweenChart(5)
-            .orderingFunction(function(a,b){
-                return a.value > b.value;
-            })
-            .height(250)
+            .height(dataset.length * 37)
             .xTicks( 0 )
             .yTicks( 0 )
             .percentageAxisToMaxRatio(1)
@@ -120,12 +118,14 @@ function createRowChartWithTooltip() {
 
         dataset = aRowDataSet().withColors().build();
         const dataTarget = dataset.slice(0,4);
-
+        const colorScheme = dataTarget.map((o)=>{
+            return o.parent ? '#20aa3f' : '#eeeeee';
+        });
         rowChart
             .isHorizontal(true)
             .isAnimated(true)
             .margin({
-                left: 70,
+                left: 140,
                 right: 50,
                 top: 20,
                 bottom: 30
@@ -135,13 +135,9 @@ function createRowChartWithTooltip() {
             .enableLabels(true)
             .labelsNumberFormat(',d')
             .labelsSuffix('complaints')
-            .colorSchema(['#20aa3f'])
+            .colorSchema(colorScheme)
             .width(containerWidth)
-            .yAxisPaddingBetweenChart(5)
-            .orderingFunction(function(a,b){
-                return a.value > b.value;
-            })
-            .height(250)
+            .height(dataTarget.length * 37)
             .xTicks( 0 )
             .yTicks( 0 )
             .percentageAxisToMaxRatio(1.5)

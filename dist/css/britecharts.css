@@ -133,10 +133,15 @@
 .row-chart .row {
   shape-rendering: crispEdges; }
 
+.row-chart g[class^="row_"] {
+  cursor: pointer; }
+  .row-chart g[class^="row_"]:hover .bg-hover {
+    fill-opacity: 1; }
+
 .row-chart .y-axis-group .tick text {
   font-size: 14px; }
 
-.row-chart .axis path {
+.row-chart .axis path.domain {
   display: none; }
 
 .row-chart .tick line {
