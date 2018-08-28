@@ -72,6 +72,7 @@ define(function(require) {
                 bottom: 30,
                 left: 40
             },
+            containerRoot,
             width = 960,
             height = 500,
             loadingState = row,
@@ -345,6 +346,7 @@ define(function(require) {
          * @private
          */
         function buildSVG(container) {
+            containerRoot = container;
             if (!svg) {
                 svg = d3Selection.select(container)
                     .append('svg')
@@ -800,7 +802,7 @@ define(function(require) {
             // eyeball fill
             // we should find the index of the currently hovered over row
             const ind = getIndex(d.name);
-            d3Selection.select('.tick svg.visibility-' + ind).attr('fill-opacity', 1);
+            d3Selection.select(containerRoot).select('.tick svg.visibility-' + ind).attr('fill-opacity', 1);
 
             if (hasSingleRowHighlight) {
                 highlightRowFunction(d3Selection.select(e));
@@ -837,10 +839,10 @@ define(function(require) {
         function handleMouseOut(e, d, rowList, chartWidth, chartHeight) {
             dispatcher.call('customMouseOut', e, d, d3Selection.mouse(e), [chartWidth, chartHeight]);
 
-            // eyeball fill
+            // eyeball fill remove
             // we should find the index of the currently hovered over row
             const ind = getIndex(d.name);
-            d3Selection.select('.tick svg.visibility-' + ind).attr('fill-opacity', 0);
+            d3Selection.select(containerRoot).select('.tick svg.visibility-' + ind).attr('fill-opacity', 0);
 
 
             rowList.forEach((rowRect) => {
