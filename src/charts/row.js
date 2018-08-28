@@ -425,7 +425,9 @@ define(function(require) {
                 elem = d3Selection.select( this );
                 let textHgt = elem.node().getBBox().height/2;
                 let group = elem.append('svg')
-                    .attr('class', (d,i) => 'visibility-' + i)
+                    .attr('class', (d) => {
+                        return 'visibility-' + getIndex(d);
+                    })
                     .attr('x', -(margin.left-5))
                     .attr('y', -textHgt)
                     .attr('width', '15')
@@ -795,6 +797,11 @@ define(function(require) {
             dispatcher.call('customMouseOver', e, d, d3Selection.mouse(e), [chartWidth, chartHeight]);
             highlightRowFunction = highlightRowFunction || function() {};
 
+            // eyeball fill
+            // we should find the index of the currently hovered over row
+            const ind = getIndex(d.name);
+            d3Selection.select('.tick svg.visibility-' + ind).attr('fill-opacity', 1);
+
             if (hasSingleRowHighlight) {
                 highlightRowFunction(d3Selection.select(e));
                 return;
@@ -808,6 +815,11 @@ define(function(require) {
             });
         }
 
+        function getIndex(name){
+            return data.findIndex((o)=>{
+                return o.name === name;
+            });
+        }
         /**
          * Custom OnMouseMove event handler
          * @return {void}
@@ -824,6 +836,12 @@ define(function(require) {
          */
         function handleMouseOut(e, d, rowList, chartWidth, chartHeight) {
             dispatcher.call('customMouseOut', e, d, d3Selection.mouse(e), [chartWidth, chartHeight]);
+
+            // eyeball fill
+            // we should find the index of the currently hovered over row
+            const ind = getIndex(d.name);
+            d3Selection.select('.tick svg.visibility-' + ind).attr('fill-opacity', 0);
+
 
             rowList.forEach((rowRect) => {
                 d3Selection.select(rowRect).attr('fill', ({name}) => colorMap(name));
