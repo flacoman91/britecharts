@@ -425,14 +425,14 @@ define(function(require) {
                 elem = d3Selection.select( this );
                 let textHgt = elem.node().getBBox().height/2;
                 let group = elem.append('svg')
-                    // .attr('class', (d,i) => 'visibility-' + i)
+                    .attr('class', (d,i) => 'visibility-' + i)
                     .attr('x', -(margin.left-5))
                     .attr('y', -textHgt)
                     .attr('width', '15')
                     .attr('height', '15')
                     .attr('viewBox', '0 0 932.15 932.15')
                     .attr('fill', '#0072ce')
-                    // .attr('fill-opacity', 0)
+                    .attr('fill-opacity', 0)
                     .append('g');
 
                 group.append( 'path' )
@@ -529,7 +529,7 @@ define(function(require) {
             const bargroups = rows.enter()
                 .append('g')
                 .attr( 'class', function(d, i){
-                    return `row row_${i}`;
+                    return `row_${i} row-wrapper`;
                 } );
 
             bargroups.append( 'rect' )
