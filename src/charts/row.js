@@ -527,7 +527,7 @@ define(function(require) {
             const bargroups = rows.enter()
                 .append('g')
                 .attr( 'class', function(d, i){
-                    return `row_${i}`;
+                    return `row row_${i}`;
                 } );
 
             bargroups.append( 'rect' )
