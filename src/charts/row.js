@@ -527,7 +527,7 @@ define(function(require) {
             const bargroups = rows.enter()
                 .append('g')
                 .attr( 'class', function(d, i){
-                    return `row row_${i}`;
+                    return `row_${i} row-wrapper`;
                 } );
 
             bargroups.append( 'rect' )
@@ -563,9 +563,6 @@ define(function(require) {
                 .attr( 'width', width )
                 .attr( 'fill', '#d6e8fa')
                 .attr( 'fill-opacity', 0);
-
-
-
             // now add the actual bars to what we got
             bargroups
                 .append( 'rect' )

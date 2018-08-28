@@ -9,7 +9,7 @@ $row-stroke-width: 0;
     .row {
         shape-rendering: crispEdges;
     }
-    g[class^="row_"]{
+    g.row-wrapper {
         cursor: pointer;
         &:hover {
             .bg-hover {
