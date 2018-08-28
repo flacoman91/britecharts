@@ -1,9 +1,9 @@
 .row-chart .row {
   shape-rendering: crispEdges; }
 
-.row-chart g[class^="row_"] {
+.row-chart g.row-wrapper {
   cursor: pointer; }
-  .row-chart g[class^="row_"]:hover .bg-hover {
+  .row-chart g.row-wrapper:hover .bg-hover {
     fill-opacity: 1; }
 
 .row-chart .y-axis-group .tick text {

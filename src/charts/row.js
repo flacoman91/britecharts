@@ -571,7 +571,6 @@ define(function(require) {
                 .attr( 'fill', '#d6e8fa')
                 .attr( 'fill-opacity', 0);
 
-
             // now add the actual bars to what we got
             bargroups
                 .append( 'rect' )
