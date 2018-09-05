@@ -578,12 +578,8 @@ define(function(require) {
                 .attr( 'height', function (d) {
                     return a * d.width;	//`a` already accounts for both types of padding
                 } )
-                .on( 'mouseover', function( d ) {
-                    rowHoverOver(d);
-                } )
-                .on('mouseout', function(d) {
-                   rowHoverOut(d);
-                })
+                .on( 'mouseover', rowHoverOver )
+                .on('mouseout', rowHoverOut)
                 .attr( 'width', width )
                 .attr( 'fill', '#d6e8fa')
                 .attr( 'fill-opacity', 0);
@@ -593,7 +589,7 @@ define(function(require) {
             bargroups
                 .append( 'rect' )
                 .attr( 'class', function(d){
-                    return 'pct';//+ d.name.toLowerCase();
+                    return 'pct';
                 } )
                 .attr( 'y', chartHeight )
                 .attr( 'x', 0 )
@@ -651,12 +647,8 @@ define(function(require) {
                             return `translate(-${textWidth}, 0)`;
                         }
                     } )
-                    .on( 'mouseover', function( d ) {
-                        rowHoverOver(d);
-                     } )
-                    .on('mouseout', function(d) {
-                        rowHoverOut(d);
-                    });
+                    .on( 'mouseover', rowHoverOver )
+                    .on('mouseout', rowHoverOut );
             }
 
             if(enableYAxisRight && enableLabels) {
@@ -839,18 +831,26 @@ define(function(require) {
             });
         }
 
-        function rowHoverOver(d) {
+        function rowHoverOver(d, i) {
             // eyeball fill-opacity 1
             // we should find the index of the currently hovered over row
-            const ind = d.name ? getIndex(d.name) : getIndex(d);
+            let ind = i;
+            if(typeof d.name === "string" || typeof d === "string") {
+                ind = d.name ? getIndex( d.name ) : getIndex( d );
+            }
+
             d3Selection.select(containerRoot).select('.tick svg.visibility-' + ind).attr('fill-opacity', 1);
             d3Selection.select(containerRoot).select('g.row_' + ind + ' .bg-hover').attr('fill-opacity', 1);
         }
 
-        function rowHoverOut(d) {
+        function rowHoverOut(d, i) {
             // eyeball fill-opacity 0
             // we should find the index of the currently hovered over row
-            const ind = d.name ? getIndex(d.name) : getIndex(d);
+            let ind = i;
+            if(typeof d.name === "string" || typeof d === "string") {
+                ind = d.name ? getIndex( d.name ) : getIndex( d );
+            }
+
             d3Selection.select(containerRoot).select('.tick svg.visibility-' + ind).attr('fill-opacity', 0);
             d3Selection.select(containerRoot).select('g.row_' + ind + ' .bg-hover').attr('fill-opacity', 0);
         }
