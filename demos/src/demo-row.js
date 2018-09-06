@@ -62,10 +62,70 @@ function createHorizontalRowChart() {
         tooltip = miniTooltip(),
         rowContainer = d3Selection.select('.js-horizontal-row-chart-container'),
         containerWidth = rowContainer.node() ? rowContainer.node().getBoundingClientRect().width : false,
+        containerHeight = rowContainer.node() ? rowContainer.node().getBoundingClientRect().height : false,
         tooltipContainer,
         dataset;
 
     if (containerWidth) {
+        d3Selection.select('.js-download-button-123').on('click', function() {
+            const oldHeight = containerHeight;
+            console.log(containerHeight);
+            const oH = rowContainer.select('svg').attr('height');
+            console.log(oH);
+
+            const detailContainer = rowContainer.select('svg')
+                .append('g')
+                .attr('transform', 'translate(0, 280)')
+                .classed('export-details', true);
+
+            detailContainer.append('text')
+                .text('URL:');
+
+            const url = 'http://192.168.33.110/#/complaints/q?size=10&page=99&sort=Created%20Date&fields=All%20Data';
+
+            let y=20;
+            detailContainer.append('text')
+                .text(url)
+                .attr('x', 0)
+                .attr('y', y);
+
+            y+=40;
+
+            detailContainer.append('text')
+                .text('Filters:')
+                .attr('x', 0)
+                .attr('y', y);
+
+            y+=20;
+
+
+            const tags = ['lorem', 'ipsum', 'foo bar', 'blah blah'];
+
+            const out = tags.join('; ');
+            detailContainer.append('text')
+                .text(out)
+                .attr('x', 0)
+                .attr('y', y);
+
+            rowContainer.select('svg').attr('height', +oH + y);
+
+            // tags.forEach(function(o){
+            //     detailContainer.append('text')
+            //         .text(o)
+            //         .attr('x', 0)
+            //         .attr('y', y);
+            //     y+=20;
+            // });
+
+
+            //rowChart.exportChart('horiz-rowchart.png', 'Britecharts Row
+            // Chart');
+            //rowContainer.select('svg').attr('height', oH);
+
+            // rowContainer.select('.export-details').remove();
+
+        });
+
         dataset = aRowDataSet().withColors().build();
 
         const colorScheme = dataset.map((o)=>{
@@ -172,14 +232,14 @@ if (d3Selection.select('.js-row-chart-tooltip-container').node()){
     createRowChartWithTooltip();
     createHorizontalRowChart();
     createSimpleRowChart();
-    createLoadingState();
+    // createLoadingState();
 
     let redrawCharts = function(){
         d3Selection.selectAll('.row-chart').remove();
         createRowChartWithTooltip();
         createHorizontalRowChart();
         createSimpleRowChart();
-        createLoadingState();
+        // createLoadingState();
     };
 
     // Redraw charts on window resize
