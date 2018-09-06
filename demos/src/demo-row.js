@@ -9,6 +9,7 @@ const colors = require('./../../src/charts/helpers/color');
 const dataBuilder = require('./../../test/fixtures/rowChartDataBuilder');
 
 const aRowDataSet = () => new dataBuilder.RowDataBuilder();
+const textHelper = require('./../../src/charts/helpers/text');
 
 require('./helpers/resizeHelper');
 
@@ -69,27 +70,58 @@ function createHorizontalRowChart() {
     if (containerWidth) {
         d3Selection.select('.js-download-button-123').on('click', function() {
             const oldHeight = containerHeight;
-            console.log(containerHeight);
+            // console.log(containerHeight);
             const oH = rowContainer.select('svg').attr('height');
-            console.log(oH);
-
+            // console.log(oH);
+            const padding = 10;
             const detailContainer = rowContainer.select('svg')
                 .append('g')
-                .attr('transform', 'translate(0, 280)')
-                .classed('export-details', true);
+                .classed('export-details', true)
+                .attr('transform', 'translate('+ padding + ', ' + oH + ')');
 
             detailContainer.append('text')
                 .text('URL:');
 
-            const url = 'http://192.168.33.110/#/complaints/q?size=10&page=99&sort=Created%20Date&fields=All%20Data';
+//            const url =
+// 'http://192.168.33.110/#/complaints/q?size=10&page=99&sort=Created%20Date&fields=All%20Data';
+            let url = 'http://192.168.33.110/#/complaints/q/trends?size=10&page=99&sort=Created%20Date&company=EQUIFAX,%20INC.&company=Experian%20Information%20Solutions%20Inc.&issue=Incorrect%20information%20on%20your%20report&issue=Problem%20with%20a%20credit%20reporting%20company\'s%20investigation%20into%20an%20existing%20problem&not_company=CAPITAL%20ONE%20FINANCIAL%20CORPORATION&interval=Month&fields=All%20Data';
+            const pos = 65;
 
+            const detailWidth = containerWidth - padding;
+
+            let pieces = [];
+            while( textHelper.getTextWidth( url, 16, 'sans-serif') > detailWidth) {
+                for ( var i = 0; i < url.length; i++ ) {
+                    const w = textHelper.getTextWidth( url.substr( 0, i ), 16, 'sans-serif' );
+                    if ( w+ 20 > detailWidth ) {
+                        pieces.push( url.slice( 0, i ) );
+                        url = url.slice(i);
+                        break;
+                    }
+                }
+            }
+
+            pieces.push(url);
+
+            console.log(pieces);
+
+            const longURL = pieces.join(' ');
             let y=20;
             detailContainer.append('text')
-                .text(url)
+                .text(longURL)
+                .classed('url', true)
                 .attr('x', 0)
                 .attr('y', y);
 
-            y+=40;
+            detailContainer
+                .select('.url')
+                .call(wrap, detailWidth );
+
+            const urlHeight = detailContainer
+                .select('.url').node().getBoundingClientRect().height;
+
+            // console.log(urlHeight);
+            y+= urlHeight + 30;
 
             detailContainer.append('text')
                 .text('Filters:')
@@ -98,32 +130,39 @@ function createHorizontalRowChart() {
 
             y+=20;
 
-
-            const tags = ['lorem', 'ipsum', 'foo bar', 'blah blah'];
+            const tags = [
+                'EQUIFAX, INC.',
+                'Experian Information Solutions',
+                'CAPITAL ONE FINANCIAL CORPORATION',
+                'Incorrect information on your report',
+                'Problem with a credit reporting company\'s investigation' +
+                ' into an existing problem',
+                'not CAPITAL ONE FINANCIAL CORPORATION'
+            ];
 
             const out = tags.join('; ');
             detailContainer.append('text')
                 .text(out)
+                .classed('tags', true)
                 .attr('x', 0)
                 .attr('y', y);
 
-            rowContainer.select('svg').attr('height', +oH + y);
+            detailContainer
+                .select('.tags')
+                .call(wrap, detailWidth);
 
-            // tags.forEach(function(o){
-            //     detailContainer.append('text')
-            //         .text(o)
-            //         .attr('x', 0)
-            //         .attr('y', y);
-            //     y+=20;
-            // });
+            const tagheight = detailContainer
+                .select('.tags').node().getBoundingClientRect().height;
 
+            rowContainer.select('svg').attr('height', +oH + y + tagheight);
 
-            //rowChart.exportChart('horiz-rowchart.png', 'Britecharts Row
-            // Chart');
-            //rowContainer.select('svg').attr('height', oH);
+            const rcOheight = rowChart.height();
+            rowChart.height(+oH + y + tagheight);
+            rowChart.exportChart('horiz-rowchart.png', 'Britecharts Row Chart');
 
-            // rowContainer.select('.export-details').remove();
-
+            rowContainer.select('svg').attr('height', rcOheight);
+            rowContainer.select('.export-details').remove();
+            rowChart.height(rcOheight);
         });
 
         dataset = aRowDataSet().withColors().build();
@@ -161,6 +200,32 @@ function createHorizontalRowChart() {
         tooltipContainer = d3Selection.select('.js-horizontal-row-chart-container .row-chart .metadata-group');
         tooltipContainer.datum([]).call(tooltip);
     }
+}
+
+
+function wrap(text, width){
+
+    text.each(function() {
+        var text = d3Selection.select(this),
+            words = text.text().split(/\s+/).reverse(),
+            word,
+            line = [],
+            lineNumber = 0,
+            lineHeight = 1.1, // ems
+            y = text.attr("y"),
+            dy = parseFloat(1),
+            tspan = text.text(null).append("tspan").attr("x", 0).attr("y", y).attr("dy", dy + "em");
+        while (word = words.pop()) {
+            line.push(word);
+            tspan.text(line.join(" "));
+            if (tspan.node().getComputedTextLength() > width) {
+                line.pop();
+                tspan.text(line.join(" "));
+                line = [word];
+                tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
+            }
+        }
+    });
 }
 
 function createRowChartWithTooltip() {
@@ -222,7 +287,6 @@ function createLoadingState() {
         dataset = null;
 
     if (containerWidth) {
-        console.log('loading state' + containerWidth);
         rowContainer.html(rowChart.loadingState());
     }
 }
