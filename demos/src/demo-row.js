@@ -82,8 +82,6 @@ function createHorizontalRowChart() {
             detailContainer.append('text')
                 .text('URL:');
 
-//            const url =
-// 'http://192.168.33.110/#/complaints/q?size=10&page=99&sort=Created%20Date&fields=All%20Data';
             let url = 'http://192.168.33.110/#/complaints/q/trends?size=10&page=99&sort=Created%20Date&company=EQUIFAX,%20INC.&company=Experian%20Information%20Solutions%20Inc.&issue=Incorrect%20information%20on%20your%20report&issue=Problem%20with%20a%20credit%20reporting%20company\'s%20investigation%20into%20an%20existing%20problem&not_company=CAPITAL%20ONE%20FINANCIAL%20CORPORATION&interval=Month&fields=All%20Data';
 
             const detailWidth = containerWidth - padding;
@@ -113,14 +111,9 @@ function createHorizontalRowChart() {
                 .attr('y', y)
                 .call(wrap, detailWidth );
 
-
-            // detailContainer
-            //     .select('.url')
-
             const urlHeight = detailContainer
                 .select('.url').node().getBoundingClientRect().height;
 
-            // console.log(urlHeight);
             y+= urlHeight + 30;
 
             detailContainer.append('text')
