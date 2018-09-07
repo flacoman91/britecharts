@@ -69,59 +69,21 @@ function createHorizontalRowChart() {
 
     if (containerWidth) {
         d3Selection.select('.js-download-button-123').on('click', function() {
-            const oldHeight = containerHeight;
-            // console.log(containerHeight);
             const oH = rowContainer.select('svg').attr('height');
-            // console.log(oH);
             const padding = 10;
             const detailContainer = rowContainer.select('svg')
                 .append('g')
                 .classed('export-details', true)
                 .attr('transform', 'translate('+ padding + ', ' + oH + ')');
 
-            detailContainer.append('text')
-                .text('URL:');
-
-            let url = 'http://192.168.33.110/#/complaints/q/trends?size=10&page=99&sort=Created%20Date&company=EQUIFAX,%20INC.&company=Experian%20Information%20Solutions%20Inc.&issue=Incorrect%20information%20on%20your%20report&issue=Problem%20with%20a%20credit%20reporting%20company\'s%20investigation%20into%20an%20existing%20problem&not_company=CAPITAL%20ONE%20FINANCIAL%20CORPORATION&interval=Month&fields=All%20Data';
-
             const detailWidth = containerWidth - padding;
 
-            let pieces = [];
-            while( textHelper.getTextWidth( url, 16, 'sans-serif') > detailWidth) {
-                for ( var i = 0; i < url.length; i++ ) {
-                    const w = textHelper.getTextWidth( url.substr( 0, i ), 16, 'sans-serif' );
-                    if ( w+ 20 > detailWidth ) {
-                        pieces.push( url.slice( 0, i ) );
-                        url = url.slice(i);
-                        break;
-                    }
-                }
-            }
-
-            pieces.push(url);
-
-            console.log(pieces);
-
-            const longURL = pieces.join(' ');
-            let y=20;
-            detailContainer.append('text')
-                .text(longURL)
-                .classed('url', true)
-                .attr('x', 0)
-                .attr('y', y)
-                .call(wrap, detailWidth );
-
-            const urlHeight = detailContainer
-                .select('.url').node().getBoundingClientRect().height;
-
-            y+= urlHeight + 30;
+            // filters
+            let y = 20;
 
             detailContainer.append('text')
                 .text('Filters:')
-                .attr('x', 0)
-                .attr('y', y);
-
-            y+=20;
+                .attr('x', 0);
 
             const tags = [
                 'EQUIFAX, INC.',
@@ -144,15 +106,61 @@ function createHorizontalRowChart() {
             const tagheight = detailContainer
                 .select('.tags').node().getBoundingClientRect().height;
 
+            y+= tagheight + 20;
+
+            // adding export date
+            // adding URL details
+            detailContainer.append('text')
+                .classed('export-date', true)
+                .text('Export Date: ' +  new Date().toLocaleDateString())
+                .attr('y', y);
+
+            y+= 30;
+
+            // adding URL details
+            detailContainer.append('text')
+                .text('URL:')
+                .attr('y', y);
+
+            let url = 'http://192.168.33.110/#/complaints/q/trends?size=10&page=99&sort=Created%20Date&company=EQUIFAX,%20INC.&company=Experian%20Information%20Solutions%20Inc.&issue=Incorrect%20information%20on%20your%20report&issue=Problem%20with%20a%20credit%20reporting%20company\'s%20investigation%20into%20an%20existing%20problem&not_company=CAPITAL%20ONE%20FINANCIAL%20CORPORATION&interval=Month&fields=All%20Data';
+
+            let pieces = [];
+            while( textHelper.getTextWidth( url, 16, 'sans-serif') > detailWidth) {
+                for ( var i = 0; i < url.length; i++ ) {
+                    const w = textHelper.getTextWidth( url.substr( 0, i ), 16, 'sans-serif' );
+                    if ( w+ 20 > detailWidth ) {
+                        pieces.push( url.slice( 0, i ) );
+                        url = url.slice(i);
+                        break;
+                    }
+                }
+            }
+
+            pieces.push(url);
+
+            const longURL = pieces.join(' ');
+            detailContainer.append('text')
+                .text(longURL)
+                .classed('url', true)
+                .attr('x', 0)
+                .attr('y', y)
+                .call(wrap, detailWidth );
+
+            // end url
+
+            const urlHeight = detailContainer
+                .select('.url').node().getBoundingClientRect().height;
+
+            y+= urlHeight + 30;
             rowContainer.select('svg').attr('height', +oH + y + tagheight);
 
-            const rcOheight = rowChart.height();
+            //const rcOheight = rowChart.height();
             rowChart.height(+oH + y + tagheight);
             rowChart.exportChart('horiz-rowchart.png', 'Britecharts Row Chart');
 
             rowContainer.select('svg').attr('height', rcOheight);
-            rowContainer.select('.export-details').remove();
-            rowChart.height(rcOheight);
+            // rowContainer.select('.export-details').remove();
+            //rowChart.height(rcOheight);
         });
 
         dataset = aRowDataSet().withColors().build();
