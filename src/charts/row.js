@@ -437,12 +437,6 @@ define(function(require) {
                     .attr('viewBox', '0 0 932.15 932.15')
                     .attr('fill', '#0072ce')
                     .attr('fill-opacity', 0)
-                    .on( 'mouseover', function( d ) {
-                        rowHoverOver(d);
-                    } )
-                    .on('mouseout', function(d) {
-                        rowHoverOut(d);
-                    })
                     .append('g');
 
                 group.append( 'path' )
@@ -470,8 +464,7 @@ define(function(require) {
                         const e = data.find((o)=>{
                             return o.parent === d
                         });
-                        return e ? `translate(${yAxisPaddingBetweenChart-15}, -2.5)` : `translate(${yAxisPaddingBetweenChart-5}, 2.5)` +
-                            ' rotate(180)';
+                        return e ? `translate(${yAxisPaddingBetweenChart-5}, 2.5) rotate(180)` : `translate(${yAxisPaddingBetweenChart-15}, -2.5)`;
                     } )
                     .attr( 'points', function( d ) {
                         return '0,0 10,0 5,5';
@@ -512,12 +505,6 @@ define(function(require) {
                     return data.find((o)=>{
                         return o.name === d;
                     }).parent;
-                })
-                .on( 'mouseover', function( d ) {
-                    rowHoverOver(d);
-                } )
-                .on('mouseout', function(d) {
-                    rowHoverOut(d);
                 })
                 // move text right so we have room for the eyeballs
                 .call(wrapText, margin.left - yAxisPaddingBetweenChart - 30);
@@ -578,8 +565,12 @@ define(function(require) {
                 .attr( 'height', function (d) {
                     return a * d.width;	//`a` already accounts for both types of padding
                 } )
-                .on( 'mouseover', rowHoverOver )
-                .on('mouseout', rowHoverOut)
+                .on( 'mouseover', function( d ) {
+                    rowHoverOver(d);
+                } )
+                .on('mouseout', function(d) {
+                   rowHoverOut(d);
+                })
                 .attr( 'width', width )
                 .attr( 'fill', '#d6e8fa')
                 .attr( 'fill-opacity', 0);
@@ -589,7 +580,7 @@ define(function(require) {
             bargroups
                 .append( 'rect' )
                 .attr( 'class', function(d){
-                    return 'pct';
+                    return 'pct';//+ d.name.toLowerCase();
                 } )
                 .attr( 'y', chartHeight )
                 .attr( 'x', 0 )
@@ -647,8 +638,12 @@ define(function(require) {
                             return `translate(-${textWidth}, 0)`;
                         }
                     } )
-                    .on( 'mouseover', rowHoverOver )
-                    .on('mouseout', rowHoverOut );
+                    .on( 'mouseover', function( d ) {
+                        rowHoverOver(d);
+                     } )
+                    .on('mouseout', function(d) {
+                        rowHoverOut(d);
+                    });
             }
 
             if(enableYAxisRight && enableLabels) {
@@ -831,28 +826,20 @@ define(function(require) {
             });
         }
 
-        function rowHoverOver(d, i) {
+        function rowHoverOver(d) {
             // eyeball fill-opacity 1
             // we should find the index of the currently hovered over row
-            let ind = i;
-            if(typeof d.name === "string" || typeof d === "string") {
-                ind = d.name ? getIndex( d.name ) : getIndex( d );
-            }
+            const ind = getIndex(d.name);
 
             d3Selection.select(containerRoot).select('.tick svg.visibility-' + ind).attr('fill-opacity', 1);
-            d3Selection.select(containerRoot).select('g.row_' + ind + ' .bg-hover').attr('fill-opacity', 1);
         }
 
-        function rowHoverOut(d, i) {
+        function rowHoverOut(d) {
             // eyeball fill-opacity 0
             // we should find the index of the currently hovered over row
-            let ind = i;
-            if(typeof d.name === "string" || typeof d === "string") {
-                ind = d.name ? getIndex( d.name ) : getIndex( d );
-            }
+            const ind = getIndex(d.name);
 
             d3Selection.select(containerRoot).select('.tick svg.visibility-' + ind).attr('fill-opacity', 0);
-            d3Selection.select(containerRoot).select('g.row_' + ind + ' .bg-hover').attr('fill-opacity', 0);
         }
 
         function getIndex(name){
