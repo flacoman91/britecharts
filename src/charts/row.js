@@ -470,8 +470,7 @@ define(function(require) {
                         const e = data.find((o)=>{
                             return o.parent === d
                         });
-                        return e ? `translate(${yAxisPaddingBetweenChart-15}, -2.5)` : `translate(${yAxisPaddingBetweenChart-5}, 2.5)` +
-                            ' rotate(180)';
+                        return e ? `translate(${yAxisPaddingBetweenChart-5}, 2.5) rotate(180)` : `translate(${yAxisPaddingBetweenChart-15}, -2.5)`;
                     } )
                     .attr( 'points', function( d ) {
                         return '0,0 10,0 5,5';
