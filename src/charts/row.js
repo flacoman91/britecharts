@@ -162,6 +162,12 @@ define(function(require) {
                     pctLabel = '  | ' + pctOfSet + '%';
                 }
 
+                if(Number(value) === 1) {
+                    // localize, remove the s
+                    // (complaint vs complaints)
+                    labelsSuffix = labelsSuffix.replace( /s$/, '' );
+                }
+
                 return d3Format.format( labelsNumberFormat )( value ) + ' ' + labelsSuffix + pctLabel;
             },
 
