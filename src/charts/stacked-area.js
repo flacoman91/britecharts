@@ -137,7 +137,7 @@ define(function(require){
             areaOutline,
 
             // Area Animation
-            maxAreaNumber = 8,
+            maxAreaNumber = 12,
             areaAnimationDelayStep = 20,
             areaAnimationDelays = d3Array.range(areaAnimationDelayStep, maxAreaNumber* areaAnimationDelayStep, areaAnimationDelayStep),
 
