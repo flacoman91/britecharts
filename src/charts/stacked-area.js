@@ -213,6 +213,7 @@ define(function(require){
                 chartHeight = height - margin.top - margin.bottom;
                 data = cleanData(_data);
                 dataByDate = getDataByDate(data);
+                maxAreaNumber = dataByDate[0].values.length;
 
                 buildLayers();
                 buildScales();
