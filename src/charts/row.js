@@ -96,7 +96,7 @@ define(function(require) {
             labelsMargin = 7,
             labelsNumberFormat = NUMBER_FORMAT,
             labelsSuffix = '',
-            labelsSize = 12,
+            labelsSize = 18,
             padding = 0.1,
             betweenRowsPadding = 0.1,
             outerPadding = 0.3,
@@ -661,7 +661,7 @@ define(function(require) {
                 // each group should contain the labels and rows
                 gunit.append( 'text' )
                     .attr( 'y', _labelsHorizontalY )
-                    .attr('font-size', '10')
+                    .attr('font-size', '18')
                     .attr('font-weight', '600')
                     .style( 'fill', ( d ) => {
                         if(d.pctChange === 0 || isNaN(d.pctChange)) {
@@ -674,7 +674,7 @@ define(function(require) {
                 gunit.append( 'polygon' )
                     .attr( 'transform', ( d ) => {
                         const yPos = _labelsHorizontalY( d );
-                        return d.pctChange < 0 ? `translate(40, ${yPos+5}) rotate(180)` : `translate(30, ${yPos - 10})`;
+                        return d.pctChange < 0 ? `translate(60, ${yPos+4}) rotate(180)` : `translate(50, ${yPos - 13})`;
                     } )
                     .attr( 'points', function( d ) {
                         return '2,8 2,13 8,13 8,8 10,8 5,0 0,8';
