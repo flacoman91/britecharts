@@ -358,6 +358,12 @@ define(function(require) {
                     .append('svg')
                       .classed('britechart row-chart', true);
 
+                svg.append('rect')
+                    .classed('export-wrapper', true)
+                    .attr('width', width)
+                    .attr('height', height)
+                    .attr('fill', 'white');
+
                 buildContainerGroups();
             }
 
