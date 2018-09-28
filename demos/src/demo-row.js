@@ -327,7 +327,7 @@ function createExportRowChart() {
             .labelsSuffix('complaints')
             .colorSchema(colorScheme)
             .width(containerWidth)
-            .height(dataset.length * 37)
+            .height(dataset.length * 60)
             .xTicks( 0 )
             .yTicks( 0 )
             .percentageAxisToMaxRatio(1)
