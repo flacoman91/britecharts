@@ -37,10 +37,10 @@
             "parent": "Shining",
             "pctChange": -9,
             "pctOfSet": 24,
-            "width": ".4"
+            "width": ".5"
         },
         {
-            "name": "pizza personal computer chicken",
+            "name": "pizza personal computer 1234 eat me haha yum yum whoooo",
             "isParent": true,
             "value": 1900,
             "pctChange": 1,
@@ -53,7 +53,7 @@
             "parent": "Brilliant",
             "pctChange": 999999,
             "pctOfSet": 8,
-            "width": ".4"
+            "width": ".5"
         },
         {
             "name": "Decrease",
@@ -61,7 +61,7 @@
             "parent": "Brilliant",
             "pctChange": -999999,
             "pctOfSet": 8,
-            "width": ".4"
+            "width": ".5"
         }
 
     ]

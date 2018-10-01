@@ -129,12 +129,13 @@ define(function(require) {
             valueLabel = 'value',
             nameLabel = 'name',
             pctChangeLabel = 'pctChange',
+            //pctOfSet = '',
             pctOfSetLabel = 'pctOfSet',
 
             baseLine,
             maskGridLines,
             shouldReverseColorList = true,
-
+            showExpandToggles = true,
             // Dispatcher object to broadcast the mouse events
             // Ref: https://github.com/mbostock/d3/wiki/Internals#d3_dispatch
             dispatcher = d3Dispatch.dispatch(
@@ -523,20 +524,21 @@ define(function(require) {
                 } )
                 .on('mouseout', function(d) {
                     rowHoverOut(d);
-                })
+                });
                 // move text right so we have room for the eyeballs
-                .call(wrapText, margin.left - yAxisPaddingBetweenChart - 30);
+                //.call(wrapText, margin.left - yAxisPaddingBetweenChart - 30);
 
             // adding the down arrow for parent elements
-            svg.selectAll('.y-axis-group.axis .tick')
-                .classed('expandable', function(d){
-                    // lets us know it's a parent element
-                    return data.find((o)=>{
-                        return o.name === d;
-                    }).isParent;
-                })
-                .call(addExpandToggle);
-
+            if(showExpandToggles) {
+                svg.selectAll( '.y-axis-group.axis .tick' )
+                    .classed( 'expandable', function( d ) {
+                        // lets us know it's a parent element
+                        return data.find( ( o ) => {
+                            return o.name === d;
+                        } ).isParent;
+                    } )
+                    .call( addExpandToggle );
+            }
         }
 
         /**
@@ -1317,6 +1319,22 @@ define(function(require) {
                 return shouldReverseColorList;
             }
             shouldReverseColorList = _x;
+
+            return this;
+        };
+
+
+        /**
+         * Gets or Sets whether the chart should show the expand toggles
+         * @param  {boolean} _x Should we show the expand toggles?
+         * @return {boolean | module} do we expand toggles
+         * @public
+         */
+        exports.showExpandToggles = function(_x) {
+            if (!arguments.length) {
+                return showExpandToggles;
+            }
+            showExpandToggles = _x;
 
             return this;
         };
