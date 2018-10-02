@@ -314,7 +314,7 @@ function createExportRowChart() {
             .isAnimated(true)
             .margin({
                 left: 400,
-                right: 200,
+                right: 97,
                 top: 20,
                 bottom: 30
             })
