@@ -488,6 +488,12 @@ define(function(require){
                     .append('svg')
                     .classed('britechart stacked-area', true);
 
+                svg.append('rect')
+                    .classed('export-wrapper', true)
+                    .attr('width', width)
+                    .attr('height', height)
+                    .attr('fill', 'white');
+
                 buildContainerGroups();
             }
 
