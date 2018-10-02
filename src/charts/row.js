@@ -366,11 +366,11 @@ define(function(require) {
 
                 buildContainerGroups();
             }
-
             svg
                 .attr('width', width)
                 .attr('height', height);
-        }
+            }
+
 
         /**
          * Cleaning data casting the values and names to the proper type while keeping
