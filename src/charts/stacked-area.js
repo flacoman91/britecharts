@@ -213,7 +213,6 @@ define(function(require){
                 chartHeight = height - margin.top - margin.bottom;
                 data = cleanData(_data);
                 dataByDate = getDataByDate(data);
-                maxAreaNumber = dataByDate[0].values.length;
 
                 buildLayers();
                 buildScales();
@@ -1268,6 +1267,22 @@ define(function(require){
                 ...margin,
                 ..._x
             };
+
+            return this;
+        };
+
+        /**
+         * Gets or Sets the maxAreaNumber of the chart. so the chart colors
+         * scale right
+         * @param  {number} _x areas of the chart
+         * @return {Number | module} Current # or Area Chart module to chain calls
+         * @public
+         */
+        exports.maxAreaNumber = function(_x) {
+            if (!arguments.length) {
+                return maxAreaNumber;
+            }
+            maxAreaNumber = _x;
 
             return this;
         };
