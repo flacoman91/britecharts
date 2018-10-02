@@ -117,7 +117,7 @@ define(function(require){
             highlightCircleActiveStrokeWidth = 5,
             highlightCircleActiveStrokeOpacity = 0.6,
 
-            areaOpacity = 0.4,
+            areaOpacity = 0.24,
             categoryColorMap,
             order,
             topicsOrder,
@@ -137,9 +137,9 @@ define(function(require){
             areaOutline,
 
             // Area Animation
-            maxAreaNumber = 12,
+            maxAreaNumber = 10,
             areaAnimationDelayStep = 20,
-            areaAnimationDelays = d3Array.range(areaAnimationDelayStep, maxAreaNumber* areaAnimationDelayStep, areaAnimationDelayStep),
+            areaAnimationDelays = d3Array.range(areaAnimationDelayStep, maxAreaNumber * areaAnimationDelayStep, areaAnimationDelayStep),
 
             overlay,
             overlayColor = 'rgba(0, 0, 0, 0)',
