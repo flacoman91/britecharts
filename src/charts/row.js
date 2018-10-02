@@ -96,7 +96,7 @@ define(function(require) {
             labelsMargin = 7,
             labelsNumberFormat = NUMBER_FORMAT,
             labelsSuffix = '',
-            labelsSize = 18,
+            labelsSize = 12,
             padding = 0.1,
             betweenRowsPadding = 0.1,
             outerPadding = 0.3,
@@ -129,12 +129,13 @@ define(function(require) {
             valueLabel = 'value',
             nameLabel = 'name',
             pctChangeLabel = 'pctChange',
+            //pctOfSet = '',
             pctOfSetLabel = 'pctOfSet',
 
             baseLine,
             maskGridLines,
             shouldReverseColorList = true,
-
+            showExpandToggles = true,
             // Dispatcher object to broadcast the mouse events
             // Ref: https://github.com/mbostock/d3/wiki/Internals#d3_dispatch
             dispatcher = d3Dispatch.dispatch(
@@ -358,19 +359,13 @@ define(function(require) {
                     .append('svg')
                       .classed('britechart row-chart', true);
 
-                svg.append('rect')
-                    .classed('export-wrapper', true)
-                    .attr('width', width)
-                    .attr('height', height)
-                    .attr('fill', 'white');
-
                 buildContainerGroups();
             }
+
             svg
                 .attr('width', width)
                 .attr('height', height);
-            }
-
+        }
 
         /**
          * Cleaning data casting the values and names to the proper type while keeping
@@ -449,6 +444,12 @@ define(function(require) {
                     .attr('viewBox', '0 0 932.15 932.15')
                     .attr('fill', '#0072ce')
                     .attr('fill-opacity', 0)
+                    .on( 'mouseover', function( d ) {
+                        rowHoverOver(d);
+                    } )
+                    .on('mouseout', function(d) {
+                        rowHoverOut(d);
+                    })
                     .append('g');
 
                 group.append( 'path' )
@@ -518,19 +519,26 @@ define(function(require) {
                         return o.name === d;
                     }).parent;
                 })
+                .on( 'mouseover', function( d ) {
+                    rowHoverOver(d);
+                } )
+                .on('mouseout', function(d) {
+                    rowHoverOut(d);
+                });
                 // move text right so we have room for the eyeballs
-                .call(wrapText, margin.left - yAxisPaddingBetweenChart - 30);
+                //.call(wrapText, margin.left - yAxisPaddingBetweenChart - 30);
 
             // adding the down arrow for parent elements
-            svg.selectAll('.y-axis-group.axis .tick')
-                .classed('expandable', function(d){
-                    // lets us know it's a parent element
-                    return data.find((o)=>{
-                        return o.name === d;
-                    }).isParent;
-                })
-                .call(addExpandToggle);
-
+            if(showExpandToggles) {
+                svg.selectAll( '.y-axis-group.axis .tick' )
+                    .classed( 'expandable', function( d ) {
+                        // lets us know it's a parent element
+                        return data.find( ( o ) => {
+                            return o.name === d;
+                        } ).isParent;
+                    } )
+                    .call( addExpandToggle );
+            }
         }
 
         /**
@@ -577,12 +585,8 @@ define(function(require) {
                 .attr( 'height', function (d) {
                     return a * d.width;	//`a` already accounts for both types of padding
                 } )
-                .on( 'mouseover', function( d ) {
-                    rowHoverOver(d);
-                } )
-                .on('mouseout', function(d) {
-                   rowHoverOut(d);
-                })
+                .on( 'mouseover', rowHoverOver )
+                .on('mouseout', rowHoverOut)
                 .attr( 'width', width )
                 .attr( 'fill', '#d6e8fa')
                 .attr( 'fill-opacity', 0);
@@ -592,7 +596,7 @@ define(function(require) {
             bargroups
                 .append( 'rect' )
                 .attr( 'class', function(d){
-                    return 'pct';//+ d.name.toLowerCase();
+                    return 'pct';
                 } )
                 .attr( 'y', chartHeight )
                 .attr( 'x', 0 )
@@ -650,12 +654,8 @@ define(function(require) {
                             return `translate(-${textWidth}, 0)`;
                         }
                     } )
-                    .on( 'mouseover', function( d ) {
-                        rowHoverOver(d);
-                     } )
-                    .on('mouseout', function(d) {
-                        rowHoverOut(d);
-                    });
+                    .on( 'mouseover', rowHoverOver )
+                    .on('mouseout', rowHoverOut );
             }
 
             if(enableYAxisRight && enableLabels) {
@@ -667,7 +667,7 @@ define(function(require) {
                 // each group should contain the labels and rows
                 gunit.append( 'text' )
                     .attr( 'y', _labelsHorizontalY )
-                    .attr('font-size', '18')
+                    .attr('font-size', '10')
                     .attr('font-weight', '600')
                     .style( 'fill', ( d ) => {
                         if(d.pctChange === 0 || isNaN(d.pctChange)) {
@@ -680,7 +680,7 @@ define(function(require) {
                 gunit.append( 'polygon' )
                     .attr( 'transform', ( d ) => {
                         const yPos = _labelsHorizontalY( d );
-                        return d.pctChange < 0 ? `translate(60, ${yPos+4}) rotate(180)` : `translate(50, ${yPos - 13})`;
+                        return d.pctChange < 0 ? `translate(40, ${yPos+5}) rotate(180)` : `translate(30, ${yPos - 10})`;
                     } )
                     .attr( 'points', function( d ) {
                         return '2,8 2,13 8,13 8,8 10,8 5,0 0,8';
@@ -838,20 +838,28 @@ define(function(require) {
             });
         }
 
-        function rowHoverOver(d) {
+        function rowHoverOver(d, i) {
             // eyeball fill-opacity 1
             // we should find the index of the currently hovered over row
-            const ind = getIndex(d.name);
+            let ind = i;
+            if(typeof d.name === "string" || typeof d === "string") {
+                ind = d.name ? getIndex( d.name ) : getIndex( d );
+            }
 
             d3Selection.select(containerRoot).select('.tick svg.visibility-' + ind).attr('fill-opacity', 1);
+            d3Selection.select(containerRoot).select('g.row_' + ind + ' .bg-hover').attr('fill-opacity', 1);
         }
 
-        function rowHoverOut(d) {
+        function rowHoverOut(d, i) {
             // eyeball fill-opacity 0
             // we should find the index of the currently hovered over row
-            const ind = getIndex(d.name);
+            let ind = i;
+            if(typeof d.name === "string" || typeof d === "string") {
+                ind = d.name ? getIndex( d.name ) : getIndex( d );
+            }
 
             d3Selection.select(containerRoot).select('.tick svg.visibility-' + ind).attr('fill-opacity', 0);
+            d3Selection.select(containerRoot).select('g.row_' + ind + ' .bg-hover').attr('fill-opacity', 0);
         }
 
         function getIndex(name){
@@ -1311,6 +1319,22 @@ define(function(require) {
                 return shouldReverseColorList;
             }
             shouldReverseColorList = _x;
+
+            return this;
+        };
+
+
+        /**
+         * Gets or Sets whether the chart should show the expand toggles
+         * @param  {boolean} _x Should we show the expand toggles?
+         * @return {boolean | module} do we expand toggles
+         * @public
+         */
+        exports.showExpandToggles = function(_x) {
+            if (!arguments.length) {
+                return showExpandToggles;
+            }
+            showExpandToggles = _x;
 
             return this;
         };
