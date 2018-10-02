@@ -97,6 +97,7 @@ define(function(require) {
             labelsNumberFormat = NUMBER_FORMAT,
             labelsSuffix = '',
             labelsSize = 12,
+            pctChangeLabelSize = 10,
             padding = 0.1,
             betweenRowsPadding = 0.1,
             outerPadding = 0.3,
@@ -679,7 +680,7 @@ define(function(require) {
                 // each group should contain the labels and rows
                 gunit.append( 'text' )
                     .attr( 'y', _labelsHorizontalY )
-                    .attr('font-size', labelsSize)
+                    .attr('font-size', pctChangeLabelSize)
                     .attr('font-weight', '600')
                     .style( 'fill', ( d ) => {
                         if(d.pctChange === 0 || isNaN(d.pctChange)) {
@@ -1227,6 +1228,22 @@ define(function(require) {
                 return labelsSize;
             }
             labelsSize = _x;
+
+            return this;
+        };
+
+        /**
+         * Get or Sets the labels text size for the percentages
+         * @param  {number} [_x=12] label font size
+         * @return {number | module}    Current text size or Chart module to chain calls
+         * @public
+         */
+        exports.pctChangeLabelSize = function(_x) {
+            if (!arguments.length) {
+                return pctChangeLabelSize;
+            }
+            pctChangeLabelSize
+                = _x;
 
             return this;
         };

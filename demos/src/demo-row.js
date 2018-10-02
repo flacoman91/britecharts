@@ -331,6 +331,7 @@ function createExportRowChart() {
             .xTicks( 0 )
             .yTicks( 0 )
             .percentageAxisToMaxRatio(1)
+            .pctChangeLabelSize(18)
             .yAxisLineWrapLimit(2)
             .yAxisPaddingBetweenChart(5);
 
