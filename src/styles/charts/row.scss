@@ -21,6 +21,9 @@ $row-stroke-width: 0;
         .tick {
             text {
                 font-size: 14px;
+                &.print-mode {
+                    font-size: 18px;
+                }
             }
         }
     }
