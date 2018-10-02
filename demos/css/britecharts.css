@@ -140,6 +140,8 @@
 
 .row-chart .y-axis-group .tick text {
   font-size: 14px; }
+  .row-chart .y-axis-group .tick text.print-mode {
+    font-size: 18px; }
 
 .row-chart .axis path.domain {
   display: none; }
