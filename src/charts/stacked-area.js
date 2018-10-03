@@ -137,7 +137,7 @@ define(function(require){
             areaOutline,
 
             // Area Animation
-            maxAreaNumber = 10,
+            maxAreaNumber = 12,
             areaAnimationDelayStep = 20,
             areaAnimationDelays = d3Array.range(areaAnimationDelayStep, maxAreaNumber * areaAnimationDelayStep, areaAnimationDelayStep),
 
@@ -1267,22 +1267,6 @@ define(function(require){
                 ...margin,
                 ..._x
             };
-
-            return this;
-        };
-
-        /**
-         * Gets or Sets the maxAreaNumber of the chart. so the chart colors
-         * scale right
-         * @param  {number} _x areas of the chart
-         * @return {Number | module} Current # or Area Chart module to chain calls
-         * @public
-         */
-        exports.maxAreaNumber = function(_x) {
-            if (!arguments.length) {
-                return maxAreaNumber;
-            }
-            maxAreaNumber = _x;
 
             return this;
         };
