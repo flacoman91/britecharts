@@ -61,7 +61,7 @@ define(function(require){
                 bottom: 2,
                 left: 2
             },
-            width = 250,
+            width = 270,
             height = 45,
 
             title = 'Tooltip title',
@@ -79,15 +79,15 @@ define(function(require){
             tooltipDivider,
             tooltipBody,
             tooltipTitle,
-            tooltipWidth = 250,
+            tooltipWidth = 270,
             tooltipHeight = 48,
             tooltipBorderRadius = 3,
             ttTextX = 0,
             ttTextY = 37,
             textHeight,
             entryLineLimit = 3,
-            initialTooltipTextXPosition = -25,
-            tooltipTextLinePadding = 5,
+            initialTooltipTextXPosition = -35,
+            tooltipTextLinePadding = 7,
             tooltipRightWidth,
             // Animations
             mouseChaseDuration = 100,
@@ -96,11 +96,11 @@ define(function(require){
             circleYOffset = 8,
 
             colorMap,
-            bodyFillColor = '#FFFFFF',
+            bodyFillColor = '#282C35',
             borderStrokeColor = '#D2D6DF',
-            titleFillColor = '#6D717A',
-            textFillColor = '#282C35',
-            tooltipTextColor = '#000000',
+            titleFillColor = '#ffffff',
+            textFillColor = '#ffffff',
+            tooltipTextColor = '#ffffff',
 
             dateLabel = 'date',
             valueLabel = 'value',
@@ -213,7 +213,7 @@ define(function(require){
             tooltipTitle = tooltipTextContainer
               .append('text')
                 .classed('tooltip-title', true)
-                .attr('x', -tooltipWidth / 4 + 16)
+                .attr('x', -tooltipWidth / 4 + 40)
                 .attr('dy', '.35em')
                 .attr('y', 16)
                 .style('fill', titleFillColor);
@@ -221,7 +221,7 @@ define(function(require){
             tooltipDivider = tooltipTextContainer
               .append('line')
                 .classed('tooltip-divider', true)
-                .attr('x1', -tooltipWidth / 4 + 16)
+                .attr('x1', -tooltipWidth / 4 + 10)
                 .attr('x2', 265)
                 .attr('y1', 31)
                 .attr('y2', 31)
@@ -367,9 +367,9 @@ define(function(require){
                 .classed('tooltip-circle', true)
                 .attr('cx', 23 - tooltipWidth / 4)
                 .attr('cy', (ttTextY + circleYOffset))
-                .attr('r', 5)
+                .attr('r', 3)
                 .style('fill', colorMap[name])
-                .style('stroke-width', 1);
+                .style('stroke-width', '1px');
 
             ttTextY += textHeight + 7;
         }
