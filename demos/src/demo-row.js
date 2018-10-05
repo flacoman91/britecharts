@@ -82,7 +82,9 @@ function createHorizontalRowChart() {
             let y = 20;
 
             detailContainer.append('text')
+
                 .text('Filters:')
+                .attr('class', 'text-title')
                 .attr('x', 0);
 
             const tags = [
@@ -113,7 +115,8 @@ function createHorizontalRowChart() {
             detailContainer.append('text')
                 .classed('export-date', true)
                 .text('Export Date: ' +  new Date().toLocaleDateString())
-                .attr('y', y);
+                .attr('dy', '1.2em');
+                // .attr('y', y);
 
             y+= 30;
 
@@ -143,7 +146,8 @@ function createHorizontalRowChart() {
                 .text(longURL)
                 .classed('url', true)
                 .attr('x', 0)
-                .attr('y', y)
+                .attr('dy', '1.2em')
+                // .attr('y', y)
                 .call(wrap, detailWidth );
 
             // end url
@@ -175,7 +179,7 @@ function createHorizontalRowChart() {
             .margin({
                 left: 200,
                 right: 50,
-                top: 20,
+                top: 50,
                 bottom: 30
             })
             .backgroundColor('#f7f8f9')
@@ -185,7 +189,7 @@ function createHorizontalRowChart() {
             .labelsSuffix('complaints')
             .colorSchema(colorScheme)
             .width(containerWidth)
-            .height(dataset.length * 37)
+            .height(dataset.length * 70)
             .xTicks( 0 )
             .yTicks( 0 )
             .percentageAxisToMaxRatio(1)

@@ -22,3 +22,5 @@
 
 .row-chart .percentage-label {
   fill: #666A73; }
+  .row-chart .percentage-label.child {
+    font-size: 12px; }

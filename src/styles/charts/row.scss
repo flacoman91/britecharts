@@ -44,5 +44,8 @@ $row-stroke-width: 0;
 
     .percentage-label {
         fill: $grey-600;
+        &.child {
+            font-size: 12px;
+        }
     }
 }

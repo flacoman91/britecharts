@@ -24,13 +24,14 @@ define(function(require) {
     const config = {
         styleClass : 'britechartStyle',
         defaultFilename: 'britechart.png',
-        chartBackground: 'white',
+        chartBackground: '#ffffff',
         imageSourceBase: 'data:image/svg+xml;base64,',
-        titleFontSize: '15px',
-        titleFontFamily: '\'Benton Sans\', sans-serif',
-        titleTopOffset: 15,
+        titleFontSize: '36px',
+        titleFontFamily: '\'Avenir Next\', sans-serif',
+        titleTopOffset: 25,
+        titleLeftOffset: 10,
         get styleBackgroundString () {
-            return `<style>svg{background:${this.chartBackground};}</style>`;
+            return `<style>svg{background:${this.chartBackground};padding: 20px;}</style>`;
         }
     };
 
@@ -128,7 +129,6 @@ define(function(require) {
      */
     function drawImageOnCanvas(image, canvas) {
         canvas.getContext('2d').drawImage(image, 0, 0);
-
         return canvas;
     }
 
@@ -160,7 +160,6 @@ define(function(require) {
         if (navigator.userAgent.search('FireFox') > -1) {
             return html.replace(/url.*&quot;\)/, 'url(&quot;linearGradient[id*="-gradient-"]&quot;);');
         }
-
         return html;
     }
 
@@ -189,7 +188,7 @@ define(function(require) {
         }
         let {grey} = colorSchemas;
 
-        html =  html.replace(/<g/,`<text x="${this.margin().left}" y="${config.titleTopOffset}" font-family="${config.titleFontFamily}" font-size="${config.titleFontSize}" fill="${grey[6]}"> ${title} </text><g `);
+        html =  html.replace(/<g/,`<text x="${config.titleLeftOffset}" y="${config.titleTopOffset}" font-family="${config.titleFontFamily}" font-size="${config.titleFontSize}" fill="${grey[6]}"> ${title} </text><g `);
 
         return html;
     }
