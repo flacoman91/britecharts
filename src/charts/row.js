@@ -525,12 +525,13 @@ define(function(require) {
             }
 
             svg.selectAll('.y-axis-group.axis .tick text')
-                .classed('child', function(d){
+                .classed('child', function(d) {
                     // lets us know it's a child element
                     return data.find((o)=>{
                         return o.name === d;
                     }).parent;
                 })
+                .attr('fill', '#75787b')
                 .classed('print-mode', isPrintMode)
                 .on( 'mouseover', function( d ) {
                     rowHoverOver(d);
