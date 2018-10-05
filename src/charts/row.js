@@ -498,7 +498,6 @@ define(function(require) {
                         const e = data.find((o)=>{
                             return o.name === d && o.isParent
                         });
-
                         return e ? 1 : 0;
                     } );
             } );
@@ -528,7 +527,6 @@ define(function(require) {
                 .classed('child', function(d) {
                     // lets us know it's a child element
                     return data.find((o) => {
-                        console.log(o.name);
                         return o.name === d;
                     }).parent;
                 })
@@ -649,6 +647,12 @@ define(function(require) {
 
                 bargroups.append( 'text' )
                     .classed( 'percentage-label', true )
+                    .classed('child', function(d) {
+                        const e = data.find((o) => {
+                            return o.name === d.name && !o.isParent;
+                        });
+                        return e ? true : false;
+                    })
                     .attr( 'x', _labelsHorizontalX )
                     .attr( 'y', _labelsHorizontalY )
                     .text( _labelsFormatValue )
@@ -680,7 +684,12 @@ define(function(require) {
                 // each group should contain the labels and rows
                 gunit.append( 'text' )
                     .attr( 'y', _labelsHorizontalY )
-                    .attr('font-size', pctChangeLabelSize)
+                    .attr('font-size', function(d) {
+                    const e = data.find((o) => {
+                        return o.name === d.name && !o.isParent;
+                     });
+                        return e ? '12px' : '16px';
+                    })
                     .attr('font-weight', '600')
                     .style( 'fill', ( d ) => {
                         if(d.pctChange === 0 || isNaN(d.pctChange)) {
@@ -690,14 +699,15 @@ define(function(require) {
                     } )
                     .text( _labelsFormatPct );
 
+                // arrows up and down to show percent change.
                 gunit.append( 'polygon' )
                     .attr( 'transform', ( d ) => {
                         const yPos = _labelsHorizontalY( d );
-                        if(isPrintMode){
+                        if(isPrintMode || d.isParent) {
                             return d.pctChange < 0 ? `translate(65, ${yPos+5}) rotate(180) scale(1.5)` :
                                 `translate(50, ${yPos - 15}) scale(1.5)`;
                         }
-                        return d.pctChange < 0 ? `translate(40, ${yPos+5}) rotate(180)` : `translate(30, ${yPos - 10})`;
+                        return d.pctChange < 0 ? `translate(50, ${yPos+5}) rotate(180)` : `translate(40, ${yPos - 10})`;
                     } )
                     .attr( 'points', function( d ) {
                         return '2,8 2,13 8,13 8,8 10,8 5,0 0,8';
