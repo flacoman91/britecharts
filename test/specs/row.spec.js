@@ -45,10 +45,6 @@ define(['d3', 'row', 'rowChartDataBuilder'], function(d3, chart, dataBuilder) {
             expect(containerFixture.select('g.metadata-group').empty()).toBeFalsy();
         });
 
-        it('should render grid lines', () => {
-            expect(containerFixture.select('.horizontal-grid-line').empty()).toBeFalsy();
-        });
-
         it('should render an X and Y axis', () => {
             expect(containerFixture.select('.x-axis-group.axis').empty()).toBeFalsy();
             expect(containerFixture.select('.y-axis-group.axis').empty()).toBeFalsy();

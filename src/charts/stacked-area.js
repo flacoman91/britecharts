@@ -117,7 +117,7 @@ define(function(require){
             highlightCircleActiveStrokeWidth = 5,
             highlightCircleActiveStrokeOpacity = 0.6,
 
-            areaOpacity = 0.4,
+            areaOpacity = 0.24,
             categoryColorMap,
             order,
             topicsOrder,
@@ -137,9 +137,9 @@ define(function(require){
             areaOutline,
 
             // Area Animation
-            maxAreaNumber = 8,
+            maxAreaNumber = 12,
             areaAnimationDelayStep = 20,
-            areaAnimationDelays = d3Array.range(areaAnimationDelayStep, maxAreaNumber* areaAnimationDelayStep, areaAnimationDelayStep),
+            areaAnimationDelays = d3Array.range(areaAnimationDelayStep, maxAreaNumber * areaAnimationDelayStep, areaAnimationDelayStep),
 
             overlay,
             overlayColor = 'rgba(0, 0, 0, 0)',
@@ -486,6 +486,12 @@ define(function(require){
                 svg = d3Selection.select(container)
                     .append('svg')
                     .classed('britechart stacked-area', true);
+
+                svg.append('rect')
+                    .classed('export-wrapper', true)
+                    .attr('width', width)
+                    .attr('height', height)
+                    .attr('fill', 'white');
 
                 buildContainerGroups();
             }

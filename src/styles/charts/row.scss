@@ -9,18 +9,27 @@ $row-stroke-width: 0;
     .row {
         shape-rendering: crispEdges;
     }
-
+    g.row-wrapper {
+        cursor: pointer;
+        &:hover {
+            .bg-hover {
+                fill-opacity: 1;
+            }
+        }
+    }
     .y-axis-group {
         .tick {
             text {
                 font-size: 14px;
+                &.print-mode {
+                    font-size: 18px;
+                }
             }
         }
     }
-
     // Axes
     .axis {
-        path {
+        path.domain {
             display: none;
         }
     }
@@ -29,12 +38,14 @@ $row-stroke-width: 0;
             display: none;
         }
     }
-
     .adjust-upwards {
         transform: translate(0, -10px);
     }
 
     .percentage-label {
         fill: $grey-600;
+        &.child {
+            font-size: 12px;
+        }
     }
 }

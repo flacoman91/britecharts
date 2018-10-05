@@ -1,7 +1,25 @@
     <div class="container" id="row">
+
+        <div class="row" style="width:1125px">
+            <div>
+                <article>
+                    <h2 class="tutorial__heading">Big Wide Chart for Export</h2>
+                    <div
+                        class="js-row-chart-export-container row-chart-export-container card--chart"></div>
+                </article>
+            </div>
+        </div>
+        <div>
+            <h4>Export Chart</h4>
+            <p>Export this chart by pressing <input
+                class="js-download-button-export btn-sm btn btn-primary"
+                type="button" value="Export" /></p>
+
+            <h4>Demo Code</h4>
+            <p>Read the whole code of this demo <a href="https://github.com/eventbrite/britecharts/blob/master/demos/src/demo-row.js">in github</a></p>
+        </div>
         <div class="row">
-            <div class="
-col-md-6">
+            <div class="col-md-6">
                 <article>
                     <h2 class="tutorial__heading">Row Chart with Tooltip and Labels</h2>
                     <div class="js-row-chart-tooltip-container row-chart-tooltip-container card--chart"></div>
@@ -69,6 +87,9 @@ rowContainer.datum(dataset).call(rowChart);
 
                 <h4>Demo Code</h4>
                 <p>Read the whole code of this demo <a href="https://github.com/eventbrite/britecharts/blob/master/demos/src/demo-row.js">in github</a></p>
+                <p>Export this chart by pressing <input
+                    class="js-download-button-123 btn-sm btn btn-primary"
+                    type="button" value="Export" /></p>
             </div>
         </div>
         <div class="row">
@@ -89,24 +110,6 @@ rowChart
     .height(300);
 
 rowContainer.datum(dataset).call(rowChart);
-                </code></pre>
-
-                <h4>Demo Code</h4>
-                <p>Read the whole code of this demo <a href="https://github.com/eventbrite/britecharts/blob/master/demos/src/demo-row.js">in github</a></p>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-6">
-                <article>
-                    <a name="loading-state"></a>
-                    <h2 class="tutorial__heading">Loading State</h2>
-                    <div class="js-loading-container"></div>
-                </article>
-            </div>
-            <div class="col-md-6 siderow">
-                <h3>The code</h3>
-                <pre><code class="language-javascript">
-rowContainer.html(rowChart.loadingState())
                 </code></pre>
 
                 <h4>Demo Code</h4>

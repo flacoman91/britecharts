@@ -133,10 +133,17 @@
 .row-chart .row {
   shape-rendering: crispEdges; }
 
+.row-chart g.row-wrapper {
+  cursor: pointer; }
+  .row-chart g.row-wrapper:hover .bg-hover {
+    fill-opacity: 1; }
+
 .row-chart .y-axis-group .tick text {
   font-size: 14px; }
+  .row-chart .y-axis-group .tick text.print-mode {
+    font-size: 18px; }
 
-.row-chart .axis path {
+.row-chart .axis path.domain {
   display: none; }
 
 .row-chart .tick line {
@@ -147,6 +154,8 @@
 
 .row-chart .percentage-label {
   fill: #666A73; }
+  .row-chart .percentage-label.child {
+    font-size: 12px; }
 
 .scatter-plot .y-axis-group .tick line {
   display: none; }

@@ -28,11 +28,19 @@ function createStackedAreaChartWithTooltip(optionalColorSchema) {
     if (containerWidth) {
         dataset = aTestDataSet().with6Sources().build();
 
+        let margin = {
+                top: 70,
+                right: 30,
+                bottom: 60,
+                left: 70
+            };
         // StackedAreChart Setup and start
         stackedArea
             .isAnimated(true)
+            .margin(margin)
             .tooltipThreshold(600)
-            .width(containerWidth)
+            .height(564)
+            .width(1175)
             .dateLabel('dateUTC')
             .valueLabel('views')
             .grid('horizontal')
@@ -45,10 +53,11 @@ function createStackedAreaChartWithTooltip(optionalColorSchema) {
                 chartTooltip.update(dataPoint, topicColorMap, dataPointXPosition);
             })
             .on('customMouseOut', chartTooltip.hide);
+        stackedArea.colorSchema(['red', 'blue', 'green', 'yellow', 'purple', 'pink', 'black', 'grey', 'orange']);
 
-        if (optionalColorSchema) {
-            stackedArea.colorSchema(optionalColorSchema);
-        }
+        // if (optionalColorSchema) {
+        //     stackedArea.colorSchema(optionalColorSchema);
+        // }
 
         container.datum(dataset.data).call(stackedArea);
 
