@@ -96,7 +96,7 @@ define(function(require) {
             labelsMargin = 7,
             labelsNumberFormat = NUMBER_FORMAT,
             labelsSuffix = '',
-            labelsSize = 12,
+            labelsSize = 16,
             pctChangeLabelSize = 10,
             padding = 0.1,
             betweenRowsPadding = 0.1,
@@ -527,11 +527,11 @@ define(function(require) {
             svg.selectAll('.y-axis-group.axis .tick text')
                 .classed('child', function(d) {
                     // lets us know it's a child element
-                    return data.find((o)=>{
+                    return data.find((o) => {
+                        console.log(o.name);
                         return o.name === d;
                     }).parent;
                 })
-                .attr('fill', '#75787b')
                 .classed('print-mode', isPrintMode)
                 .on( 'mouseover', function( d ) {
                     rowHoverOver(d);
@@ -641,7 +641,6 @@ define(function(require) {
                 } )
                 .attr( 'width', ( { value } ) => xScale( value ) )
                 .attr( 'fill', ( d ) => {
-
                     return computeColor( d.name );
                 } );
             if(enableLabels) {
