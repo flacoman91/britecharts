@@ -649,7 +649,7 @@ define(function(require) {
                     .classed( 'percentage-label', true )
                     .classed('child', function(d) {
                         const e = data.find((o) => {
-                            return o.name === d.name && !o.isParent;
+                            return o.name === d.name && !o.isParent && !isPrintMode;
                         });
                         return e ? true : false;
                     })
@@ -686,7 +686,7 @@ define(function(require) {
                     .attr( 'y', _labelsHorizontalY )
                     .attr('font-size', function(d) {
                     const e = data.find((o) => {
-                        return o.name === d.name && !o.isParent;
+                        return o.name === d.name && !o.isParent && !isPrintMode;
                      });
                         return e ? '12px' : '16px';
                     })
