@@ -97,6 +97,7 @@ define(function(require) {
             labelsNumberFormat = NUMBER_FORMAT,
             labelsSuffix = '',
             labelsSize = 12,
+            pctChangeLabelSize = 10,
             padding = 0.1,
             betweenRowsPadding = 0.1,
             outerPadding = 0.3,
@@ -135,7 +136,7 @@ define(function(require) {
             baseLine,
             maskGridLines,
             shouldReverseColorList = true,
-            showExpandToggles = true,
+            isPrintMode = false,
             // Dispatcher object to broadcast the mouse events
             // Ref: https://github.com/mbostock/d3/wiki/Internals#d3_dispatch
             dispatcher = d3Dispatch.dispatch(
@@ -432,7 +433,8 @@ define(function(require) {
          * @private
          */
         function wrapText(text, containerWidth) {
-            textHelper.wrapTextWithEllipses(text, containerWidth, 0, yAxisLineWrapLimit)
+            const lineHeight = yAxisLineWrapLimit > 1 ? .8 : 1.2;
+            textHelper.wrapTextWithEllipses(text, containerWidth, 0, yAxisLineWrapLimit, lineHeight);
         }
 
         function addVisibilityToggle(elem){
@@ -507,6 +509,7 @@ define(function(require) {
          * @private
          */
         function drawAxis() {
+            let labelsBoxWidth = margin.left;
             svg.select('.x-axis-group.axis')
                 .attr('transform', `translate(0, ${chartHeight})`)
                 .call(xAxis);
@@ -515,8 +518,11 @@ define(function(require) {
                 .call(yAxis);
 
             // adding the eyeball
-            svg.selectAll('.y-axis-group.axis .tick')
-                .call(addVisibilityToggle);
+            if(!isPrintMode) {
+                svg.selectAll( '.y-axis-group.axis .tick' )
+                    .call( addVisibilityToggle );
+                labelsBoxWidth = margin.left - yAxisPaddingBetweenChart - 30;
+            }
 
             svg.selectAll('.y-axis-group.axis .tick text')
                 .classed('child', function(d){
@@ -525,17 +531,18 @@ define(function(require) {
                         return o.name === d;
                     }).parent;
                 })
+                .classed('print-mode', isPrintMode)
                 .on( 'mouseover', function( d ) {
                     rowHoverOver(d);
                 } )
                 .on('mouseout', function(d) {
                     rowHoverOut(d);
-                });
+                })
                 // move text right so we have room for the eyeballs
-                //.call(wrapText, margin.left - yAxisPaddingBetweenChart - 30);
+                .call(wrapText, labelsBoxWidth);
 
             // adding the down arrow for parent elements
-            if(showExpandToggles) {
+            if(!isPrintMode) {
                 svg.selectAll( '.y-axis-group.axis .tick' )
                     .classed( 'expandable', function( d ) {
                         // lets us know it's a parent element
@@ -673,7 +680,7 @@ define(function(require) {
                 // each group should contain the labels and rows
                 gunit.append( 'text' )
                     .attr( 'y', _labelsHorizontalY )
-                    .attr('font-size', '10')
+                    .attr('font-size', pctChangeLabelSize)
                     .attr('font-weight', '600')
                     .style( 'fill', ( d ) => {
                         if(d.pctChange === 0 || isNaN(d.pctChange)) {
@@ -686,6 +693,10 @@ define(function(require) {
                 gunit.append( 'polygon' )
                     .attr( 'transform', ( d ) => {
                         const yPos = _labelsHorizontalY( d );
+                        if(isPrintMode){
+                            return d.pctChange < 0 ? `translate(65, ${yPos+5}) rotate(180) scale(1.5)` :
+                                `translate(50, ${yPos - 15}) scale(1.5)`;
+                        }
                         return d.pctChange < 0 ? `translate(40, ${yPos+5}) rotate(180)` : `translate(30, ${yPos - 10})`;
                     } )
                     .attr( 'points', function( d ) {
@@ -1222,6 +1233,22 @@ define(function(require) {
         };
 
         /**
+         * Get or Sets the labels text size for the percentages
+         * @param  {number} [_x=12] label font size
+         * @return {number | module}    Current text size or Chart module to chain calls
+         * @public
+         */
+        exports.pctChangeLabelSize = function(_x) {
+            if (!arguments.length) {
+                return pctChangeLabelSize;
+            }
+            pctChangeLabelSize
+                = _x;
+
+            return this;
+        };
+
+        /**
          * Gets or Sets the loading state of the chart
          * @param  {string} markup Desired markup to show when null data
          * @return {loadingState | module} Current loading state markup or Chart module to chain calls
@@ -1331,16 +1358,16 @@ define(function(require) {
 
 
         /**
-         * Gets or Sets whether the chart should show the expand toggles
+         * Gets or Sets whether the chart should show the expand toggles/eyeball
          * @param  {boolean} _x Should we show the expand toggles?
          * @return {boolean | module} do we expand toggles
          * @public
          */
-        exports.showExpandToggles = function(_x) {
+        exports.isPrintMode = function(_x) {
             if (!arguments.length) {
-                return showExpandToggles;
+                return isPrintMode;
             }
-            showExpandToggles = _x;
+            isPrintMode = _x;
 
             return this;
         };
@@ -1388,6 +1415,21 @@ define(function(require) {
                 return pctOfSet;
             }
             pctOfSet = _x;
+
+            return this;
+        };
+
+        /**
+         * Gets or Sets the yAxisLineWrapLimit of the chart, default 2
+         * @param  {Number} _x Desired yAxisLineWrapLimit for the graph
+         * @return { valueLabel | module} Current valueLabel or Chart module to chain calls
+         * @public
+         */
+        exports.yAxisLineWrapLimit = function(_x) {
+            if (!arguments.length) {
+                return yAxisLineWrapLimit;
+            }
+            yAxisLineWrapLimit = _x;
 
             return this;
         };

@@ -20,7 +20,10 @@ $row-stroke-width: 0;
     .y-axis-group {
         .tick {
             text {
-                font-size: 18px;
+                font-size: 14px;
+                &.print-mode {
+                    font-size: 18px;
+                }
             }
         }
     }

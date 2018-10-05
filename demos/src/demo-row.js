@@ -206,11 +206,9 @@ function createHorizontalRowChart() {
 
 function createExportRowChart() {
     let rowChart = row(),
-        tooltip = miniTooltip(),
         rowContainer = d3Selection.select('.js-row-chart-export-container'),
         containerWidth = rowContainer.node() ? rowContainer.node().getBoundingClientRect().width : false,
         containerHeight = rowContainer.node() ? rowContainer.node().getBoundingClientRect().height : false,
-        tooltipContainer,
         dataset;
 
     if (containerWidth) {
@@ -320,7 +318,7 @@ function createExportRowChart() {
             .isAnimated(true)
             .margin({
                 left: 400,
-                right: 200,
+                right: 97,
                 top: 20,
                 bottom: 30
             })
@@ -328,22 +326,20 @@ function createExportRowChart() {
             .enableYAxisRight(true)
             .enableLabels(true)
             .labelsNumberFormat(',d')
+            .labelsSize(18)
             .labelsSuffix('complaints')
             .colorSchema(colorScheme)
-            .showExpandToggles(false)
+            .isPrintMode(true)
             .width(containerWidth)
             .height(dataset.length * 60)
             .xTicks( 0 )
             .yTicks( 0 )
             .percentageAxisToMaxRatio(1)
-            .on('customMouseOver', tooltip.show)
-            .on('customMouseMove', tooltip.update)
-            .on('customMouseOut', tooltip.hide);
+            .pctChangeLabelSize(18)
+            .yAxisLineWrapLimit(2)
+            .yAxisPaddingBetweenChart(5);
 
         rowContainer.datum(dataset).call(rowChart);
-
-        tooltipContainer = d3Selection.select('.js-horizontal-row-chart-container .row-chart .metadata-group');
-        tooltipContainer.datum([]).call(tooltip);
     }
 }
 
@@ -424,32 +420,19 @@ function createRowChartWithTooltip() {
     }
 }
 
-function createLoadingState() {
-    let rowChart = row(),
-        rowContainer = d3Selection.select('.js-loading-container'),
-        containerWidth = rowContainer.node() ? rowContainer.node().getBoundingClientRect().width : false,
-        dataset = null;
-
-    if (containerWidth) {
-        rowContainer.html(rowChart.loadingState());
-    }
-}
-
 // Show charts if container available
 if (d3Selection.select('.js-row-chart-tooltip-container').node()){
     createRowChartWithTooltip();
     createHorizontalRowChart();
     createSimpleRowChart();
     createExportRowChart();
-    // createLoadingState();
 
     let redrawCharts = function(){
         d3Selection.selectAll('.row-chart').remove();
-        createRowChartWithTooltip();
-        createHorizontalRowChart();
-        createSimpleRowChart();
+       createRowChartWithTooltip();
+       createHorizontalRowChart();
+       createSimpleRowChart();
         createExportRowChart();
-        // createLoadingState();
     };
 
     // Redraw charts on window resize

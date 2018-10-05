@@ -28,13 +28,19 @@ function createStackedAreaChartWithTooltip(optionalColorSchema) {
     if (containerWidth) {
         dataset = aTestDataSet().with6Sources().build();
 
-        console.log(dataset);
-
+        let margin = {
+                top: 70,
+                right: 30,
+                bottom: 60,
+                left: 70
+            };
         // StackedAreChart Setup and start
         stackedArea
             .isAnimated(true)
+            .margin(margin)
             .tooltipThreshold(600)
-            .width(containerWidth)
+            .height(564)
+            .width(1175)
             .dateLabel('dateUTC')
             .valueLabel('views')
             .grid('horizontal')
