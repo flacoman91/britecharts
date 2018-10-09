@@ -252,7 +252,7 @@ define(function(require){
                 .attr('dy', '.35em')
                 .attr('y', ttTextY + 5)
                 .attr('font-size', '18px')
-                .attr('font-weight', '600')
+                .attr('font-weight', '500')
                 .style('fill', titleFillColor);
 
             tooltipBody = tooltipTextContainer
