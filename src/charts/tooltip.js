@@ -214,35 +214,46 @@ define(function(require){
                 .style('stroke', borderStrokeColor)
                 .style('stroke-width', 1);
 
+            tooltipTextContainer.append('rect')
+                .classed('tooltip-title-container', true)
+                .attr('x', -tooltipWidth / 4 + tooltipTextLinePadding)
+                .attr('y', 0)
+                .attr('width', tooltipWidth)
+                .attr('height', tooltipHeight + 12)
+                .attr('rx', tooltipBorderRadius)
+                .attr('ry', tooltipBorderRadius)
+                .style('fill', tooltipTitleColor)
+                .style('stroke', tooltipTitleColor)
+                .style('stroke-width', 1);
+
             tooltipTitle = tooltipTextContainer
               .append('text')
                 .classed('tooltip-title', true)
                 .attr('x',0)
                 .attr('dy', '.35em')
-                .attr('y', 16)
+                .attr('y', 12)
                 .attr('font-size', '12px')
                 .attr('font-weight', '600')
                 .style('fill', titleFillColor);
+
+            tooltipDivider = tooltipTextContainer
+                .append('line')
+                .classed('tooltip-divider', true)
+                .attr('x1', -tooltipWidth / 4 + 10)
+                .attr('x2', 265)
+                .attr('y1', 25)
+                .attr('y2', 25)
+                .style('stroke', borderStrokeColor);
 
             tooltipSubTitle = tooltipTextContainer
                 .append('text')
                 .classed('tooltip-subtitle', true)
                 .attr('x',0)
                 .attr('dy', '.35em')
-                .attr('y', ttTextY + 10)
+                .attr('y', ttTextY + 5)
                 .attr('font-size', '18px')
                 .attr('font-weight', '600')
                 .style('fill', titleFillColor);
-
-
-            tooltipDivider = tooltipTextContainer
-              .append('line')
-                .classed('tooltip-divider', true)
-                .attr('x1', -tooltipWidth / 4 + 10)
-                .attr('x2', 265)
-                .attr('y1', 31)
-                .attr('y2', 31)
-                .style('stroke', borderStrokeColor);
 
             tooltipBody = tooltipTextContainer
               .append('g')
