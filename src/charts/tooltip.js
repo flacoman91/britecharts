@@ -216,6 +216,8 @@ define(function(require){
                 .attr('x', -tooltipWidth / 4 + 40)
                 .attr('dy', '.35em')
                 .attr('y', 16)
+                .attr('font-size', '12px')
+                .attr('font-weight', '600')
                 .style('fill', titleFillColor);
 
             tooltipDivider = tooltipTextContainer
@@ -418,7 +420,10 @@ define(function(require){
                 tTitle = formattedDate;
             }
 
-            tooltipTitle.text(tTitle);
+            const titleCenter = d3Selection.select( '.tooltip-title' );
+            const titleWdth = titleCenter.node().getBoundingClientRect().width;
+
+            tooltipTitle.text(tTitle).attr('x', -tooltipWidth /(titleWdth/2) );
         }
 
         /**
