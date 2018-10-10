@@ -188,6 +188,7 @@ define(function(require){
         function cleanContent(){
             tooltipBody.selectAll('text').remove();
             tooltipBody.selectAll('circle').remove();
+            tooltipBody.selectAll('line').remove();
             tooltipSubTitle.selectAll('tspan').remove();
         }
 
@@ -402,6 +403,15 @@ define(function(require){
                 .attr('r', 3)
                 .style('fill', colorMap[name])
                 .style('stroke-width', '1px');
+
+            tooltipBody
+                .append('line')
+                .classed('tooltip-divider', true)
+                .attr('x1', -tooltipWidth / 4 + 10)
+                .attr('x2',  tooltipWidth - (tooltipWidth / 4 - tooltipTextLinePadding))
+                .attr('y1',  (ttTextY + circleYOffset + 10))
+                .attr('y2',  (ttTextY + circleYOffset + 10))
+                .style('stroke', '#43484e');
 
             ttTextY += textHeight + 7;
         }
