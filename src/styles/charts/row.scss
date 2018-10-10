@@ -20,7 +20,7 @@ $row-stroke-width: 0;
     .y-axis-group {
         .tick {
             text {
-                font-size: 14px;
+                font-size: 16px;
                 &.print-mode {
                     font-size: 18px;
                 }
@@ -44,8 +44,5 @@ $row-stroke-width: 0;
 
     .percentage-label {
         fill: $grey-600;
-        &.child {
-            font-size: 12px;
-        }
     }
 }

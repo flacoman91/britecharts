@@ -169,8 +169,12 @@ function createHorizontalRowChart() {
 
         dataset = aRowDataSet().withColors().build();
 
+        console.log(dataset);
+
         const colorScheme = dataset.map((o)=>{
-            return o.parent ? '#20aa3f' : '#eeeeee';
+            if(o) {
+                return '#20aa3f';
+            }
         });
 
         rowChart
@@ -186,10 +190,12 @@ function createHorizontalRowChart() {
             .enableYAxisRight(true)
             .enableLabels(true)
             .labelsNumberFormat(',d')
+            .labelsSize(16)
+            .labelsSizeChild(12)
             .labelsSuffix('complaints')
             .colorSchema(colorScheme)
             .width(containerWidth)
-            .height(dataset.length * 70)
+            .height(dataset.length * 50)
             .xTicks( 0 )
             .yTicks( 0 )
             .percentageAxisToMaxRatio(1)
@@ -309,9 +315,13 @@ function createExportRowChart() {
 
         dataset = aRowDataSet().withLongNames().build();
 
-        const colorScheme = dataset.map((o)=>{
-            return o.parent ? '#20aa3f' : '#eeeeee';
-        });
+        const colorScheme = [
+            'orange', 'orange', 'orange',
+            'purple',
+            'green', 'green', 'green',
+            'teal',
+            'brown'
+        ];
 
         rowChart
             .isHorizontal(true)
@@ -327,6 +337,7 @@ function createExportRowChart() {
             .enableLabels(true)
             .labelsNumberFormat(',d')
             .labelsSize(18)
+            .labelsSizeChild(14)
             .labelsSuffix('complaints')
             .colorSchema(colorScheme)
             .isPrintMode(true)

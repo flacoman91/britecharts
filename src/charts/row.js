@@ -97,9 +97,9 @@ define(function(require) {
             labelsNumberFormat = NUMBER_FORMAT,
             labelsSuffix = '',
             labelsSize = 16,
+            labelsSizeChild = 12,
             pctChangeLabelSize = 10,
             padding = 0.1,
-            betweenRowsPadding = 0.1,
             outerPadding = 0.3,
             xAxis, yAxis,
             xAxisPadding = {
@@ -426,6 +426,27 @@ define(function(require) {
             return { data, dataZeroed };
         }
 
+
+        /**
+         * utility function if we are a Root Row, big font, etc
+         * @param d
+         * @returns {*}
+         */
+        function isParent(d){
+            return data.find((o) => {
+                return (o.name === d.name || o.name === d) && o.isParent;
+            })
+        }
+        /**
+         * utility function to get font size for a row
+         * @param d
+         * @returns {string}
+         */
+        function getFontSize(d){
+            const e = isParent(d);
+            return e ? `${labelsSize}px` : `${labelsSizeChild}px`;
+        }
+
         /**
          * Utility function that wraps a text into the given width
          * @param  {D3Selection} text         Text to write
@@ -496,7 +517,7 @@ define(function(require) {
                     .style( 'fill-opacity', ( d ) => {
                         // if there are no children, make this transparent
                         const e = data.find((o)=>{
-                            return o.name === d && o.isParent
+                            return o.name === d && o.hasChildren
                         });
                         return e ? 1 : 0;
                     } );
@@ -538,7 +559,9 @@ define(function(require) {
                     rowHoverOut(d);
                 })
                 // move text right so we have room for the eyeballs
-                .call(wrapText, labelsBoxWidth);
+                .call(wrapText, labelsBoxWidth)
+                .selectAll('tspan')
+                .attr('font-size', getFontSize);
 
             // adding the down arrow for parent elements
             if(!isPrintMode) {
@@ -547,7 +570,7 @@ define(function(require) {
                         // lets us know it's a parent element
                         return data.find( ( o ) => {
                             return o.name === d;
-                        } ).isParent;
+                        } ).hasChildren;
                     } )
                     .call( addExpandToggle );
             }
@@ -640,7 +663,10 @@ define(function(require) {
                 .attr( 'width', ( { value } ) => xScale( value ) )
                 .attr( 'fill', ( d ) => {
                     return computeColor( d.name );
-                } );
+                } )
+                .attr('fill-opacity', (d)=>{
+                    return d.parent ? 0.5 : 1;
+                });
             if(enableLabels) {
                 const backgroundRows = d3Selection.select( '.chart-group .bg' );
                 const bgWidth = backgroundRows.node().getBBox().x || backgroundRows.node().getBoundingClientRect().width;
@@ -648,15 +674,14 @@ define(function(require) {
                 bargroups.append( 'text' )
                     .classed( 'percentage-label', true )
                     .classed('child', function(d) {
-                        const e = data.find((o) => {
-                            return o.name === d.name && !o.isParent && !isPrintMode;
+                        return data.find((o) => {
+                            return o.name === d.name && !o.isParent;
                         });
-                        return e ? true : false;
                     })
                     .attr( 'x', _labelsHorizontalX )
                     .attr( 'y', _labelsHorizontalY )
                     .text( _labelsFormatValue )
-                    .attr( 'font-size', labelsSize + 'px' )
+                    .attr( 'font-size', getFontSize )
                     .attr( 'fill', ( d, i ) => {
                         const barWidth = xScale( d.value );
                         const labels = bargroups.selectAll( 'text' );
@@ -684,12 +709,7 @@ define(function(require) {
                 // each group should contain the labels and rows
                 gunit.append( 'text' )
                     .attr( 'y', _labelsHorizontalY )
-                    .attr('font-size', function(d) {
-                    const e = data.find((o) => {
-                        return o.name === d.name && !o.isParent && !isPrintMode;
-                     });
-                        return e ? '12px' : '16px';
-                    })
+                    .attr('font-size', getFontSize)
                     .attr('font-weight', '600')
                     .style( 'fill', ( d ) => {
                         if(d.pctChange === 0 || isNaN(d.pctChange)) {
@@ -703,7 +723,7 @@ define(function(require) {
                 gunit.append( 'polygon' )
                     .attr( 'transform', ( d ) => {
                         const yPos = _labelsHorizontalY( d );
-                        if(isPrintMode || d.isParent) {
+                        if(isParent(d)) {
                             return d.pctChange < 0 ? `translate(65, ${yPos+5}) rotate(180) scale(1.5)` :
                                 `translate(50, ${yPos - 15}) scale(1.5)`;
                         }
@@ -1008,21 +1028,6 @@ define(function(require) {
         }
 
         /**
-         * Gets or Sets the padding of the chart (Default is 0.1)
-         * @param  { Number | module } _x Padding value to get/set
-         * @return {padding | module} Current padding or Chart module to chain calls
-         * @public
-         */
-        exports.betweenRowsPadding = function(_x) {
-            if (!arguments.length) {
-                return betweenRowsPadding;
-            }
-            betweenRowsPadding = _x;
-
-            return this;
-        };
-
-        /**
          * Gets or Sets the colorSchema of the chart
          * @param  {String[]} _x Desired colorSchema for the graph
          * @return { colorSchema | module} Current colorSchema or Chart module to chain calls
@@ -1241,6 +1246,22 @@ define(function(require) {
 
             return this;
         };
+
+        /**
+         * Get or Sets the labels text size for child rows
+         * @param  {number} [_x=12] label font size
+         * @return {number | module} Current text size or Chart module to chain calls
+         * @public
+         */
+        exports.labelsSizeChild = function(_x) {
+            if (!arguments.length) {
+                return labelsSizeChild;
+            }
+            labelsSizeChild = _x;
+
+            return this;
+        };
+
 
         /**
          * Get or Sets the labels text size for the percentages

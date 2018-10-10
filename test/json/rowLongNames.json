@@ -1,6 +1,8 @@
 {
     "data": [
         {
+            "hasChildren": false,
+            "isParent": true,
             "name": "Lorem reporting, lorem gypsum cycles, or pizza personal computer chicken",
             "value": 2024,
             "pctChange": -20,
@@ -8,6 +10,7 @@
             "width": ".5"
         },
         {
+            "hasChildren": false,
             "name": "Lorem reporting, lorem gypsum, or pizza personal computer chicken1",
             "isParent": true,
             "value": 7000,
@@ -16,14 +19,17 @@
             "width": ".5"
         },
         {
+            "hasChildren": true,
             "name": "Shining",
             "isParent": true,
-            "value": 213,
+            "value": 2000,
             "pctChange": 1,
             "pctOfSet": 12,
             "width": ".5"
         },
         {
+            "hasChildren": false,
+            "isParent": false,
             "name": "lorem gypsum cycles, or pizza personal computer chicken",
             "value": 6001,
             "parent": "Shining",
@@ -32,36 +38,52 @@
             "width": ".4"
         },
         {
+            "hasChildren": false,
+            "isParent": false,
             "name": "pizza personal computer chicken",
             "value": 613,
             "parent": "Shining",
             "pctChange": -9,
             "pctOfSet": 24,
-            "width": ".5"
+            "width": ".4"
         },
         {
-            "name": "pizza personal computer 1234 eat me haha yum yum whoooo",
+            "hasChildren": false,
             "isParent": true,
+            "name": "pizza personal computer 1234 eat me haha yum yum whoooo",
             "value": 1900,
             "pctChange": 1,
             "pctOfSet": 8,
             "width": ".5"
         },
         {
-            "name": "Increase",
+            "hasChildren": true,
+            "isParent": true,
+            "name": "Brilliant",
             "value": 1900,
-            "parent": "Brilliant",
             "pctChange": 999999,
             "pctOfSet": 8,
             "width": ".5"
         },
         {
-            "name": "Decrease",
-            "value": 1900,
+            "hasChildren": false,
+            "isParent": false,
+            "name": "Increase",
+            "value": 1300,
             "parent": "Brilliant",
-            "pctChange": -999999,
+            "pctChange": 50,
             "pctOfSet": 8,
-            "width": ".5"
+            "width": ".4"
+        },
+        {
+            "hasChildren": false,
+            "isParent": false,
+            "name": "Decrease",
+            "value": 900,
+            "parent": "Brilliant",
+            "pctChange": -99,
+            "pctOfSet": 8,
+            "width": ".4"
         }
 
     ]
