@@ -401,7 +401,7 @@ function createRowChartWithTooltip() {
             .isHorizontal(true)
             .isAnimated(true)
             .margin({
-                left: 140,
+                left:140,
                 right: 50,
                 top: 20,
                 bottom: 30

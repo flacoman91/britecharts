@@ -119,6 +119,7 @@ define(function(require) {
             animationDuration = 800,
             animationStepRatio = 70,
             backgroundColor = '#bebebe',
+            backgroundHoverColor = '#d6e8fa',
             backgroundWidth = 70,
             downArrowColor = '#20AA3F',
             upArrowColor = '#D14124',
@@ -458,39 +459,40 @@ define(function(require) {
             textHelper.wrapTextWithEllipses(text, containerWidth, 0, yAxisLineWrapLimit, lineHeight);
         }
 
+        // eyeball
         function addVisibilityToggle(elem){
             elem.each( function() {
                 elem = d3Selection.select( this );
                 let textHgt = elem.node().getBBox().height/2;
                 let group = elem.append('svg')
                     .attr('class', (d) => {
-                        return 'visibility-' + getIndex(d);
+                        return 'visibility visibility-' + getIndex(d);
                     })
                     .attr('x', -(margin.left-5))
                     .attr('y', -textHgt)
-                    .attr('width', '15')
-                    .attr('height', '15')
-                    .attr('viewBox', '0 0 932.15 932.15')
-                    .attr('fill', '#0072ce')
-                    .attr('fill-opacity', 0)
+                    .attr('width', '300')
+                    .attr('height', '300')
+                    .attr('viewBox', '0 0 600 600')
+                    .attr('fill', 'none')
+                    .attr('opacity', 0);
+
+                group.append( 'rect' )
+                    .attr('x', -10)
+                    .attr('y', -10)
+                    .attr('height', '50')
+                    .attr('width', '50')
+                    .attr('fill', backgroundHoverColor)
                     .on( 'mouseover', function( d ) {
                         rowHoverOver(d);
                     } )
                     .on('mouseout', function(d) {
                         rowHoverOut(d);
-                    })
-                    .append('g');
+                    });
 
                 group.append( 'path' )
-                    .attr('d', 'M466.075,161.525c-205.6,0-382.8,121.2-464.2,296.1c-2.5,5.3-2.5,11.5,0,16.9c81.4,174.899,258.601,296.1,464.2,296.1 ' +
-                        's382.8-121.2,464.2-296.1c2.5-5.3,2.5-11.5,0-16.9C848.875,282.725,671.675,161.525,466.075,161.525z M466.075,676.226 ' +
-                        'c-116.1,0-210.1-94.101-210.1-210.101c0-116.1,94.1-210.1,210.1-210.1c116.1,0,210.1,94.1,210.1,210.1 ' +
-                        'S582.075,676.226,466.075,676.226z');
-
-                group.append('circle')
-                    .attr('cx', '466.075')
-                    .attr('cy', '466.025')
-                    .attr('r', '134.5');
+                    .attr('d', 'M 10,10 L 30,30 M 30,10 L 10,30')
+                    .attr('stroke', '#0072ce')
+                    .attr('stroke-width', '2');
 
             } );
         }
@@ -623,7 +625,7 @@ define(function(require) {
                 .on( 'mouseover', rowHoverOver )
                 .on('mouseout', rowHoverOut)
                 .attr( 'width', width )
-                .attr( 'fill', '#d6e8fa')
+                .attr( 'fill', backgroundHoverColor )
                 .attr( 'fill-opacity', 0);
 
 
@@ -893,7 +895,7 @@ define(function(require) {
                 ind = d.name ? getIndex( d.name ) : getIndex( d );
             }
 
-            d3Selection.select(containerRoot).select('.tick svg.visibility-' + ind).attr('fill-opacity', 1);
+            d3Selection.select(containerRoot).select('.tick svg.visibility-' + ind).attr('opacity', 1);
             d3Selection.select(containerRoot).select('g.row_' + ind + ' .bg-hover').attr('fill-opacity', 1);
         }
 
@@ -905,7 +907,7 @@ define(function(require) {
                 ind = d.name ? getIndex( d.name ) : getIndex( d );
             }
 
-            d3Selection.select(containerRoot).select('.tick svg.visibility-' + ind).attr('fill-opacity', 0);
+            d3Selection.select(containerRoot).select('.tick svg.visibility-' + ind).attr('opacity', 0);
             d3Selection.select(containerRoot).select('g.row_' + ind + ' .bg-hover').attr('fill-opacity', 0);
         }
 
