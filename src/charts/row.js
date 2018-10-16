@@ -291,24 +291,83 @@ define(function(require) {
             return +d.value;
         }
 
+        //scale factor between value and bar width
         function alpha(values, value) {
-            var n = values.length, total = d3.sum(values, value);
-            return (chartHeight - (n - 1) * padding * chartHeight / n - 2 * outerPadding * chartHeight / n) / total
+            var n = values.length,
+                total = d3.sum(values, value);
+
+            console.log('sum' + total);
+
+            const retAlpha = (chartHeight - (n - 1) * padding * chartHeight / n - 2 * outerPadding * chartHeight / n) / total;
+            const squishScale = d3Scale.scaleLinear()
+                //.exponent( 0.1 )
+                .domain( [ 0, 100 ] )
+                .range( [ 0, 20 ] );
+
+            for(let i=0; i< 30; i++){
+                console.log(i + ' ' + squishScale(i));
+            }
+
+            return retAlpha - squishScale(n);
         }
+
+        //width of bar i
         function Wi(values, value, alpha) {
             return function (i) {
                 return value(values[i]) * alpha
             }
         }
 
+        //mid-point displacement of bar i
         function Midi(values, value, alpha) {
-            var w = Wi(values, value, alpha), n = values.length;
+            var w = Wi(values, value, alpha),
+                n = values.length;
+            const expandedGroups = getExpandedGroups(values);
+            const groupIndices = getGroupIndices(expandedGroups, values);
+
             return function (_, i) {
-                var op = outerPadding * chartHeight / n, p = padding * chartHeight / n;
-                return op + d3.sum(values.slice(0, i), value) * alpha + i * p + w(i) / 2;
+                var op = outerPadding * chartHeight / n,
+                    p = padding * chartHeight / n;
+                let retVal = op + d3.sum(values.slice(0, i), value) * alpha + i * p + w(i) / 2;
+                groupIndices.forEach(g=>{
+                    // space above group
+                    if ( g[ 0 ] > 1 &&i >= g[ 0 ] ) {
+                        retVal += isPrintMode ? 20 : 10;
+                    }
+                    //space below group
+                    if ( i > g[ g.length - 1 ] ) {
+                        retVal += isPrintMode ? 20 : 10;
+                    }
+                });
+
+                return retVal;
             }
         }
         let a, mid, w;
+
+        /**
+         * helper function to return list of groups that are expanded
+         * @param data
+         * @returns {any[]}
+         */
+        function getExpandedGroups(data){
+            return [... new Set(data.filter( o => {
+                return o.parent && o.isParent === false;
+            }).map(o=>{
+                return o.parent;
+            }))];
+        }
+
+        function getGroupIndices(parents, data){
+            let groups = [];
+            parents.forEach(name=>{
+                const points = data.map((o, i)=>{
+                    return o.name === name || o.parent === name ? i : null
+                }).filter(o=> {return o;});
+                groups.push(points);
+            });
+            return groups;
+        }
 
         /**
          * Creates the x and y scales of the graph
@@ -327,48 +386,6 @@ define(function(require) {
 
             // we already found the midpoints
             let vals = data.map( mid );
-
-//            console.log(JSON.stringify(data));
-
-            // find expanded groups
-            let parents = [... new Set(data.filter( o => {
-                return o.parent && o.isParent === false;
-            }).map(o=>{
-                return o.parent;
-            }))];
-
-            let groups = [];
-
-            // now just return the set of points for each parent
-            parents.forEach(name=>{
-                const points = data.map((o, i)=>{
-                    return o.name === name || o.parent === name ? i : null
-                }).filter(o=> {return o;});
-                groups.push(points);
-            });
-
-            // start / finish
-            for(let i=0; i< vals.length; i++){
-                groups.forEach(g=>{
-                    // space above group
-                    if ( g[ 0 ] > 1  &&i >= g[ 0 ] ) {
-                        vals[ i ] += isPrintMode ? 20 : 10;
-                    }
-                    //space below group
-                    if ( i > g[ g.length - 1 ] ) {
-                        vals[ i ] += isPrintMode ? 20 : 10;
-                    }
-                });
-            }
-
-            const powScale = d3Scale.scalePow()
-                .exponent(.75)
-                .domain( [ 0, 10 ] )
-                .range( [ 0, 1000 ] );
-
-            for(let i = 0; i< 30; i+=2){
-                //console.log(i + '===>' + powScale(i));
-            }
 
             yScale = d3Scale.scaleOrdinal()
                 .domain(data.map(getName))
@@ -648,7 +665,6 @@ define(function(require) {
                     return yScale(d.name) - a * d.width/2;	//center the bar on the tick
                 })
                 .attr( 'height', function (d) {
-                    console.log(d);
                     return a * d.width;	//`a` already accounts for both types of padding
                 } )
                 .attr( 'width', chartWidth )
@@ -664,7 +680,6 @@ define(function(require) {
                     return yScale(d.name) - a * d.width/2;	//center the bar on the tick
                 })
                 .attr( 'height', function (d) {
-                    console.log(a);
                     return a * d.width;	//`a` already accounts for both types of padding
                 } )
                 .on( 'mouseover', rowHoverOver )

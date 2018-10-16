@@ -145,7 +145,7 @@ function createExportRowChart() {
             .labelsSize(18)
             .labelsSizeChild(14)
             .labelsSuffix('complaints')
-            .outerPadding(1)
+            .outerPadding(.1)
             .colorSchema(colorScheme)
             .isPrintMode(true)
             .width(containerWidth)
@@ -195,7 +195,7 @@ function createRowChartWithTooltip() {
             .enableLabels(true)
             .labelsNumberFormat(',d')
             .labelsSuffix('complaints')
-            .outerPadding(.3)
+            .outerPadding(.2)
             .colorSchema(colorScheme)
             .width(containerWidth)
             .height(height)
@@ -429,7 +429,7 @@ function createRow4ExpandedChart() {
             .margin({
                 left: 200,
                 right: 50,
-                top: 50,
+                top: 10,
                 bottom: 5
             })
             .backgroundColor('#f7f8f9')
@@ -440,7 +440,7 @@ function createRow4ExpandedChart() {
             .labelsSizeChild(12)
             .labelsSuffix('complaints')
             .colorSchema(colorScheme)
-            .outerPadding(0)
+            .outerPadding(.3)
             .width(containerWidth)
             .height(height)
             .xTicks( 0 )
@@ -464,9 +464,8 @@ function calculateMaxRatio(data){
 function calculateHeight(data){
 
     let height = 37;
-    const parentHeight = data.length * 37;
-    //data.filter( o => o.isParent ).length * 37;
-    const childrenHeight = 0; //data.filter( o => !o.isParent ).length * 35;
+    const parentHeight = data.filter( o => o.isParent ).length * 37;
+    const childrenHeight = data.filter( o => !o.isParent ).length * 35;
 
     const expandedParents = [ ... new Set(data
         .filter(o=>{ return !o.isParent })
@@ -474,9 +473,9 @@ function calculateHeight(data){
     ) ];
 
     const powScale = d3Scale.scalePow()
-        .exponent( 0.75 )
+        //.exponent( 0.1 )
         .domain( [ 0, 10 ] )
-        .range( [ 0, 500 ] );
+        .range( [ 0, 200 ] );
 
     const expandedHeight = powScale( expandedParents.length );
 
