@@ -296,19 +296,22 @@ define(function(require) {
             var n = values.length,
                 total = d3.sum(values, value);
 
+            const exGroups = getExpandedGroups(values);
             console.log('sum' + total);
 
             const retAlpha = (chartHeight - (n - 1) * padding * chartHeight / n - 2 * outerPadding * chartHeight / n) / total;
-            const squishScale = d3Scale.scaleLinear()
-                //.exponent( 0.1 )
+            const squishScale = d3Scale.scalePow()
+                .exponent( 1/exGroups.length )
                 .domain( [ 0, 100 ] )
-                .range( [ 0, 20 ] );
+                .range( [ 0, 30 ] );
 
-            for(let i=0; i< 30; i++){
-                console.log(i + ' ' + squishScale(i));
-            }
+            // for(let i=0; i< 30; i++){
+            //     console.log(i + ' ' + squishScale(i));
+            // }
 
-            return retAlpha - squishScale(n);
+            const scale = squishScale(n);
+            const diff = isPrintMode ? scale * 2 : scale;
+            return retAlpha - diff;
         }
 
         //width of bar i
@@ -686,8 +689,8 @@ define(function(require) {
                 .on('mouseout', rowHoverOut)
                 .attr( 'width', width )
                 .attr( 'fill', backgroundHoverColor )
-                .attr( 'fill-opacity', 0)
-                .attr('stroke', 'red');
+                .attr( 'fill-opacity', 0);
+//                .attr('stroke', 'red');
 
 
             // now add the actual bars to what we got

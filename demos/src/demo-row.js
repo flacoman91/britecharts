@@ -346,7 +346,7 @@ function createHorizontalRowChart() {
             .labelsSizeChild(12)
             .labelsSuffix('complaints')
             .colorSchema(colorScheme)
-            .outerPadding(.7)
+            .outerPadding(.1)
             .width(containerWidth)
             .height(height)
             .xTicks( 0 )
@@ -440,7 +440,7 @@ function createRow4ExpandedChart() {
             .labelsSizeChild(12)
             .labelsSuffix('complaints')
             .colorSchema(colorScheme)
-            .outerPadding(.3)
+            .outerPadding(.1)
             .width(containerWidth)
             .height(height)
             .xTicks( 0 )
@@ -456,6 +456,55 @@ function createRow4ExpandedChart() {
         tooltipContainer.datum([]).call(tooltip);
     }
 }
+
+function createLastExpandedChart() {
+    let rowChart = row(),
+        tooltip = miniTooltip(),
+        rowContainer = d3Selection.select('.js-last-row-chart-container'),
+        containerWidth = rowContainer.node() ? rowContainer.node().getBoundingClientRect().width : false,
+        containerHeight = rowContainer.node() ? rowContainer.node().getBoundingClientRect().height : false,
+        tooltipContainer,
+        dataset;
+
+    if (containerWidth) {
+        dataset = aRowDataSet().with5Bars().build();
+
+        const colorScheme = dataset.map((o)=>{ return '#20aa3f'; });
+        const height = calculateHeight(dataset);
+        rowChart
+            .isHorizontal(true)
+            .isAnimated(true)
+            .margin({
+                left: 200,
+                right: 50,
+                top: 10,
+                bottom: 5
+            })
+            .backgroundColor('#f7f8f9')
+            .enableYAxisRight(true)
+            .enableLabels(true)
+            .labelsNumberFormat(',d')
+            .labelsSize(16)
+            .labelsSizeChild(12)
+            .labelsSuffix('complaints')
+            .colorSchema(colorScheme)
+            .outerPadding(.1)
+            .width(containerWidth)
+            .height(height)
+            .xTicks( 0 )
+            .yTicks( 0 )
+            .percentageAxisToMaxRatio(calculateMaxRatio(dataset))
+            .on('customMouseOver', tooltip.show)
+            .on('customMouseMove', tooltip.update)
+            .on('customMouseOut', tooltip.hide);
+
+        rowContainer.datum(dataset).call(rowChart);
+
+        tooltipContainer = d3Selection.select('.js-horizontal-row-chart-container .row-chart .metadata-group');
+        tooltipContainer.datum([]).call(tooltip);
+    }
+}
+
 
 function calculateMaxRatio(data){
     return 100 / d3Array.max( data, o => o.pctOfSet )
@@ -473,9 +522,9 @@ function calculateHeight(data){
     ) ];
 
     const powScale = d3Scale.scalePow()
-        //.exponent( 0.1 )
+        .exponent( 1 )
         .domain( [ 0, 10 ] )
-        .range( [ 0, 200 ] );
+        .range( [ 0, 500 ] );
 
     const expandedHeight = powScale( expandedParents.length );
 
@@ -527,6 +576,7 @@ if (d3Selection.select('.js-row-chart-tooltip-container').node()){
     createSimpleRowChart();
     createExportRowChart();
     createRow4ExpandedChart();
+    createLastExpandedChart();
 
     let redrawCharts = function() {
         d3Selection.selectAll( '.row-chart' ).remove();
@@ -534,6 +584,7 @@ if (d3Selection.select('.js-row-chart-tooltip-container').node()){
         createHorizontalRowChart();
         createSimpleRowChart();
         createRow4ExpandedChart();
+        createLastExpandedChart();
         createExportRowChart();
     };
 
