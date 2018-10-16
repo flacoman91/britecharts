@@ -1,4 +1,5 @@
 'use strict';
+const d3Array = require('d3-array');
 const d3Scale = require('d3-scale');
 const d3Selection = require('d3-selection');
 const PubSub = require('pubsub-js');
@@ -134,8 +135,8 @@ function createExportRowChart() {
             .margin({
                 left: 400,
                 right: 97,
-                top: 20,
-                bottom: 60
+                top: 0,
+                bottom: 0
             })
             .backgroundColor('#f7f8f9')
             .enableYAxisRight(true)
@@ -144,13 +145,14 @@ function createExportRowChart() {
             .labelsSize(18)
             .labelsSizeChild(14)
             .labelsSuffix('complaints')
+            .outerPadding(1)
             .colorSchema(colorScheme)
             .isPrintMode(true)
             .width(containerWidth)
-            .height(height)
+            .height(height * 2)
             .xTicks( 0 )
             .yTicks( 0 )
-            .percentageAxisToMaxRatio(1)
+            .percentageAxisToMaxRatio(calculateMaxRatio(dataset))
             .pctChangeLabelSize(18)
             .yAxisLineWrapLimit(2)
             .yAxisPaddingBetweenChart(5);
@@ -175,7 +177,7 @@ function createRowChartWithTooltip() {
         dataset = aRowDataSet().withColors().build();
         const dataTarget = dataset.slice(0,4);
         const colorScheme = dataTarget.map((o)=>{
-            return o.parent ? '#20aa3f' : '#eeeeee';
+            return '#20aa3f';
         });
 
         const height = calculateHeight(dataTarget);
@@ -185,7 +187,7 @@ function createRowChartWithTooltip() {
             .margin({
                 left:140,
                 right: 50,
-                top: 20,
+                top: 10,
                 bottom: 10
             })
             .backgroundColor('#f7f8f9')
@@ -193,12 +195,13 @@ function createRowChartWithTooltip() {
             .enableLabels(true)
             .labelsNumberFormat(',d')
             .labelsSuffix('complaints')
+            .outerPadding(.3)
             .colorSchema(colorScheme)
             .width(containerWidth)
             .height(height)
             .xTicks( 0 )
             .yTicks( 0 )
-            .percentageAxisToMaxRatio(1.5)
+            .percentageAxisToMaxRatio(calculateMaxRatio(dataset))
             .on('customMouseOver', tooltip.show)
             .on('customMouseMove', tooltip.update)
             .on('customMouseOut', tooltip.hide);
@@ -332,7 +335,7 @@ function createHorizontalRowChart() {
             .margin({
                 left: 200,
                 right: 50,
-                top: 50,
+                top: 5,
                 bottom: 5
             })
             .backgroundColor('#f7f8f9')
@@ -343,12 +346,12 @@ function createHorizontalRowChart() {
             .labelsSizeChild(12)
             .labelsSuffix('complaints')
             .colorSchema(colorScheme)
-            //.outerPadding(1)
+            .outerPadding(.7)
             .width(containerWidth)
             .height(height)
             .xTicks( 0 )
             .yTicks( 0 )
-            .percentageAxisToMaxRatio(1)
+            .percentageAxisToMaxRatio(calculateMaxRatio(dataset))
             .on('customMouseOver', tooltip.show)
             .on('customMouseMove', tooltip.update)
             .on('customMouseOut', tooltip.hide);
@@ -380,8 +383,8 @@ function createSimpleRowChart() {
             .margin({
                 left: 140,
                 right: 50,
-                top: 20,
-                bottom: 30
+                top: 10,
+                bottom: 5
             })
             .backgroundColor('#f7f8f9')
             .enableYAxisRight(true)
@@ -390,10 +393,11 @@ function createSimpleRowChart() {
             .labelsSuffix('complaints')
             .colorSchema(colorScheme)
             .width(containerWidth)
-            .height(dataTarget.length * 100)
+            .outerPadding(0)
+            .height(60)
             .xTicks( 0 )
             .yTicks( 0 )
-            .percentageAxisToMaxRatio(1)
+            .percentageAxisToMaxRatio(calculateMaxRatio(dataTarget))
             .on('customMouseOver', tooltip.show)
             .on('customMouseMove', tooltip.update)
             .on('customMouseOut', tooltip.hide);
@@ -405,11 +409,64 @@ function createSimpleRowChart() {
     }
 }
 
+function createRow4ExpandedChart() {
+    let rowChart = row(),
+        tooltip = miniTooltip(),
+        rowContainer = d3Selection.select('.js-four-row-chart-container'),
+        containerWidth = rowContainer.node() ? rowContainer.node().getBoundingClientRect().width : false,
+        containerHeight = rowContainer.node() ? rowContainer.node().getBoundingClientRect().height : false,
+        tooltipContainer,
+        dataset;
+
+    if (containerWidth) {
+        dataset = aRowDataSet().with4Bars().build();
+
+        const colorScheme = dataset.map((o)=>{ return '#20aa3f'; });
+        const height = calculateHeight(dataset);
+        rowChart
+            .isHorizontal(true)
+            .isAnimated(true)
+            .margin({
+                left: 200,
+                right: 50,
+                top: 50,
+                bottom: 5
+            })
+            .backgroundColor('#f7f8f9')
+            .enableYAxisRight(true)
+            .enableLabels(true)
+            .labelsNumberFormat(',d')
+            .labelsSize(16)
+            .labelsSizeChild(12)
+            .labelsSuffix('complaints')
+            .colorSchema(colorScheme)
+            .outerPadding(0)
+            .width(containerWidth)
+            .height(height)
+            .xTicks( 0 )
+            .yTicks( 0 )
+            .percentageAxisToMaxRatio(calculateMaxRatio(dataset))
+            .on('customMouseOver', tooltip.show)
+            .on('customMouseMove', tooltip.update)
+            .on('customMouseOut', tooltip.hide);
+
+        rowContainer.datum(dataset).call(rowChart);
+
+        tooltipContainer = d3Selection.select('.js-horizontal-row-chart-container .row-chart .metadata-group');
+        tooltipContainer.datum([]).call(tooltip);
+    }
+}
+
+function calculateMaxRatio(data){
+    return 100 / d3Array.max( data, o => o.pctOfSet )
+}
+
 function calculateHeight(data){
 
     let height = 37;
-    const parentHeight = data.filter( o => o.isParent ).length * 37;
-    const childrenHeight = data.filter( o => !o.isParent ).length * 35;
+    const parentHeight = data.length * 37;
+    //data.filter( o => o.isParent ).length * 37;
+    const childrenHeight = 0; //data.filter( o => !o.isParent ).length * 35;
 
     const expandedParents = [ ... new Set(data
         .filter(o=>{ return !o.isParent })
@@ -470,13 +527,15 @@ if (d3Selection.select('.js-row-chart-tooltip-container').node()){
     createHorizontalRowChart();
     createSimpleRowChart();
     createExportRowChart();
+    createRow4ExpandedChart();
 
-    let redrawCharts = function(){
-        d3Selection.selectAll('.row-chart').remove();
-       createRowChartWithTooltip();
-       createHorizontalRowChart();
-       createSimpleRowChart();
-       createExportRowChart();
+    let redrawCharts = function() {
+        d3Selection.selectAll( '.row-chart' ).remove();
+        createRowChartWithTooltip();
+        createHorizontalRowChart();
+        createSimpleRowChart();
+        createRow4ExpandedChart();
+        createExportRowChart();
     };
 
     // Redraw charts on window resize
