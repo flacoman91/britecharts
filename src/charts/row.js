@@ -100,7 +100,7 @@ define(function(require) {
             labelsSizeChild = 12,
             pctChangeLabelSize = 10,
             padding = 0.1,
-            outerPadding = 0.3,
+            outerPadding = .3,
             xAxis, yAxis,
             xAxisPadding = {
                 top: 0,
@@ -325,11 +325,54 @@ define(function(require) {
                 .domain([0, percentageAxis])
                 .rangeRound([0, chartWidth]);
 
+            // we already found the midpoints
+            let vals = data.map( mid );
+
+//            console.log(JSON.stringify(data));
+
+            // find expanded groups
+            let parents = [... new Set(data.filter( o => {
+                return o.parent && o.isParent === false;
+            }).map(o=>{
+                return o.parent;
+            }))];
+
+            let groups = [];
+
+            // now just return the set of points for each parent
+            parents.forEach(name=>{
+                const points = data.map((o, i)=>{
+                    return o.name === name || o.parent === name ? i : null
+                }).filter(o=> {return o;});
+                groups.push(points);
+            });
+
+            // start / finish
+            for(let i=0; i< vals.length; i++){
+                groups.forEach(g=>{
+                    // space above group
+                    if ( g[ 0 ] > 1  &&i >= g[ 0 ] ) {
+                        vals[ i ] += isPrintMode ? 20 : 10;
+                    }
+                    //space below group
+                    if ( i > g[ g.length - 1 ] ) {
+                        vals[ i ] += isPrintMode ? 20 : 10;
+                    }
+                });
+            }
+
+            const powScale = d3Scale.scalePow()
+                .exponent(.75)
+                .domain( [ 0, 10 ] )
+                .range( [ 0, 1000 ] );
+
+            for(let i = 0; i< 30; i+=2){
+                //console.log(i + '===>' + powScale(i));
+            }
+
             yScale = d3Scale.scaleOrdinal()
                 .domain(data.map(getName))
-                .range(data.map(mid)); //force irregular intervals based on
-            // value
-
+                .range(vals); //force irregular intervals based on value
 
             if (shouldReverseColorList) {
                 colorList = data.map(d => d)
@@ -605,6 +648,7 @@ define(function(require) {
                     return yScale(d.name) - a * d.width/2;	//center the bar on the tick
                 })
                 .attr( 'height', function (d) {
+                    console.log(d);
                     return a * d.width;	//`a` already accounts for both types of padding
                 } )
                 .attr( 'width', chartWidth )
@@ -620,13 +664,15 @@ define(function(require) {
                     return yScale(d.name) - a * d.width/2;	//center the bar on the tick
                 })
                 .attr( 'height', function (d) {
+                    console.log(a);
                     return a * d.width;	//`a` already accounts for both types of padding
                 } )
                 .on( 'mouseover', rowHoverOver )
                 .on('mouseout', rowHoverOut)
                 .attr( 'width', width )
                 .attr( 'fill', backgroundHoverColor )
-                .attr( 'fill-opacity', 0);
+                .attr( 'fill-opacity', 0)
+                .attr('stroke', 'red');
 
 
             // now add the actual bars to what we got
@@ -791,7 +837,7 @@ define(function(require) {
                 svg.select('.chart-group').append('line')
                     .attr('y1', 0)
                     .attr('x1', chartWidth)
-                    .attr('y2', chartHeight - 5)
+                    .attr('y2', chartHeight + margin.top + margin.bottom)
                     .attr('x2', chartWidth)
                     .style('stroke', '#000')
                     .style('stroke-width', 1);
@@ -1419,7 +1465,37 @@ define(function(require) {
             orderingFunction = _x;
 
             return this;
-        }
+        };
+
+        /**
+         * Gets or Sets the outerPadding of the chart
+         * @param  {Number} _x Desired pctChangeLabel for the graph
+         * @return { valueLabel | module} Current pctChangeLabel or Chart module to chain calls
+         * @public
+         */
+        exports.outerPadding = function(_x) {
+            if (!arguments.length) {
+                return outerPadding;
+            }
+            outerPadding = _x;
+
+            return this;
+        };
+
+        /**
+         * Gets or Sets the padding of the chart
+         * @param  {Number} _x Desired pctChangeLabel for the graph
+         * @return { valueLabel | module} Current pctChangeLabel or Chart module to chain calls
+         * @public
+         */
+        exports.padding = function(_x) {
+            if (!arguments.length) {
+                return padding;
+            }
+            padding = _x;
+
+            return this;
+        };
 
         /**
          * Gets or Sets the pctChangeLabel of the chart

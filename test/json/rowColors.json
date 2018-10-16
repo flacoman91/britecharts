@@ -1,13 +1,23 @@
 {
     "data": [
         {
-            "hasChildren": false,
+            "hasChildren": true,
             "isParent": true,
             "name": "Radiating",
             "value": 2024,
             "pctChange": -20,
             "pctOfSet": 5,
             "width": ".5"
+        },
+        {
+            "hasChildren": false,
+            "isParent": false,
+            "name": "Radiating Kid",
+            "value": 1024,
+            "parent": "Radiating",
+            "pctChange": 50,
+            "pctOfSet": 55,
+            "width": ".4"
         },
         {
             "hasChildren": false,

@@ -2,7 +2,8 @@ define(function(require) {
     'use strict';
 
     var _ = require('underscore'),
-
+        json4ExpandedBars = require('json-loader!../json/row4ExpandedBars.json'),
+        json5Bars = require('json-loader!../json/row5Bars.json'),
         jsonColors = require('json-loader!../json/rowColors.json'),
         jsonLetters = require('json-loader!../json/rowDataLetters.json'),
         jsonLongNames = require('json-loader!../json/rowLongNames.json');
@@ -31,6 +32,19 @@ define(function(require) {
 
             return new this.Klass(attributes);
         };
+
+        this.with4Bars = function(){
+            var attributes = _.extend({}, this.config, json4ExpandedBars);
+
+            return new this.Klass(attributes);
+        };
+
+        this.with5Bars = function(){
+            var attributes = _.extend({}, this.config, json5Bars);
+
+            return new this.Klass(attributes);
+        };
+
 
         this.build = function() {
             return this.config.data;

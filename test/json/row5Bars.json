@@ -1,0 +1,64 @@
+{
+    "data": [
+        {
+            "hasChildren": false,
+            "isNotFilter": false,
+            "isParent": true,
+            "pctChange": -10.65,
+            "pctOfSet": 11.33,
+            "name": "EQUIFAX, INC.",
+            "value": 8497,
+            "parent": false,
+            "visible": true,
+            "width": 0.5
+        },
+        {
+            "hasChildren": false,
+            "isNotFilter": false,
+            "isParent": true,
+            "pctChange": -7.9,
+            "pctOfSet": 7.25,
+            "name": "Experian Information Solutions Inc.",
+            "value": 5438,
+            "parent": false,
+            "visible": true,
+            "width": 0.5
+        },
+        {
+            "hasChildren": false,
+            "isNotFilter": false,
+            "isParent": true,
+            "pctChange": 4.32,
+            "pctOfSet": 6.99,
+            "name": "TRANSUNION INTERMEDIATE HOLDINGS, INC.",
+            "value": 5241,
+            "parent": false,
+            "visible": true,
+            "width": 0.5
+        },
+        {
+            "hasChildren": false,
+            "isNotFilter": false,
+            "isParent": true,
+            "pctChange": 21.28,
+            "pctOfSet": 2.23,
+            "name": "CAPITAL ONE FINANCIAL CORPORATION",
+            "value": 1670,
+            "parent": false,
+            "visible": true,
+            "width": 0.5
+        },
+        {
+            "hasChildren": false,
+            "isNotFilter": false,
+            "isParent": true,
+            "pctChange": 5.46,
+            "pctOfSet": 2.17,
+            "name": "JPMORGAN CHASE & CO.",
+            "value": 1631,
+            "parent": false,
+            "visible": true,
+            "width": 0.5
+        }
+    ]
+}
