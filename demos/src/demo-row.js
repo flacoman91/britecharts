@@ -505,6 +505,84 @@ function createLastExpandedChart() {
     }
 }
 
+function createCollapsedChart() {
+    let rowChart = row(),
+        rowContainer = d3Selection.select('.js-row-collapsed-chart-container'),
+        containerWidth = rowContainer.node() ? rowContainer.node().getBoundingClientRect().width : false,
+        dataset;
+
+    if (containerWidth) {
+        dataset = aRowDataSet().with5CollapsedBars().build();
+
+        const colorScheme = dataset.map((o)=>{ return '#20aa3f'; });
+        const height = calculateHeight(dataset);
+        rowChart
+            .isHorizontal(true)
+            .isAnimated(true)
+            .margin({
+                left: 200,
+                right: 50,
+                top: 10,
+                bottom: 5
+            })
+            .backgroundColor('#f7f8f9')
+            .enableYAxisRight(true)
+            .enableLabels(true)
+            .labelsNumberFormat(',d')
+            .labelsSize(16)
+            .labelsSizeChild(12)
+            .labelsSuffix('complaints')
+            .colorSchema(colorScheme)
+            .outerPadding(.1)
+            .width(containerWidth)
+            .height(height)
+            .xTicks( 0 )
+            .yTicks( 0 )
+            .percentageAxisToMaxRatio(calculateMaxRatio(dataset));
+
+        rowContainer.datum(dataset).call(rowChart);
+    }
+}
+
+function createMassiveChart() {
+    let rowChart = row(),
+        rowContainer = d3Selection.select('.js-row-massive-chart-container'),
+        containerWidth = rowContainer.node() ? rowContainer.node().getBoundingClientRect().width : false,
+        dataset;
+
+    if (containerWidth) {
+        dataset = aRowDataSet().withMassiveSet().build();
+
+        const colorScheme = dataset.map((o)=>{ return '#20aa3f'; });
+        const height = calculateHeight(dataset);
+        rowChart
+            .isHorizontal(true)
+            .isAnimated(true)
+            .margin({
+                left: 200,
+                right: 50,
+                top: 10,
+                bottom: 5
+            })
+            .backgroundColor('#f7f8f9')
+            .enableYAxisRight(true)
+            .enableLabels(true)
+            .labelsNumberFormat(',d')
+            .labelsSize(16)
+            .labelsSizeChild(12)
+            .labelsSuffix('complaints')
+            .colorSchema(colorScheme)
+            .outerPadding(.1)
+            .width(containerWidth)
+            .height(height)
+            .xTicks( 0 )
+            .yTicks( 0 )
+            .percentageAxisToMaxRatio(calculateMaxRatio(dataset));
+
+        rowContainer.datum(dataset).call(rowChart);
+    }
+}
+
 
 function calculateMaxRatio(data){
     return 100 / d3Array.max( data, o => o.pctOfSet )
@@ -521,14 +599,14 @@ function calculateHeight(data){
         .map(o=>{ return o.parent; })
     ) ];
 
-    const powScale = d3Scale.scalePow()
-        .exponent( 1 )
+    const powScale = d3Scale.scaleLinear()
+        //.exponent( 1/expandedParents.length )
         .domain( [ 0, 10 ] )
-        .range( [ 0, 500 ] );
+        .range( [ 0, data.length * 50 ] );
 
     const expandedHeight = powScale( expandedParents.length );
 
-    console.log( 'extra expands =>' + expandedHeight );
+    //console.log(data.length + ' eh-> ' + expandedHeight);
 
     switch ( data.length ) {
         case 1:
@@ -540,7 +618,7 @@ function calculateHeight(data){
         default:
             height = parentHeight + childrenHeight + expandedHeight;
     }
-    // console.log( 'chartHeight' + height );
+
     return height;
 }
 
@@ -577,6 +655,8 @@ if (d3Selection.select('.js-row-chart-tooltip-container').node()){
     createExportRowChart();
     createRow4ExpandedChart();
     createLastExpandedChart();
+    createCollapsedChart();
+    createMassiveChart();
 
     let redrawCharts = function() {
         d3Selection.selectAll( '.row-chart' ).remove();
@@ -585,7 +665,9 @@ if (d3Selection.select('.js-row-chart-tooltip-container').node()){
         createSimpleRowChart();
         createRow4ExpandedChart();
         createLastExpandedChart();
+        createCollapsedChart();
         createExportRowChart();
+        createMassiveChart();
     };
 
     // Redraw charts on window resize

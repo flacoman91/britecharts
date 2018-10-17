@@ -1,0 +1,64 @@
+{
+    "data": [
+        {
+            "hasChildren": true,
+            "isNotFilter": false,
+            "isParent": true,
+            "pctChange": -0.38,
+            "pctOfSet": 20.67,
+            "name": "Incorrect information on your report",
+            "value": 15502,
+            "parent": false,
+            "visible": true,
+            "width": 0.5
+        },
+        {
+            "hasChildren": true,
+            "isNotFilter": false,
+            "isParent": true,
+            "pctChange": 0.53,
+            "pctOfSet": 10.43,
+            "name": "Improper use of your report",
+            "value": 7823,
+            "parent": false,
+            "visible": true,
+            "width": 0.5
+        },
+        {
+            "hasChildren": true,
+            "isNotFilter": false,
+            "isParent": true,
+            "pctChange": -6.48,
+            "pctOfSet": 10.35,
+            "name": "Problem with a credit reporting company's investigation into an existing problem",
+            "value": 7759,
+            "parent": false,
+            "visible": true,
+            "width": 0.5
+        },
+        {
+            "hasChildren": true,
+            "isNotFilter": false,
+            "isParent": true,
+            "pctChange": 22.73,
+            "pctOfSet": 8.44,
+            "name": "Attempts to collect debt not owed",
+            "value": 6329,
+            "parent": false,
+            "visible": true,
+            "width": 0.5
+        },
+        {
+            "hasChildren": false,
+            "isNotFilter": false,
+            "isParent": true,
+            "pctChange": 13.71,
+            "pctOfSet": 4,
+            "name": "Trouble during payment process",
+            "value": 3000,
+            "parent": false,
+            "visible": true,
+            "width": 0.5
+        }
+    ]
+}

@@ -208,6 +208,7 @@ define(function(require) {
                 drawGridLines();
                 drawRows();
                 drawAxis();
+                updateChartHeight();
             });
         }
 
@@ -297,17 +298,15 @@ define(function(require) {
                 total = d3.sum(values, value);
 
             const exGroups = getExpandedGroups(values);
-            console.log('sum' + total);
-
             const retAlpha = (chartHeight - (n - 1) * padding * chartHeight / n - 2 * outerPadding * chartHeight / n) / total;
+
+            if(exGroups.length === 0)
+                return retAlpha;
+
             const squishScale = d3Scale.scalePow()
                 .exponent( 1/exGroups.length )
                 .domain( [ 0, 100 ] )
-                .range( [ 0, 30 ] );
-
-            // for(let i=0; i< 30; i++){
-            //     console.log(i + ' ' + squishScale(i));
-            // }
+                .range( [ 0, exGroups.length * 10 ] );
 
             const scale = squishScale(n);
             const diff = isPrintMode ? scale * 2 : scale;
@@ -347,6 +346,13 @@ define(function(require) {
             }
         }
         let a, mid, w;
+
+        function isExpandable(data, d){
+            // lets us know it's a parent element
+            return data.find( ( o ) => {
+                return o.name === d;
+            } ).hasChildren;
+        }
 
         /**
          * helper function to return list of groups that are expanded
@@ -588,6 +594,16 @@ define(function(require) {
                     } );
             } );
         }
+
+        function updateChartHeight(){
+            const bars = svg.selectAll('.row-wrapper');
+            const num = Number(bars.size()) - 1;
+            const lastBar = svg.select('.row_' + num).select('.bg-hover');
+            const pos = Number(lastBar.attr('y'));
+            const height = pos + Number(lastBar.attr('height'))+ 40;
+            svg.attr('height', height);
+        }
+
         /**
          * Draws the x and y axis on the svg object within their
          * respective groups
@@ -632,10 +648,7 @@ define(function(require) {
             if(!isPrintMode) {
                 svg.selectAll( '.y-axis-group.axis .tick' )
                     .classed( 'expandable', function( d ) {
-                        // lets us know it's a parent element
-                        return data.find( ( o ) => {
-                            return o.name === d;
-                        } ).hasChildren;
+                        return isExpandable(data, d);
                     } )
                     .call( addExpandToggle );
             }
