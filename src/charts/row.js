@@ -601,6 +601,8 @@ define(function(require) {
             const lastBar = svg.select('.row_' + num).select('.bg-hover');
             const pos = Number(lastBar.attr('y'));
             const height = pos + Number(lastBar.attr('height'))+ 40;
+            svg.select('line.pct-separator').attr('y2', height);
+            svg.select('.export-wrapper').attr('height', height);
             svg.attr('height', height);
         }
 
@@ -866,6 +868,7 @@ define(function(require) {
 
                 // adding separator line
                 svg.select('.chart-group').append('line')
+                    .classed('pct-separator', true)
                     .attr('y1', 0)
                     .attr('x1', chartWidth)
                     .attr('y2', chartHeight + margin.top + margin.bottom)

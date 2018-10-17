@@ -600,13 +600,10 @@ function calculateHeight(data){
     ) ];
 
     const powScale = d3Scale.scaleLinear()
-        //.exponent( 1/expandedParents.length )
         .domain( [ 0, 10 ] )
         .range( [ 0, data.length * 50 ] );
 
     const expandedHeight = powScale( expandedParents.length );
-
-    //console.log(data.length + ' eh-> ' + expandedHeight);
 
     switch ( data.length ) {
         case 1:
