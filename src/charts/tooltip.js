@@ -368,7 +368,7 @@ define(function(require){
                 .attr('x', ttTextX)
                 .attr('y', ttTextY)
                 .attr('font-size', '12px')
-                .attr('font-weight', '600')
+                .attr('font-weight', '500')
                 .style('fill', tooltipTextColor)
                 .text(tooltipLeftText)
                 .call(wrapTextWithEllipses, tooltipMaxTopicLength, initialTooltipTextXPosition, 1);
@@ -380,7 +380,7 @@ define(function(require){
                 .attr('x', ttTextX)
                 .attr('y', ttTextY)
                 .attr('font-size', '12px')
-                .attr('font-weight', '600')
+                .attr('font-weight', '500')
                 .style('fill', tooltipTextColor)
                 .text(tooltipRightText);
 
