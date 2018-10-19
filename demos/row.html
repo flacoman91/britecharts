@@ -3,7 +3,7 @@
         <div class="row" style="width:1125px">
             <div>
                 <article>
-                    <h2 class="tutorial__heading">Big Wide Chart for Export</h2>
+                    <h2 class="tutorial__heading">Create Export Row Chart</h2>
                     <div
                         class="js-row-chart-export-container row-chart-export-container card--chart"></div>
                 </article>
@@ -21,32 +21,9 @@
         <div class="row">
             <div class="col-md-6">
                 <article>
-                    <h2 class="tutorial__heading">Row Chart with Tooltip and Labels</h2>
+                    <h2 class="tutorial__heading">Create Row Chart with Tooltip and Labels</h2>
                     <div class="js-row-chart-tooltip-container row-chart-tooltip-container card--chart"></div>
                 </article>
-            </div>
-            <div class="col-md-6 siderow">
-                <h3>The code</h3>
-                <pre><code class="language-javascript">
-rowChart
-    .width(containerWidth)
-    .height(300)
-    .hasPercentage(true)
-    .enableLabels(true)
-    .labelsNumberFormat('.0%')
-    .isAnimated(true)
-    .on('customMouseOver', tooltip.show)
-    .on('customMouseMove', tooltip.update)
-    .on('customMouseOut', tooltip.hide);
-
-rowContainer.datum(dataset).call(rowChart);
-
-tooltip
-    .numberFormat('.2%');
-
-tooltipContainer = d3.select('.row-chart .metadata-group');
-tooltipContainer.datum([]).call(tooltip);
-                </code></pre>
 
                 <h4>Data Input</h4>
                 <p>Check the <a href="/britecharts/global.html#RowChartData__anchor">data input schema</a> of this chart.</p>
@@ -57,36 +34,14 @@ tooltipContainer.datum([]).call(tooltip);
                 <h4>Demo Code</h4>
                 <p>Read the whole code of this demo <a href="https://github.com/eventbrite/britecharts/blob/master/demos/src/demo-row.js">in github</a></p>
             </div>
+
         </div>
         <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-8">
                 <article>
-                    <h2 class="tutorial__heading">Horizontal Row Chart</h2>
+                    <h2 class="tutorial__heading">Create Horizontal Row Chart</h2>
                     <div class="js-horizontal-row-chart-container card--chart"></div>
                 </article>
-            </div>
-            <div class="col-md-6 siderow">
-                <h3>The code</h3>
-                <pre><code class="language-javascript">
-rowChart
-    .margin({
-        left: 120,
-        right: 20,
-        top: 20,
-        bottom: 5
-    })
-    .percentageAxisToMaxRatio(1.3)
-    .isHorizontal(true)
-    .isAnimated(true)
-    .colorSchema(colors.colorSchemas.britecharts)
-    .width(containerWidth)
-    .height(300);
-
-rowContainer.datum(dataset).call(rowChart);
-                </code></pre>
-
-                <h4>Demo Code</h4>
-                <p>Read the whole code of this demo <a href="https://github.com/eventbrite/britecharts/blob/master/demos/src/demo-row.js">in github</a></p>
                 <p>Export this chart by pressing <input
                     class="js-download-button-123 btn-sm btn btn-primary"
                     type="button" value="Export" /></p>
@@ -95,25 +50,45 @@ rowContainer.datum(dataset).call(rowChart);
         <div class="row">
             <div class="col-md-6">
                 <article>
-                    <h2 class="tutorial__heading">Simple Row Chart with labels</h2>
+                    <h2 class="tutorial__heading">Create Simple Row Chart with labels</h2>
                     <div class="js-row-chart-container card--chart"></div>
                 </article>
             </div>
-            <div class="col-md-6 siderow">
-                <h3>The code</h3>
-                <pre><code class="language-javascript">
-rowChart
-    .width(containerWidth)
-    .hasPercentage(true)
-    .enableLabels(true)
-    .labelsNumberFormat('.0%')
-    .height(300);
+        </div>
 
-rowContainer.datum(dataset).call(rowChart);
-                </code></pre>
+        <div class="row">
+            <div class="col-md-8">
+                <article>
+                    <h2 class="tutorial__heading">Create row 4 Expanded Bars</h2>
+                    <div class="js-four-row-chart-container card--chart"></div>
+                </article>
+            </div>
+        </div>
 
-                <h4>Demo Code</h4>
-                <p>Read the whole code of this demo <a href="https://github.com/eventbrite/britecharts/blob/master/demos/src/demo-row.js">in github</a></p>
+        <div class="row">
+            <div class="col-md-8">
+                <article>
+                    <h2 class="tutorial__heading">Create Last 3 Expanded Bars</h2>
+                    <div class="js-last-row-chart-container card--chart"></div>
+                </article>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-8">
+                <article>
+                    <h2 class="tutorial__heading">Create 5 Collapsed Bars</h2>
+                    <div class="js-row-collapsed-chart-container card--chart"></div>
+                </article>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-8">
+                <article>
+                    <h2 class="tutorial__heading">Create Massive Set Bars</h2>
+                    <div class="js-row-massive-chart-container card--chart"></div>
+                </article>
             </div>
         </div>
     </div>

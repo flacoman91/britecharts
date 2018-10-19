@@ -1,6 +1,8 @@
 {
     "data": [
         {
+            "hasChildren": true,
+            "isParent": true,
             "name": "Radiating",
             "value": 2024,
             "pctChange": -20,
@@ -8,6 +10,17 @@
             "width": ".5"
         },
         {
+            "hasChildren": false,
+            "isParent": false,
+            "name": "Radiating Kid",
+            "value": 1024,
+            "parent": "Radiating",
+            "pctChange": 50,
+            "pctOfSet": 55,
+            "width": ".4"
+        },
+        {
+            "hasChildren": false,
             "name": "Opalescent",
             "isParent": true,
             "value": 7000,
@@ -16,6 +29,7 @@
             "width": ".5"
         },
         {
+            "hasChildren": true,
             "name": "Shining",
             "isParent": true,
             "value": 213,
@@ -24,6 +38,8 @@
             "width": ".5"
         },
         {
+            "hasChildren": false,
+            "isParent": false,
             "name": "Brillian Brillian Brillian BrillianBrillian Brillian",
             "value": 6001,
             "parent": "Shining",
@@ -32,6 +48,8 @@
             "width": ".4"
         },
         {
+            "hasChildren": false,
+            "isParent": false,
             "name": "Vivid",
             "value": 613,
             "parent": "Shining",
@@ -40,6 +58,7 @@
             "width": ".4"
         },
         {
+            "hasChildren": true,
             "name": "Brilliant",
             "isParent": true,
             "value": 1900,
@@ -48,6 +67,8 @@
             "width": ".5"
         },
         {
+            "hasChildren": false,
+            "isParent": false,
             "name": "Increase",
             "value": 1900,
             "parent": "Brilliant",
@@ -56,6 +77,8 @@
             "width": ".4"
         },
         {
+            "hasChildren": false,
+            "isParent": false,
             "name": "Decrease",
             "value": 1900,
             "parent": "Brilliant",

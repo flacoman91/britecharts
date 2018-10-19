@@ -96,11 +96,11 @@ define(function(require) {
             labelsMargin = 7,
             labelsNumberFormat = NUMBER_FORMAT,
             labelsSuffix = '',
-            labelsSize = 12,
+            labelsSize = 16,
+            labelsSizeChild = 12,
             pctChangeLabelSize = 10,
             padding = 0.1,
-            betweenRowsPadding = 0.1,
-            outerPadding = 0.3,
+            outerPadding = .3,
             xAxis, yAxis,
             xAxisPadding = {
                 top: 0,
@@ -119,6 +119,7 @@ define(function(require) {
             animationDuration = 800,
             animationStepRatio = 70,
             backgroundColor = '#bebebe',
+            backgroundHoverColor = '#d6e8fa',
             backgroundWidth = 70,
             downArrowColor = '#20AA3F',
             upArrowColor = '#D14124',
@@ -207,6 +208,7 @@ define(function(require) {
                 drawGridLines();
                 drawRows();
                 drawAxis();
+                updateChartHeight();
             });
         }
 
@@ -290,24 +292,91 @@ define(function(require) {
             return +d.value;
         }
 
+        //scale factor between value and bar width
         function alpha(values, value) {
-            var n = values.length, total = d3.sum(values, value);
-            return (chartHeight - (n - 1) * padding * chartHeight / n - 2 * outerPadding * chartHeight / n) / total
+            var n = values.length,
+                total = d3.sum(values, value);
+
+            const exGroups = getExpandedGroups(values);
+            const retAlpha = (chartHeight - (n - 1) * padding * chartHeight / n - 2 * outerPadding * chartHeight / n) / total;
+
+            if(exGroups.length === 0)
+                return retAlpha;
+
+            const squishScale = d3Scale.scalePow()
+                .exponent( 1/exGroups.length )
+                .domain( [ 0, 100 ] )
+                .range( [ 0, exGroups.length * 10 ] );
+
+            const scale = squishScale(n);
+            const diff = isPrintMode ? scale * 2 : scale;
+            return retAlpha - diff;
         }
+
+        //width of bar i
         function Wi(values, value, alpha) {
             return function (i) {
                 return value(values[i]) * alpha
             }
         }
 
+        //mid-point displacement of bar i
         function Midi(values, value, alpha) {
-            var w = Wi(values, value, alpha), n = values.length;
+            var w = Wi(values, value, alpha),
+                n = values.length;
+            const expandedGroups = getExpandedGroups(values);
+            const groupIndices = getGroupIndices(expandedGroups, values);
+
             return function (_, i) {
-                var op = outerPadding * chartHeight / n, p = padding * chartHeight / n;
-                return op + d3.sum(values.slice(0, i), value) * alpha + i * p + w(i) / 2;
+                var op = outerPadding * chartHeight / n,
+                    p = padding * chartHeight / n;
+                let retVal = op + d3.sum(values.slice(0, i), value) * alpha + i * p + w(i) / 2;
+                groupIndices.forEach(g=>{
+                    // space above group
+                    if ( g[ 0 ] > 1 &&i >= g[ 0 ] ) {
+                        retVal += isPrintMode ? 20 : 10;
+                    }
+                    //space below group
+                    if ( i > g[ g.length - 1 ] ) {
+                        retVal += isPrintMode ? 20 : 10;
+                    }
+                });
+
+                return retVal;
             }
         }
         let a, mid, w;
+
+        function isExpandable(data, d){
+            // lets us know it's a parent element
+            return data.find( ( o ) => {
+                return o.name === d;
+            } ).hasChildren;
+        }
+
+        /**
+         * helper function to return list of groups that are expanded
+         * @param data
+         * @returns {any[]}
+         */
+        function getExpandedGroups(data){
+            return [... new Set(data.filter( o => {
+                return o.parent && o.isParent === false;
+            }).map(o=>{
+                return o.parent;
+            }))];
+        }
+
+        function getGroupIndices(parents, data){
+            let groups = [];
+            parents.forEach(name=>{
+                const points = data.map((o, i)=>{
+                    return o.name === name || o.parent === name ? i : null
+                }).filter(o=> {return o;});
+                groups.push(points);
+            });
+            return groups;
+        }
 
         /**
          * Creates the x and y scales of the graph
@@ -324,11 +393,12 @@ define(function(require) {
                 .domain([0, percentageAxis])
                 .rangeRound([0, chartWidth]);
 
+            // we already found the midpoints
+            let vals = data.map( mid );
+
             yScale = d3Scale.scaleOrdinal()
                 .domain(data.map(getName))
-                .range(data.map(mid)); //force irregular intervals based on
-            // value
-
+                .range(vals); //force irregular intervals based on value
 
             if (shouldReverseColorList) {
                 colorList = data.map(d => d)
@@ -426,6 +496,27 @@ define(function(require) {
             return { data, dataZeroed };
         }
 
+
+        /**
+         * utility function if we are a Root Row, big font, etc
+         * @param d
+         * @returns {*}
+         */
+        function isParent(d){
+            return data.find((o) => {
+                return (o.name === d.name || o.name === d) && o.isParent;
+            })
+        }
+        /**
+         * utility function to get font size for a row
+         * @param d
+         * @returns {string}
+         */
+        function getFontSize(d){
+            const e = isParent(d);
+            return e ? `${labelsSize}px` : `${labelsSizeChild}px`;
+        }
+
         /**
          * Utility function that wraps a text into the given width
          * @param  {D3Selection} text         Text to write
@@ -437,39 +528,40 @@ define(function(require) {
             textHelper.wrapTextWithEllipses(text, containerWidth, 0, yAxisLineWrapLimit, lineHeight);
         }
 
+        // eyeball
         function addVisibilityToggle(elem){
             elem.each( function() {
                 elem = d3Selection.select( this );
                 let textHgt = elem.node().getBBox().height/2;
                 let group = elem.append('svg')
                     .attr('class', (d) => {
-                        return 'visibility-' + getIndex(d);
+                        return 'visibility visibility-' + getIndex(d);
                     })
                     .attr('x', -(margin.left-5))
                     .attr('y', -textHgt)
-                    .attr('width', '15')
-                    .attr('height', '15')
-                    .attr('viewBox', '0 0 932.15 932.15')
-                    .attr('fill', '#0072ce')
-                    .attr('fill-opacity', 0)
+                    .attr('width', '300')
+                    .attr('height', '300')
+                    .attr('viewBox', '0 0 600 600')
+                    .attr('fill', 'none')
+                    .attr('opacity', 0);
+
+                group.append( 'rect' )
+                    .attr('x', -10)
+                    .attr('y', -10)
+                    .attr('height', '50')
+                    .attr('width', '50')
+                    .attr('fill', backgroundHoverColor)
                     .on( 'mouseover', function( d ) {
                         rowHoverOver(d);
                     } )
                     .on('mouseout', function(d) {
                         rowHoverOut(d);
-                    })
-                    .append('g');
+                    });
 
                 group.append( 'path' )
-                    .attr('d', 'M466.075,161.525c-205.6,0-382.8,121.2-464.2,296.1c-2.5,5.3-2.5,11.5,0,16.9c81.4,174.899,258.601,296.1,464.2,296.1 ' +
-                        's382.8-121.2,464.2-296.1c2.5-5.3,2.5-11.5,0-16.9C848.875,282.725,671.675,161.525,466.075,161.525z M466.075,676.226 ' +
-                        'c-116.1,0-210.1-94.101-210.1-210.101c0-116.1,94.1-210.1,210.1-210.1c116.1,0,210.1,94.1,210.1,210.1 ' +
-                        'S582.075,676.226,466.075,676.226z');
-
-                group.append('circle')
-                    .attr('cx', '466.075')
-                    .attr('cy', '466.025')
-                    .attr('r', '134.5');
+                    .attr('d', 'M 10,10 L 30,30 M 30,10 L 10,30')
+                    .attr('stroke', '#0072ce')
+                    .attr('stroke-width', '2');
 
             } );
         }
@@ -496,13 +588,24 @@ define(function(require) {
                     .style( 'fill-opacity', ( d ) => {
                         // if there are no children, make this transparent
                         const e = data.find((o)=>{
-                            return o.name === d && o.isParent
+                            return o.name === d && o.hasChildren
                         });
-
                         return e ? 1 : 0;
                     } );
             } );
         }
+
+        function updateChartHeight(){
+            const bars = svg.selectAll('.row-wrapper');
+            const num = Number(bars.size()) - 1;
+            const lastBar = svg.select('.row_' + num).select('.bg-hover');
+            const pos = Number(lastBar.attr('y'));
+            const height = pos + Number(lastBar.attr('height'))+ 40;
+            svg.select('line.pct-separator').attr('y2', height);
+            svg.select('.export-wrapper').attr('height', height);
+            svg.attr('height', height);
+        }
+
         /**
          * Draws the x and y axis on the svg object within their
          * respective groups
@@ -525,9 +628,9 @@ define(function(require) {
             }
 
             svg.selectAll('.y-axis-group.axis .tick text')
-                .classed('child', function(d){
+                .classed('child', function(d) {
                     // lets us know it's a child element
-                    return data.find((o)=>{
+                    return data.find((o) => {
                         return o.name === d;
                     }).parent;
                 })
@@ -539,16 +642,15 @@ define(function(require) {
                     rowHoverOut(d);
                 })
                 // move text right so we have room for the eyeballs
-                .call(wrapText, labelsBoxWidth);
+                .call(wrapText, labelsBoxWidth)
+                .selectAll('tspan')
+                .attr('font-size', getFontSize);
 
             // adding the down arrow for parent elements
             if(!isPrintMode) {
                 svg.selectAll( '.y-axis-group.axis .tick' )
                     .classed( 'expandable', function( d ) {
-                        // lets us know it's a parent element
-                        return data.find( ( o ) => {
-                            return o.name === d;
-                        } ).isParent;
+                        return isExpandable(data, d);
                     } )
                     .call( addExpandToggle );
             }
@@ -601,8 +703,9 @@ define(function(require) {
                 .on( 'mouseover', rowHoverOver )
                 .on('mouseout', rowHoverOut)
                 .attr( 'width', width )
-                .attr( 'fill', '#d6e8fa')
+                .attr( 'fill', backgroundHoverColor )
                 .attr( 'fill-opacity', 0);
+//                .attr('stroke', 'red');
 
 
             // now add the actual bars to what we got
@@ -640,19 +743,26 @@ define(function(require) {
                 } )
                 .attr( 'width', ( { value } ) => xScale( value ) )
                 .attr( 'fill', ( d ) => {
-
                     return computeColor( d.name );
-                } );
+                } )
+                .attr('fill-opacity', (d)=>{
+                    return d.parent ? 0.5 : 1;
+                });
             if(enableLabels) {
                 const backgroundRows = d3Selection.select( '.chart-group .bg' );
                 const bgWidth = backgroundRows.node().getBBox().x || backgroundRows.node().getBoundingClientRect().width;
 
                 bargroups.append( 'text' )
                     .classed( 'percentage-label', true )
+                    .classed('child', function(d) {
+                        return data.find((o) => {
+                            return o.name === d.name && !o.isParent;
+                        });
+                    })
                     .attr( 'x', _labelsHorizontalX )
                     .attr( 'y', _labelsHorizontalY )
                     .text( _labelsFormatValue )
-                    .attr( 'font-size', labelsSize + 'px' )
+                    .attr( 'font-size', getFontSize )
                     .attr( 'fill', ( d, i ) => {
                         const barWidth = xScale( d.value );
                         const labels = bargroups.selectAll( 'text' );
@@ -680,7 +790,7 @@ define(function(require) {
                 // each group should contain the labels and rows
                 gunit.append( 'text' )
                     .attr( 'y', _labelsHorizontalY )
-                    .attr('font-size', pctChangeLabelSize)
+                    .attr('font-size', getFontSize)
                     .attr('font-weight', '600')
                     .style( 'fill', ( d ) => {
                         if(d.pctChange === 0 || isNaN(d.pctChange)) {
@@ -690,14 +800,15 @@ define(function(require) {
                     } )
                     .text( _labelsFormatPct );
 
+                // arrows up and down to show percent change.
                 gunit.append( 'polygon' )
                     .attr( 'transform', ( d ) => {
                         const yPos = _labelsHorizontalY( d );
-                        if(isPrintMode){
+                        if(isParent(d)) {
                             return d.pctChange < 0 ? `translate(65, ${yPos+5}) rotate(180) scale(1.5)` :
                                 `translate(50, ${yPos - 15}) scale(1.5)`;
                         }
-                        return d.pctChange < 0 ? `translate(40, ${yPos+5}) rotate(180)` : `translate(30, ${yPos - 10})`;
+                        return d.pctChange < 0 ? `translate(50, ${yPos+5}) rotate(180)` : `translate(40, ${yPos - 10})`;
                     } )
                     .attr( 'points', function( d ) {
                         return '2,8 2,13 8,13 8,8 10,8 5,0 0,8';
@@ -757,9 +868,10 @@ define(function(require) {
 
                 // adding separator line
                 svg.select('.chart-group').append('line')
+                    .classed('pct-separator', true)
                     .attr('y1', 0)
                     .attr('x1', chartWidth)
-                    .attr('y2', chartHeight - 5)
+                    .attr('y2', chartHeight + margin.top + margin.bottom)
                     .attr('x2', chartWidth)
                     .style('stroke', '#000')
                     .style('stroke-width', 1);
@@ -863,7 +975,7 @@ define(function(require) {
                 ind = d.name ? getIndex( d.name ) : getIndex( d );
             }
 
-            d3Selection.select(containerRoot).select('.tick svg.visibility-' + ind).attr('fill-opacity', 1);
+            d3Selection.select(containerRoot).select('.tick svg.visibility-' + ind).attr('opacity', 1);
             d3Selection.select(containerRoot).select('g.row_' + ind + ' .bg-hover').attr('fill-opacity', 1);
         }
 
@@ -875,7 +987,7 @@ define(function(require) {
                 ind = d.name ? getIndex( d.name ) : getIndex( d );
             }
 
-            d3Selection.select(containerRoot).select('.tick svg.visibility-' + ind).attr('fill-opacity', 0);
+            d3Selection.select(containerRoot).select('.tick svg.visibility-' + ind).attr('opacity', 0);
             d3Selection.select(containerRoot).select('g.row_' + ind + ' .bg-hover').attr('fill-opacity', 0);
         }
 
@@ -996,21 +1108,6 @@ define(function(require) {
 
             return this;
         }
-
-        /**
-         * Gets or Sets the padding of the chart (Default is 0.1)
-         * @param  { Number | module } _x Padding value to get/set
-         * @return {padding | module} Current padding or Chart module to chain calls
-         * @public
-         */
-        exports.betweenRowsPadding = function(_x) {
-            if (!arguments.length) {
-                return betweenRowsPadding;
-            }
-            betweenRowsPadding = _x;
-
-            return this;
-        };
 
         /**
          * Gets or Sets the colorSchema of the chart
@@ -1233,6 +1330,22 @@ define(function(require) {
         };
 
         /**
+         * Get or Sets the labels text size for child rows
+         * @param  {number} [_x=12] label font size
+         * @return {number | module} Current text size or Chart module to chain calls
+         * @public
+         */
+        exports.labelsSizeChild = function(_x) {
+            if (!arguments.length) {
+                return labelsSizeChild;
+            }
+            labelsSizeChild = _x;
+
+            return this;
+        };
+
+
+        /**
          * Get or Sets the labels text size for the percentages
          * @param  {number} [_x=12] label font size
          * @return {number | module}    Current text size or Chart module to chain calls
@@ -1386,7 +1499,37 @@ define(function(require) {
             orderingFunction = _x;
 
             return this;
-        }
+        };
+
+        /**
+         * Gets or Sets the outerPadding of the chart
+         * @param  {Number} _x Desired pctChangeLabel for the graph
+         * @return { valueLabel | module} Current pctChangeLabel or Chart module to chain calls
+         * @public
+         */
+        exports.outerPadding = function(_x) {
+            if (!arguments.length) {
+                return outerPadding;
+            }
+            outerPadding = _x;
+
+            return this;
+        };
+
+        /**
+         * Gets or Sets the padding of the chart
+         * @param  {Number} _x Desired pctChangeLabel for the graph
+         * @return { valueLabel | module} Current pctChangeLabel or Chart module to chain calls
+         * @public
+         */
+        exports.padding = function(_x) {
+            if (!arguments.length) {
+                return padding;
+            }
+            padding = _x;
+
+            return this;
+        };
 
         /**
          * Gets or Sets the pctChangeLabel of the chart
