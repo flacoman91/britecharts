@@ -14,7 +14,7 @@ define(function(require){
         isInteger
     } = require('./helpers/number');
 
-    const {getTextWidth} = require('./helpers/text');
+    const {getTextWidth, wrapTextWithEllipses} = require('./helpers/text');
 
     /**
      * Tooltip Component reusable API class that renders a
@@ -301,10 +301,10 @@ define(function(require){
             // show tooltip to the right
             if ((mouseX - tooltipWidth) < 0) {
                 // Tooltip on the right
-                tooltipX = tooltipWidth - 185;
+                tooltipX = tooltipWidth - 200;
             } else {
                 // Tooltip on the left
-                tooltipX = -205
+                tooltipX = -(tooltipWidth - 45);
             }
 
             if (mouseY) {
@@ -371,7 +371,7 @@ define(function(require){
                 .attr('font-weight', '600')
                 .style('fill', tooltipTextColor)
                 .text(tooltipLeftText)
-                .call(textWrap, tooltipMaxTopicLength, initialTooltipTextXPosition);
+                .call(wrapTextWithEllipses, tooltipMaxTopicLength, initialTooltipTextXPosition, 1);
 
             tooltipRight = tooltipBody
               .append('text')
@@ -475,8 +475,12 @@ define(function(require){
          * @private
          */
         function updateSubTitle(dataPoint) {
+            const total = dataPoint.values.reduce((acc, cur)=>{
+               return acc+ cur.value;
+            }, 0);
+
             let tTitle = subTitle,
-                formattedTotal = getFormattedValue(300000).toString(),
+                formattedTotal = getFormattedValue(total).toString(),
                 subtitleRight;
 
             if (tTitle.length) {
