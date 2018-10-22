@@ -178,7 +178,7 @@ define(function(require) {
                 const w = textHelper.getTextWidth(t, textSize, 'sans-serif') + 10;
                 const barWidth = xScale( value );
 
-                if (Number(w) > barWidth && w > bgWidth - barWidth) {
+                if (w > barWidth && w > bgWidth - barWidth) {
                     // only return the number if it won't fit.
                     return d3Format.format( labelsNumberFormat )( value );
                 }
