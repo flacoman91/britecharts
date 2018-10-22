@@ -144,7 +144,8 @@ function createExportRowChart() {
             .labelsNumberFormat(',d')
             .labelsSize(18)
             .labelsSizeChild(14)
-            .labelsSuffix('complaints')
+            //.labelsSuffix('complaints')
+            .downArrowColor( '#257675' )
             .outerPadding(.1)
             .colorSchema(colorScheme)
             .isPrintMode(true)
@@ -194,7 +195,8 @@ function createRowChartWithTooltip() {
             .enableYAxisRight(true)
             .enableLabels(true)
             .labelsNumberFormat(',d')
-            .labelsSuffix('complaints')
+            .downArrowColor( '#257675' )
+            //.labelsSuffix('complaints')
             .outerPadding(.2)
             .colorSchema(colorScheme)
             .width(containerWidth)
@@ -218,11 +220,9 @@ function createRowChartWithTooltip() {
 
 function createHorizontalRowChart() {
     let rowChart = row(),
-        tooltip = miniTooltip(),
         rowContainer = d3Selection.select('.js-horizontal-row-chart-container'),
         containerWidth = rowContainer.node() ? rowContainer.node().getBoundingClientRect().width : false,
         containerHeight = rowContainer.node() ? rowContainer.node().getBoundingClientRect().height : false,
-        tooltipContainer,
         dataset;
 
     if (containerWidth) {
@@ -344,22 +344,18 @@ function createHorizontalRowChart() {
             .labelsNumberFormat(',d')
             .labelsSize(16)
             .labelsSizeChild(12)
-            .labelsSuffix('complaints')
+            .downArrowColor( '#257675' )
+            //.labelsSuffix('complaints')
             .colorSchema(colorScheme)
             .outerPadding(.1)
             .width(containerWidth)
             .height(height)
             .xTicks( 0 )
             .yTicks( 0 )
-            .percentageAxisToMaxRatio(calculateMaxRatio(dataset))
-            .on('customMouseOver', tooltip.show)
-            .on('customMouseMove', tooltip.update)
-            .on('customMouseOut', tooltip.hide);
+            .percentageAxisToMaxRatio(calculateMaxRatio(dataset));
 
         rowContainer.datum(dataset).call(rowChart);
 
-        tooltipContainer = d3Selection.select('.js-horizontal-row-chart-container .row-chart .metadata-group');
-        tooltipContainer.datum([]).call(tooltip);
     }
 }
 
@@ -390,7 +386,7 @@ function createSimpleRowChart() {
             .enableYAxisRight(true)
             .enableLabels(true)
             .labelsNumberFormat(',d')
-            .labelsSuffix('complaints')
+            //.labelsSuffix('complaints')
             .colorSchema(colorScheme)
             .width(containerWidth)
             .outerPadding(0)
@@ -411,11 +407,9 @@ function createSimpleRowChart() {
 
 function createRow4ExpandedChart() {
     let rowChart = row(),
-        tooltip = miniTooltip(),
         rowContainer = d3Selection.select('.js-four-row-chart-container'),
         containerWidth = rowContainer.node() ? rowContainer.node().getBoundingClientRect().width : false,
         containerHeight = rowContainer.node() ? rowContainer.node().getBoundingClientRect().height : false,
-        tooltipContainer,
         dataset;
 
     if (containerWidth) {
@@ -438,32 +432,26 @@ function createRow4ExpandedChart() {
             .labelsNumberFormat(',d')
             .labelsSize(16)
             .labelsSizeChild(12)
-            .labelsSuffix('complaints')
+            .downArrowColor( '#257675' )
+            //.labelsSuffix('complaints')
             .colorSchema(colorScheme)
             .outerPadding(.1)
             .width(containerWidth)
             .height(height)
             .xTicks( 0 )
             .yTicks( 0 )
-            .percentageAxisToMaxRatio(calculateMaxRatio(dataset))
-            .on('customMouseOver', tooltip.show)
-            .on('customMouseMove', tooltip.update)
-            .on('customMouseOut', tooltip.hide);
+            .percentageAxisToMaxRatio(calculateMaxRatio(dataset));
 
         rowContainer.datum(dataset).call(rowChart);
 
-        tooltipContainer = d3Selection.select('.js-horizontal-row-chart-container .row-chart .metadata-group');
-        tooltipContainer.datum([]).call(tooltip);
     }
 }
 
 function createLastExpandedChart() {
     let rowChart = row(),
-        tooltip = miniTooltip(),
         rowContainer = d3Selection.select('.js-last-row-chart-container'),
         containerWidth = rowContainer.node() ? rowContainer.node().getBoundingClientRect().width : false,
         containerHeight = rowContainer.node() ? rowContainer.node().getBoundingClientRect().height : false,
-        tooltipContainer,
         dataset;
 
     if (containerWidth) {
@@ -486,22 +474,18 @@ function createLastExpandedChart() {
             .labelsNumberFormat(',d')
             .labelsSize(16)
             .labelsSizeChild(12)
-            .labelsSuffix('complaints')
+            .downArrowColor( '#257675' )
+            //.labelsSuffix('complaints')
             .colorSchema(colorScheme)
             .outerPadding(.1)
             .width(containerWidth)
             .height(height)
             .xTicks( 0 )
             .yTicks( 0 )
-            .percentageAxisToMaxRatio(calculateMaxRatio(dataset))
-            .on('customMouseOver', tooltip.show)
-            .on('customMouseMove', tooltip.update)
-            .on('customMouseOut', tooltip.hide);
+            .percentageAxisToMaxRatio(calculateMaxRatio(dataset));
 
         rowContainer.datum(dataset).call(rowChart);
 
-        tooltipContainer = d3Selection.select('.js-horizontal-row-chart-container .row-chart .metadata-group');
-        tooltipContainer.datum([]).call(tooltip);
     }
 }
 
@@ -531,7 +515,8 @@ function createCollapsedChart() {
             .labelsNumberFormat(',d')
             .labelsSize(16)
             .labelsSizeChild(12)
-            .labelsSuffix('complaints')
+            .downArrowColor( '#257675' )
+            //.labelsSuffix('complaints')
             .colorSchema(colorScheme)
             .outerPadding(.1)
             .width(containerWidth)
@@ -570,7 +555,8 @@ function createMassiveChart() {
             .labelsNumberFormat(',d')
             .labelsSize(16)
             .labelsSizeChild(12)
-            .labelsSuffix('complaints')
+            .downArrowColor( '#257675' )
+            //.labelsSuffix('complaints')
             .colorSchema(colorScheme)
             .outerPadding(.1)
             .width(containerWidth)
