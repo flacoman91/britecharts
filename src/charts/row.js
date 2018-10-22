@@ -152,7 +152,9 @@ define(function(require) {
             getPctChange = ({pctChange}) => pctChange,
             getValue = ({value}) => value,
 
-            _labelsFormatValue = ( { isNotFilter, pctOfSet, parent, value } ) => {
+            _labelsFormatValue = ( d, bgWidth ) => {
+
+                const { isNotFilter, pctOfSet, parent, value, isParent } = d;
                 let pctLabel = '';
 
                 // exclude this on NOT filters
@@ -171,7 +173,18 @@ define(function(require) {
                     labelsSuffix = labelsSuffix.replace( /s$/, '' );
                 }
 
-                return d3Format.format( labelsNumberFormat )( value ) + ' ' + labelsSuffix + pctLabel;
+                const t = d3Format.format( labelsNumberFormat )( value ) + ' ' + labelsSuffix + pctLabel;
+                const textSize = isParent ? labelsSize : labelsSizeChild;
+                const w = textHelper.getTextWidth(t, textSize, 'sans-serif') + 10;
+                const barWidth = xScale( value );
+
+                if (Number(w) > barWidth && w > bgWidth - barWidth) {
+                    // only return the number if it won't fit.
+                    return d3Format.format( labelsNumberFormat )( value );
+                }
+
+                return t;
+
             },
 
             _labelsFormatPct = ({pctChange}) => {
@@ -507,6 +520,10 @@ define(function(require) {
                 return (o.name === d.name || o.name === d) && o.isParent;
             })
         }
+
+        function positionPercentageLabel(d){
+
+        }
         /**
          * utility function to get font size for a row
          * @param d
@@ -754,14 +771,12 @@ define(function(require) {
 
                 bargroups.append( 'text' )
                     .classed( 'percentage-label', true )
-                    .classed('child', function(d) {
-                        return data.find((o) => {
-                            return o.name === d.name && !o.isParent;
-                        });
-                    })
+                    .classed( 'child', ( d ) => !isParent( d ) )
                     .attr( 'x', _labelsHorizontalX )
                     .attr( 'y', _labelsHorizontalY )
-                    .text( _labelsFormatValue )
+                    .text( (d)=>{
+                        return _labelsFormatValue(d, bgWidth);
+                    } )
                     .attr( 'font-size', getFontSize )
                     .attr( 'fill', ( d, i ) => {
                         const barWidth = xScale( d.value );
