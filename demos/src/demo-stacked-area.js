@@ -77,6 +77,71 @@ function createStackedAreaChartWithTooltip(optionalColorSchema) {
     }
 }
 
+
+function createStackedAreaJumping() {
+    let stackedArea = stackedAreaChart(),
+        chartTooltip = tooltip(),
+        container = d3Selection.select('.js-stacked-area-chart-jumping-container'),
+        containerWidth = container.node() ? container.node().getBoundingClientRect().width : false,
+        tooltipContainer,
+        dataset;
+
+    if (containerWidth) {
+        dataset = aTestDataSet().withMassiveSources().build();
+
+        let margin = {
+            top: 70,
+            right: 30,
+            bottom: 60,
+            left: 70
+        };
+        // StackedAreChart Setup and start
+
+        const rowNames = [ 'Other', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K' ];
+
+        stackedArea
+            .isAnimated(true)
+            .topicsOrder(rowNames)
+            .margin(margin)
+            .tooltipThreshold(600)
+            .height(564)
+            .width(1175)
+            .dateLabel('date')
+            .valueLabel('value')
+            .grid('horizontal')
+            .on('customDataEntryClick', function(d, mousePosition) {
+                // eslint-disable-next-line no-console
+                console.log('Data entry marker clicked', d, mousePosition);
+            })
+            .on('customMouseOver', chartTooltip.show)
+            .on('customMouseMove', function(dataPoint, topicColorMap, dataPointXPosition) {
+                chartTooltip.update(dataPoint, topicColorMap, dataPointXPosition);
+            })
+            .on('customMouseOut', chartTooltip.hide);
+        stackedArea.colorSchema(['red', 'blue', 'green', 'yellow', 'purple', 'pink', 'black', 'grey', 'orange']);
+
+        // if (optionalColorSchema) {
+        //     stackedArea.colorSchema(optionalColorSchema);
+        // }
+
+        container.datum(dataset.data).call(stackedArea);
+
+        chartTooltip
+            .topicsOrder(rowNames)
+            .topicLabel('values')
+            .title('Testing tooltip');
+
+        // Note that if the viewport width is less than the tooltipThreshold value,
+        // this container won't exist, and the tooltip won't show up
+        tooltipContainer = d3Selection.select('.js-stacked-area-chart-jumping-container .metadata-group .vertical-marker-container');
+        tooltipContainer.datum([]).call(chartTooltip);
+
+        d3Selection.select('#button').on('click', function() {
+            stackedArea.exportChart('stacked-area.png', 'Britecharts Stacked Area');
+        });
+    }
+}
+
 function createStackedAreaChartWithFixedAspectRatio(optionalColorSchema) {
     let stackedArea = stackedAreaChart(),
         chartTooltip = tooltip(),
@@ -187,6 +252,7 @@ function createLoadingState() {
 if (d3Selection.select('.js-stacked-area-chart-tooltip-container').node()){
     // Chart creation
     createStackedAreaChartWithTooltip();
+    createStackedAreaJumping();
     createStackedAreaChartWithFixedAspectRatio();
     createStackedAreaChartWithSyncedTooltip();
     createLoadingState();
@@ -196,6 +262,7 @@ if (d3Selection.select('.js-stacked-area-chart-tooltip-container').node()){
     redrawCharts = function(){
         d3Selection.selectAll('.stacked-area').remove();
         createStackedAreaChartWithTooltip();
+        createStackedAreaJumping();
         createStackedAreaChartWithFixedAspectRatio();
         createStackedAreaChartWithSyncedTooltip();
         createLoadingState();
