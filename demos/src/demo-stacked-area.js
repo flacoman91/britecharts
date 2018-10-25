@@ -97,10 +97,11 @@ function createStackedAreaJumping() {
         };
         // StackedAreChart Setup and start
 
-        const rowNames = [ 'Other', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K' ];
-
+        const rowNames = uniq(dataset.data.map(o=>{ return o.name; }));
+        const names = rowNames.slice().reverse();
         stackedArea
             .isAnimated(true)
+            .areaCurve('linear')
             .topicsOrder(rowNames)
             .margin(margin)
             .tooltipThreshold(600)
@@ -118,7 +119,19 @@ function createStackedAreaJumping() {
                 chartTooltip.update(dataPoint, topicColorMap, dataPointXPosition);
             })
             .on('customMouseOut', chartTooltip.hide);
-        stackedArea.colorSchema(['red', 'blue', 'green', 'yellow', 'purple', 'pink', 'black', 'grey', 'orange']);
+        stackedArea.colorSchema([
+            'red',
+            'blue',
+            'brown',
+            'green',
+            'yellow',
+            'purple',
+            'pink',
+            'black',
+            'grey',
+            'orange',
+            'teal'
+        ]);
 
         // if (optionalColorSchema) {
         //     stackedArea.colorSchema(optionalColorSchema);
@@ -127,7 +140,7 @@ function createStackedAreaJumping() {
         container.datum(dataset.data).call(stackedArea);
 
         chartTooltip
-            .topicsOrder(rowNames)
+            .topicsOrder(names)
             .topicLabel('values')
             .title('Testing tooltip');
 
