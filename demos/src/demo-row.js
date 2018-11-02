@@ -162,6 +162,49 @@ function createExportRowChart() {
     }
 }
 
+function createRowChartDataLens() {
+    let rowChart = row(),
+        rowContainer = d3Selection.select('.js-row-chart-lens-container'),
+        containerWidth = rowContainer.node() ? rowContainer.node().getBoundingClientRect().width : false,
+        dataset;
+
+    if (containerWidth) {
+        dataset = aRowDataSet().withDataLens().build();
+        const dataTarget = dataset;
+        const colorScheme = dataTarget.map((o)=>{
+            return '#20aa3f';
+        });
+
+        // let out total count be 10000
+        const height = calculateHeight(dataTarget);
+        rowChart
+            .isHorizontal(true)
+            .isAnimated(true)
+            .margin({
+                left:140,
+                right: 50,
+                top: 10,
+                bottom: 10
+            })
+            .backgroundColor('#f7f8f9')
+            .enableYAxisRight(true)
+            .enableLabels(true)
+            .labelsNumberFormat(',d')
+            .downArrowColor( '#257675' )
+            //.labelsSuffix('complaints')
+            .outerPadding(.2)
+            .colorSchema(colorScheme)
+            .width(containerWidth)
+            .height(height)
+            .xTicks( 0 )
+            .yTicks( 0 )
+            .percentageAxisToMaxRatio(10000/800);
+
+
+        rowContainer.datum(dataTarget).call(rowChart);
+    }
+}
+
 function createRowChartWithTooltip() {
     let rowChart = row(),
         tooltip = miniTooltip(),
@@ -633,6 +676,7 @@ function wrap(text, width){
 // Show charts if container available
 if (d3Selection.select('.js-row-chart-tooltip-container').node()){
     createRowChartWithTooltip();
+    createRowChartDataLens();
     createHorizontalRowChart();
     createSimpleRowChart();
     createExportRowChart();
@@ -644,6 +688,7 @@ if (d3Selection.select('.js-row-chart-tooltip-container').node()){
     let redrawCharts = function() {
         d3Selection.selectAll( '.row-chart' ).remove();
         createRowChartWithTooltip();
+        createRowChartDataLens();
         createHorizontalRowChart();
         createSimpleRowChart();
         createRow4ExpandedChart();

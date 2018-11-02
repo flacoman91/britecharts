@@ -200,7 +200,10 @@ define(function(require) {
             },
 
             // labels per row, aka XX Complaints
-            _labelsHorizontalX = ({value}) => xScale(value) + labelsMargin,
+            _labelsHorizontalX = ({parentCount, value}) => {
+                    return parentCount ? xScale(parentCount) + labelsMargin :
+                        xScale(value) + labelsMargin;
+            },
             _labelsHorizontalY= ({name}) => { return yScale(name) + (labelsSize * (3/8)); };
 
         /**
@@ -724,6 +727,33 @@ define(function(require) {
                 .attr( 'fill-opacity', 0);
 //                .attr('stroke', 'red');
 
+            // now add the actual bars to what we got
+            bargroups
+                .append( 'rect' )
+                .attr( 'class', function(d){
+                    return 'focus-bar';
+                } )
+                .attr( 'y', chartHeight )
+                .attr( 'x', 0 )
+                .attr( 'height', function (d) {
+                    return a * d.width;	//`a` already accounts for both types of padding
+                } )
+                .attr( 'width', ( { value } ) => xScale( value ) )
+                .merge( rows )
+                .attr( 'x', 0 )
+                .attr( 'y', function (d, i) {
+                    return yScale(d.name) - a * d.width/2;
+                    //center the bar on the tick
+                })
+                .attr( 'height',function (d) {
+                    return a * d.width;	//`a` already accounts for both types of padding
+                } )
+                .attr( 'width', ( { parentCount } ) => xScale( parentCount ) )
+                .attr( 'fill', '#e7e8e9')
+                .attr('fill-opacity', (d)=>{
+                    return d.parent ? 0.5 : 1;
+                });
+
 
             // now add the actual bars to what we got
             bargroups
@@ -765,6 +795,8 @@ define(function(require) {
                 .attr('fill-opacity', (d)=>{
                     return d.parent ? 0.5 : 1;
                 });
+
+
             if(enableLabels) {
                 const backgroundRows = d3Selection.select( '.chart-group .bg' );
                 const bgWidth = backgroundRows.node().getBBox().x || backgroundRows.node().getBoundingClientRect().width;
@@ -785,7 +817,7 @@ define(function(require) {
                         return ( bgWidth > 0 && bgWidth - barWidth < textWidth ) ? '#FFF' : '#000';
                     } )
                     .attr( 'transform', ( d, i ) => {
-                        const barWidth = xScale( d.value );
+                        const barWidth = d.parentCount ? xScale( d.parentCount ) : xScale( d.value );
                         const labels = bargroups.selectAll( 'text' );
                         const textWidth = labels._groups[ i ][ 0 ].getComputedTextLength() + 10;
                         if ( bgWidth > 0 && bgWidth - barWidth < textWidth ) {
@@ -880,6 +912,28 @@ define(function(require) {
                     .data(dataZeroed);
 
                 drawHorizontalRows(rows);
+
+                console.log(data[0].parentCount);
+
+                if(data[0].parentCount){
+                    svg.select('.chart-group').append('line')
+                        .classed('focus-separator', true)
+                        .attr('y1', 0)
+                        .attr('x1', xScale(data[0].parentCount))
+                        .attr('y2', chartHeight + margin.top + margin.bottom)
+                        .attr('x2', xScale(data[0].parentCount))
+                        .style('stroke', '#000')
+                        .style('stroke-width', 1);
+                }
+                svg.select('.chart-group').append('line')
+                    .classed('pct-separator', true)
+                    .attr('y1', 0)
+                    .attr('x1', chartWidth)
+                    .attr('y2', chartHeight + margin.top + margin.bottom)
+                    .attr('x2', chartWidth)
+                    .style('stroke', '#000')
+                    .style('stroke-width', 1);
+
 
                 // adding separator line
                 svg.select('.chart-group').append('line')

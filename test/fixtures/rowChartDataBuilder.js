@@ -6,6 +6,7 @@ define(function(require) {
         json5Bars = require('json-loader!../json/row5Bars.json'),
         json5CollapsedBars = require('json-loader!../json/row5CollapsedBars.json'),
         jsonColors = require('json-loader!../json/rowColors.json'),
+        jsonDataLens = require('json-loader!../json/rowFocusLens.json'),
         jsonLetters = require('json-loader!../json/rowDataLetters.json'),
         jsonLongNames = require('json-loader!../json/rowLongNames.json'),
         jsonMassiveSet = require('json-loader!../json/rowMassiveSetBars.json');
@@ -15,6 +16,12 @@ define(function(require) {
         this.Klass = RowDataBuilder;
 
         this.config = _.defaults({}, config);
+
+        this.withDataLens = function(){
+            var attributes = _.extend({}, this.config, jsonDataLens);
+
+            return new this.Klass(attributes);
+        };
 
         this.withLettersFrequency = function(){
             var attributes = _.extend({}, this.config, jsonLetters);
