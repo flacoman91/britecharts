@@ -98,6 +98,7 @@ define(function(require) {
             labelsSuffix = '',
             labelsSize = 16,
             labelsSizeChild = 12,
+            parentFocusColor = '#e7e8e9',
             pctChangeLabelSize = 10,
             padding = 0.1,
             outerPadding = .3,
@@ -730,30 +731,31 @@ define(function(require) {
             // now add the actual bars to what we got
             bargroups
                 .append( 'rect' )
-                .attr( 'class', function(d){
+                .attr( 'class', function( d ) {
                     return 'focus-bar';
                 } )
                 .attr( 'y', chartHeight )
                 .attr( 'x', 0 )
-                .attr( 'height', function (d) {
+                .attr( 'height', function( d ) {
                     return a * d.width;	//`a` already accounts for both types of padding
                 } )
                 .attr( 'width', ( { value } ) => xScale( value ) )
                 .merge( rows )
                 .attr( 'x', 0 )
-                .attr( 'y', function (d, i) {
-                    return yScale(d.name) - a * d.width/2;
+                .attr( 'y', function( d, i ) {
+                    return yScale( d.name ) - a * d.width / 2;
                     //center the bar on the tick
-                })
-                .attr( 'height',function (d) {
+                } )
+                .attr( 'height', function( d ) {
                     return a * d.width;	//`a` already accounts for both types of padding
                 } )
-                .attr( 'width', ( { parentCount } ) => xScale( parentCount ) )
-                .attr( 'fill', '#e7e8e9')
-                .attr('fill-opacity', (d)=>{
+                .attr( 'width', ( { parentCount } ) => {
+                    return parentCount ? xScale( parentCount ) : 0;
+                } )
+                .attr( 'fill', parentFocusColor )
+                .attr( 'fill-opacity', ( d ) => {
                     return d.parent ? 0.5 : 1;
-                });
-
+                } );
 
             // now add the actual bars to what we got
             bargroups
@@ -913,8 +915,6 @@ define(function(require) {
 
                 drawHorizontalRows(rows);
 
-                console.log(data[0].parentCount);
-
                 if(data[0].parentCount){
                     svg.select('.chart-group').append('line')
                         .classed('focus-separator', true)
@@ -922,7 +922,7 @@ define(function(require) {
                         .attr('x1', xScale(data[0].parentCount))
                         .attr('y2', chartHeight + margin.top + margin.bottom)
                         .attr('x2', xScale(data[0].parentCount))
-                        .style('stroke', '#000')
+                        .style('stroke', parentFocusColor)
                         .style('stroke-width', 1);
                 }
                 svg.select('.chart-group').append('line')
