@@ -182,13 +182,16 @@ function createRowChartDataLens() {
             .isAnimated(true)
             .margin({
                 left:140,
-                right: 50,
-                top: 10,
+                right: 100,
+                top: 20,
                 bottom: 10
             })
             .backgroundColor('#f7f8f9')
             .enableYAxisRight(true)
             .enableLabels(true)
+            .labelsTotalCount('99,999')
+            .labelsFocusTitle('Some Focus Item')
+            .labelsInterval('month')
             .labelsNumberFormat(',d')
             .downArrowColor( '#257675' )
             //.labelsSuffix('complaints')

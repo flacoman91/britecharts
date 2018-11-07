@@ -92,6 +92,7 @@ define(function(require) {
             percentageAxisToMaxRatio = 1,
             numberFormat = NUMBER_FORMAT,
             enableLabels = false,
+            enableGridLines = false,
             enableYAxisRight = false,
             labelsMargin = 7,
             labelsNumberFormat = NUMBER_FORMAT,
@@ -128,7 +129,9 @@ define(function(require) {
 
             highlightRowFunction = (rowSelection) => rowSelection.attr('fill', ({name}) => d3Color.color(colorMap(name)).darker()),
             orderingFunction,
-
+            labelsFocusTitle = '',
+            labelsTotalCount = '',
+            labelsInterval = '',
             valueLabel = 'value',
             nameLabel = 'name',
             pctChangeLabel = 'pctChange',
@@ -223,6 +226,7 @@ define(function(require) {
                 buildSVG(this);
                 buildGradient();
                 drawGridLines();
+                drawChartTitleLabels();
                 drawRows();
                 drawAxis();
                 updateChartHeight();
@@ -250,13 +254,16 @@ define(function(require) {
             let container = svg
                 .append('g')
                   .classed('container-group', true)
-                  .attr('transform', `translate(${margin.left + yAxisPaddingBetweenChart}, ${margin.top-2})`);
+                  .attr('transform', `translate(${margin.left + yAxisPaddingBetweenChart}, ${margin.top})`);
 
             container
                 .append('g').classed('grid-lines-group', true);
 
             container
                 .append('g').classed('chart-group', true);
+
+            container
+                .append('g').classed('title-group', true);
 
             // labels on the bottom
             container
@@ -359,7 +366,7 @@ define(function(require) {
                     }
                 });
 
-                return retVal;
+                return retVal + margin.top;
             }
         }
         let a, mid, w;
@@ -546,6 +553,21 @@ define(function(require) {
          */
         function wrapText(text, containerWidth) {
             const lineHeight = yAxisLineWrapLimit > 1 ? .8 : 1.2;
+            let fontSize = 12;
+
+            textHelper.wrapText.call(null, 0, fontSize, containerWidth, text.node());
+            //textHelper.wrapText(text, containerWidth, 0,
+            // yAxisLineWrapLimit, lineHeight);
+        }
+
+        /**
+         * Utility function that wraps a text into the given width
+         * @param  {D3Selection} text         Text to write
+         * @param  {Number} containerWidth
+         * @private
+         */
+        function wrapTextWithEllipses(text, containerWidth) {
+            const lineHeight = yAxisLineWrapLimit > 1 ? .8 : 1.2;
             textHelper.wrapTextWithEllipses(text, containerWidth, 0, yAxisLineWrapLimit, lineHeight);
         }
 
@@ -663,7 +685,7 @@ define(function(require) {
                     rowHoverOut(d);
                 })
                 // move text right so we have room for the eyeballs
-                .call(wrapText, labelsBoxWidth)
+                .call(wrapTextWithEllipses, labelsBoxWidth)
                 .selectAll('tspan')
                 .attr('font-size', getFontSize);
 
@@ -918,29 +940,20 @@ define(function(require) {
                 if(data[0].parentCount){
                     svg.select('.chart-group').append('line')
                         .classed('focus-separator', true)
-                        .attr('y1', 0)
+                        .attr('y1', -10)
                         .attr('x1', xScale(data[0].parentCount))
                         .attr('y2', chartHeight + margin.top + margin.bottom)
                         .attr('x2', xScale(data[0].parentCount))
                         .style('stroke', parentFocusColor)
                         .style('stroke-width', 1);
                 }
-                svg.select('.chart-group').append('line')
-                    .classed('pct-separator', true)
-                    .attr('y1', 0)
-                    .attr('x1', chartWidth)
-                    .attr('y2', chartHeight + margin.top + margin.bottom)
-                    .attr('x2', chartWidth)
-                    .style('stroke', '#000')
-                    .style('stroke-width', 1);
-
 
                 // adding separator line
                 svg.select('.chart-group').append('line')
                     .classed('pct-separator', true)
-                    .attr('y1', 0)
+                    .attr('y1', -10)
                     .attr('x1', chartWidth)
-                    .attr('y2', chartHeight + margin.top + margin.bottom)
+                    .attr('y2', chartHeight)
                     .attr('x2', chartWidth)
                     .style('stroke', '#000')
                     .style('stroke-width', 1);
@@ -963,16 +976,78 @@ define(function(require) {
                 .remove();
         }
 
+        function drawChartTitleLabels() {
+            // chart group
+            // adding separator line
+            const focusWidth = data[0].parentCount ? xScale(data[0].parentCount) : false;
+            const focusCount = data[0].parentCount;
+            svg.select('.title-group').selectAll('g').remove();
+            svg.select('.title-group').selectAll('text').remove();
+
+            if(focusWidth && labelsFocusTitle && focusCount) {
+                const focusTitle = `${labelsFocusTitle} ${focusCount.toLocaleString()}`;
+                const w = textHelper.getTextWidth( focusTitle, labelsSizeChild, 'sans-serif' );
+                const focusTitleGroup = svg.select( '.title-group' ).append( 'text' )
+                    .text(null)
+                    .attr( 'x', focusWidth - w - 5 )
+                    .attr( 'y', margin.top );
+
+                focusTitleGroup.append('tspan')
+                    .text( labelsFocusTitle )
+                    .attr('font-size', labelsSizeChild);
+
+                focusTitleGroup.append('tspan')
+                    .text( focusCount.toLocaleString() )
+                    .attr('dx', 5)
+                    .attr('font-size', labelsSizeChild)
+                    .attr( 'font-weight', 600 );
+
+            }
+
+            if(labelsTotalCount) {
+                const compCountTxt = `Total complaints ${labelsTotalCount}`;
+                const cw = textHelper.getTextWidth( compCountTxt, labelsSizeChild, 'sans-serif' );
+
+                const complaintTotalGroup = svg.select( '.title-group' ).append( 'text' )
+                    .text( null )
+                    .attr( 'x', chartWidth - cw - 10 )
+                    .attr( 'y', margin.top );
+
+                complaintTotalGroup.append('tspan')
+                    .text('Total complaints')
+                    .attr( 'font-size', labelsSizeChild );
+
+                complaintTotalGroup.append('tspan')
+                    .text( labelsTotalCount )
+                    .attr('dx', 5)
+                    .attr( 'font-size', labelsSizeChild )
+                    .attr( 'font-weight', 600 );
+
+            }
+
+            if(labelsInterval) {
+                svg.select( '.title-group' )
+                    .append( 'text' )
+                    .text( `Change in past ${labelsInterval}` )
+                    .attr( 'font-size', labelsSizeChild )
+                    .attr( 'x', chartWidth + 5 )
+                    .attr( 'y', margin.top );
+
+            }
+        }
+
         /**
          * Draws grid lines on the background of the chart
          * @return void
          */
         function drawGridLines() {
-            svg.select('.grid-lines-group')
-                .selectAll('line')
-                .remove();
+            if(enableGridLines){
+                svg.select('.grid-lines-group')
+                    .selectAll('line')
+                    .remove();
 
-            drawHorizontalGridLines();
+                    drawHorizontalGridLines();
+            }
         }
 
         /**
@@ -986,9 +1061,9 @@ define(function(require) {
                 .enter()
                   .append('line')
                     .attr('class', 'vertical-grid-line')
-                    .attr('y1', (xAxisPadding.left))
-                    .attr('y2', chartHeight)
+                    .attr('y1', margin.top + 20)
                     .attr('x1', (d) => xScale(d))
+                    .attr('y2', chartHeight)
                     .attr('x2', (d) => xScale(d));
 
             drawVerticalExtendedLine();
@@ -1005,9 +1080,9 @@ define(function(require) {
                 .enter()
                   .append('line')
                     .attr('class', 'extended-y-line')
-                    .attr('y1', (xAxisPadding.bottom))
-                    .attr('y2', chartHeight)
+                    .attr('y1', margin.top + 20)
                     .attr('x1', 0)
+                    .attr('y2', chartHeight)
                     .attr('x2', 0);
         }
 
@@ -1192,6 +1267,22 @@ define(function(require) {
 
             return this;
         };
+
+        /**
+         * If true, adds gridlines to row chart
+         * @param  {Boolean} [_x=false]
+         * @return {Boolean | module} Current value of enableGridLines or Chart module to chain calls
+         * @public
+         */
+        exports.enableGridLines = function(_x) {
+            if (!arguments.length) {
+                return enableGridLines;
+            }
+            enableGridLines = _x;
+
+            return this;
+        };
+
 
         /**
          * If true, adds labels at the end of the rows
@@ -1602,8 +1693,8 @@ define(function(require) {
 
         /**
          * Gets or Sets the pctChangeLabel of the chart
-         * @param  {Number} _x Desired pctChangeLabel for the graph
-         * @return { valueLabel | module} Current pctChangeLabel or Chart module to chain calls
+         * @param  {String} _x Desired pctChangeLabel for the graph
+         * @return { String | module} Current pctChangeLabel or Chart module to chain calls
          * @public
          */
         exports.pctChangeLabel = function(_x) {
@@ -1618,8 +1709,9 @@ define(function(require) {
 
         /**
          * Gets or Sets the pctOfSet of the chart
-         * @param  {Number} _x Desired pctOfSet for the graph
-         * @return { valueLabel | module} Current pctOfSet or Chart module to chain calls
+         * @param  {String} _x Desired pctOfSet for the graph
+         * @return { String | module} Current pctOfSet or Chart module to chain
+         * calls
          * @public
          */
         exports.pctOfSet = function(_x) {
@@ -1634,7 +1726,8 @@ define(function(require) {
         /**
          * Gets or Sets the yAxisLineWrapLimit of the chart, default 2
          * @param  {Number} _x Desired yAxisLineWrapLimit for the graph
-         * @return { valueLabel | module} Current valueLabel or Chart module to chain calls
+         * @return { Number | module} Current valueLabel or Chart module to
+         * chain calls
          * @public
          */
         exports.yAxisLineWrapLimit = function(_x) {
@@ -1646,6 +1739,53 @@ define(function(require) {
             return this;
         };
 
+        /**
+         * Gets or Sets the labelsFocusTitle of the chart
+         * @param {String} _x Desired labelsFocusTitle for the graph
+         * @return { String | module} Current labelsFocusTitle or Chart
+         * module to chain calls
+         * @public
+         */
+        exports.labelsFocusTitle = function(_x) {
+            if (!arguments.length) {
+                return labelsFocusTitle;
+            }
+            labelsFocusTitle = _x;
+
+            return this;
+        };
+
+        /**
+         * Gets or Sets the labelsTotalCount of the chart
+         * @param {String} _x Desired labelsTotalCount for the graph
+         * @return { String | module} Current labelsTotalCount or Chart
+         * module to chain calls
+         * @public
+         */
+        exports.labelsTotalCount = function(_x) {
+            if (!arguments.length) {
+                return labelsTotalCount;
+            }
+            labelsTotalCount = _x;
+
+            return this;
+        };
+
+
+        /**
+         * Gets or Sets the labelsInterval of the chart
+         * @param  {String} _x Desired labelsInterval for the graph
+         * @return { labelsInterval | module} Current labelsInterval or Chart module to chain calls
+         * @public
+         */
+        exports.labelsInterval = function(_x) {
+            if (!arguments.length) {
+                return labelsInterval;
+            }
+            labelsInterval = _x;
+
+            return this;
+        };
 
         /**
          * Gets or Sets the valueLabel of the chart
