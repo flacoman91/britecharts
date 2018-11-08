@@ -190,7 +190,7 @@ function createRowChartDataLens() {
             .enableYAxisRight(true)
             .enableLabels(true)
             .labelsTotalCount('99,999')
-            .labelsFocusTitle('Some Focus Item')
+            .labelsFocusTitle('Some Focus Item Lorem approximate of the text width by using a canvas element')
             .labelsInterval('month')
             .labelsNumberFormat(',d')
             .downArrowColor( '#257675' )

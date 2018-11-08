@@ -820,9 +820,8 @@ define(function(require) {
                     return d.parent ? 0.5 : 1;
                 });
 
-
-            if(enableLabels) {
-                const backgroundRows = d3Selection.select( '.chart-group .bg' );
+            const backgroundRows = d3Selection.select( '.chart-group .bg' );
+            if(enableLabels && backgroundRows.node()) {
                 const bgWidth = backgroundRows.node().getBBox().x || backgroundRows.node().getBoundingClientRect().width;
 
                 bargroups.append( 'text' )
@@ -979,19 +978,31 @@ define(function(require) {
         function drawChartTitleLabels() {
             // chart group
             // adding separator line
+            if(!(data && data[0]))
+                return;
+
             const focusWidth = data[0].parentCount ? xScale(data[0].parentCount) : false;
             const focusCount = data[0].parentCount;
             svg.select('.title-group').selectAll('g').remove();
             svg.select('.title-group').selectAll('text').remove();
 
             if(focusWidth && labelsFocusTitle && focusCount) {
-                const focusTitle = `${labelsFocusTitle} ${focusCount.toLocaleString()}`;
-                const w = textHelper.getTextWidth( focusTitle, labelsSizeChild, 'sans-serif' );
+                let focusTitle = `${labelsFocusTitle} ${focusCount.toLocaleString()}`;
+                let w = textHelper.getTextWidth( focusTitle, labelsSizeChild, 'sans-serif' );
+                const availfocusTitleAreaWidth = margin.left + focusWidth;
+                let wasTrimmed = false;
+                while(w > availfocusTitleAreaWidth){
+                    labelsFocusTitle = labelsFocusTitle.slice(0, -1);
+                    wasTrimmed = true;
+                    focusTitle = `${labelsFocusTitle}... ${focusCount.toLocaleString()}`;
+                    w = textHelper.getTextWidth( focusTitle, labelsSizeChild, 'sans-serif' );
+                }
+
                 const focusTitleGroup = svg.select( '.title-group' ).append( 'text' )
                     .text(null)
-                    .attr( 'x', focusWidth - w - 5 )
                     .attr( 'y', margin.top );
 
+                labelsFocusTitle = wasTrimmed ? labelsFocusTitle + '...' : labelsFocusTitle;
                 focusTitleGroup.append('tspan')
                     .text( labelsFocusTitle )
                     .attr('font-size', labelsSizeChild);
@@ -1001,6 +1012,8 @@ define(function(require) {
                     .attr('dx', 5)
                     .attr('font-size', labelsSizeChild)
                     .attr( 'font-weight', 600 );
+
+                focusTitleGroup.attr( 'dx', focusWidth - focusTitleGroup.node().getBoundingClientRect().width )
 
             }
 
