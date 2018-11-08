@@ -256,7 +256,7 @@ function createRowChartWithTooltip() {
 
         rowContainer.datum(dataTarget).call(rowChart);
         tooltip
-            .numberFormat('.2%')
+            .numberFormat('.2%');
 
 
         tooltipContainer = d3Selection.select('.row-chart .metadata-group');

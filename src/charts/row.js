@@ -991,7 +991,8 @@ define(function(require) {
             if(focusWidth && labelsFocusTitle && focusCount) {
                 let focusTitle = `${labelsFocusTitle} ${focusCount.toLocaleString()}`;
                 let w = textHelper.getTextWidth( focusTitle, labelsSizeChild, 'sans-serif' );
-                const availfocusTitleAreaWidth = margin.left + focusWidth;
+                const moPadding = 40;
+                const availfocusTitleAreaWidth = margin.left + focusWidth - moPadding;
                 let wasTrimmed = false;
                 while(w > availfocusTitleAreaWidth){
                     labelsFocusTitle = labelsFocusTitle.slice(0, -1);
@@ -1011,11 +1012,17 @@ define(function(require) {
 
                 focusTitleGroup.append('tspan')
                     .text( focusCount.toLocaleString() )
+                    .classed('count', true)
                     .attr('dx', 5)
                     .attr('font-size', labelsSizeChild)
                     .attr( 'font-weight', 600 );
 
-                focusTitleGroup.attr( 'dx', focusWidth - focusTitleGroup.node().getBoundingClientRect().width )
+                let shiftFocus = focusWidth - focusTitleGroup.node().getBoundingClientRect().width;
+                if(isPrintMode) {
+                    shiftFocus -= 20;
+                }
+
+                focusTitleGroup.attr( 'x', shiftFocus );
 
             }
 
@@ -1034,6 +1041,7 @@ define(function(require) {
 
                 complaintTotalGroup.append('tspan')
                     .text( labelsTotalCount )
+                    .classed('count', true)
                     .attr('dx', 5)
                     .attr( 'font-size', labelsSizeChild )
                     .attr( 'font-weight', 600 );
