@@ -993,7 +993,7 @@ define(function(require) {
             const isIE = ua.indexOf( 'Edge' ) > -1 || ua.indexOf( 'MSIE' ) > -1;
             // for EXPORT ONLY!
             const xPatch = isIE && isPrintMode ? 50 : 0;
-
+            const titleMarginTop = 10;
             if(labelsFocusTitle && focusCount) {
                 let focusTitle = `${labelsFocusTitle} ${focusCount.toLocaleString()}`;
                 let w = textHelper.getTextWidth( focusTitle, labelsSizeChild, 'sans-serif' );
@@ -1009,7 +1009,7 @@ define(function(require) {
 
                 const focusTitleGroup = svg.select( '.title-group' ).append( 'text' )
                     .text(null)
-                    .attr( 'y', margin.top );
+                    .attr( 'y', titleMarginTop );
 
                 labelsFocusTitle = wasTrimmed ? labelsFocusTitle + '...' : labelsFocusTitle;
                 focusTitleGroup.append('tspan')
@@ -1046,7 +1046,7 @@ define(function(require) {
                 const complaintTotalGroup = svg.select( '.title-group' ).append( 'text' )
                     .text( null )
                     .attr( 'x', chartWidth - cw - printPadding - 10 - ieTweak )
-                    .attr( 'y', margin.top );
+                    .attr( 'y', titleMarginTop );
 
                 complaintTotalGroup.append('tspan')
                     .text('Total complaints')
@@ -1067,7 +1067,7 @@ define(function(require) {
                     .text( `Change in past ${labelsInterval}` )
                     .attr( 'font-size', labelsSizeChild )
                     .attr( 'x', chartWidth + 5 )
-                    .attr( 'y', margin.top );
+                    .attr( 'y', titleMarginTop );
 
             }
         }

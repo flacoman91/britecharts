@@ -183,7 +183,7 @@ function createRowChartDataLens() {
             .margin({
                 left:250,
                 right: 100,
-                top: 20,
+                top: 10,
                 bottom: 10
             })
             .backgroundColor('#f7f8f9')
