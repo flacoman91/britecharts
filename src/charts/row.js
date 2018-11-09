@@ -1023,7 +1023,6 @@ define(function(require) {
                     .attr('font-size', labelsSizeChild)
                     .attr( 'font-weight', 600 );
 
-                console.log(focusTitleGroup.node().getBoundingClientRect().width);
                 let shiftFocus = focusWidth - focusTitleGroup.node().getBoundingClientRect().width - 5;
                 if(isPrintMode) {
                     shiftFocus -= 20;
