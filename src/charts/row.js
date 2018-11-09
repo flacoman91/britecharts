@@ -983,16 +983,22 @@ define(function(require) {
             if(!(data && data[0]))
                 return;
 
-            const focusWidth = data[0].parentCount ? xScale(data[0].parentCount) : false;
+            let focusWidth = data[0].parentCount ? xScale(data[0].parentCount) : 1;
+            focusWidth = focusWidth > 0 ? focusWidth : 1;
             const focusCount = data[0].parentCount;
             svg.select('.title-group').selectAll('g').remove();
             svg.select('.title-group').selectAll('text').remove();
 
-            if(focusWidth && labelsFocusTitle && focusCount) {
+            const ua = window.navigator.userAgent;
+            const isIE = ua.indexOf( 'Edge' ) > -1 || ua.indexOf( 'MSIE' ) > -1;
+            // for EXPORT ONLY!
+            const xPatch = isIE && isPrintMode ? 50 : 0;
+
+            if(labelsFocusTitle && focusCount) {
                 let focusTitle = `${labelsFocusTitle} ${focusCount.toLocaleString()}`;
                 let w = textHelper.getTextWidth( focusTitle, labelsSizeChild, 'sans-serif' );
                 const moPadding = 40;
-                const availfocusTitleAreaWidth = margin.left + focusWidth - moPadding;
+                const availfocusTitleAreaWidth = margin.left + focusWidth - moPadding - xPatch;
                 let wasTrimmed = false;
                 while(w > availfocusTitleAreaWidth){
                     labelsFocusTitle = labelsFocusTitle.slice(0, -1);
@@ -1017,9 +1023,12 @@ define(function(require) {
                     .attr('font-size', labelsSizeChild)
                     .attr( 'font-weight', 600 );
 
-                let shiftFocus = focusWidth - focusTitleGroup.node().getBoundingClientRect().width;
+                console.log(focusTitleGroup.node().getBoundingClientRect().width);
+                let shiftFocus = focusWidth - focusTitleGroup.node().getBoundingClientRect().width - 5;
                 if(isPrintMode) {
                     shiftFocus -= 20;
+                    if(isIE)
+                        shiftFocus -= 20;
                 }
 
                 focusTitleGroup.attr( 'x', shiftFocus );
@@ -1028,11 +1037,16 @@ define(function(require) {
 
             if(labelsTotalCount) {
                 const compCountTxt = `Total complaints ${labelsTotalCount}`;
-                const cw = textHelper.getTextWidth( compCountTxt, labelsSizeChild, 'sans-serif' );
+                let cw = textHelper.getTextWidth( compCountTxt, labelsSizeChild, 'sans-serif' );
+                let printPadding = 0;
+                if(isPrintMode) {
+                    printPadding += 20;
+                }
 
+                const ieTweak = isIE ? 5 :0;
                 const complaintTotalGroup = svg.select( '.title-group' ).append( 'text' )
                     .text( null )
-                    .attr( 'x', chartWidth - cw - 10 )
+                    .attr( 'x', chartWidth - cw - printPadding - 10 - ieTweak )
                     .attr( 'y', margin.top );
 
                 complaintTotalGroup.append('tspan')

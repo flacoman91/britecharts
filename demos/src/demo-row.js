@@ -181,7 +181,7 @@ function createRowChartDataLens() {
             .isHorizontal(true)
             .isAnimated(true)
             .margin({
-                left:140,
+                left:250,
                 right: 100,
                 top: 20,
                 bottom: 10
@@ -189,7 +189,7 @@ function createRowChartDataLens() {
             .backgroundColor('#f7f8f9')
             .enableYAxisRight(true)
             .enableLabels(true)
-            .labelsTotalCount('99,999')
+            .labelsTotalCount('75,000')
             .labelsFocusTitle('Some Focus Item Lorem approximate of the text width by using a canvas element')
             .labelsInterval('month')
             .labelsNumberFormat(',d')
@@ -197,7 +197,7 @@ function createRowChartDataLens() {
             //.labelsSuffix('complaints')
             .outerPadding(.2)
             .colorSchema(colorScheme)
-            .width(containerWidth)
+            .width(1020)
             .height(height)
             .xTicks( 0 )
             .yTicks( 0 )
