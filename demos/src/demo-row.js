@@ -14,6 +14,78 @@ const textHelper = require('./../../src/charts/helpers/text');
 
 require('./helpers/resizeHelper');
 
+function createFocusExportRowChart() {
+    let rowChart = row(),
+        rowContainer = d3Selection.select('.js-row-chart-focus-export-container'),
+        containerWidth = rowContainer.node() ? rowContainer.node().getBoundingClientRect().width : false,
+        containerHeight = rowContainer.node() ? rowContainer.node().getBoundingClientRect().height : false,
+        dataset;
+
+    if (containerWidth) {
+        d3Selection.select('.js-download-button-focus-export').on('click', function() {
+            const scope = {
+                chartName: 'deez',
+                chartWidth: containerWidth - 50,
+                dateRange: { to: '9/23/1980', from: '9/23/2012' },
+                filters: [
+                    'EQUIFAX, INC.',
+                    'Experian Information Solutions',
+                    'CAPITAL ONE FINANCIAL CORPORATION',
+                    'Incorrect information on your report',
+                    'Problem with a credit reporting company\'s investigation' +
+                    ' into an existing problem',
+                    'not CAPITAL ONE FINANCIAL CORPORATION'
+                ]
+            };
+            appendExportDetails(rowChart, rowContainer, scope);
+        });
+
+        dataset = aRowDataSet().withFocusLens().build();
+
+        const colorScheme = [
+            'orange', 'orange', 'orange',
+            'purple',
+            'green', 'green', 'green',
+            'teal',
+            'brown'
+        ];
+
+        const height = calculateHeight(dataset);
+
+        rowChart
+            .isAnimated(true)
+            .margin({
+                left: 400,
+                right: 175,
+                top: 20,
+                bottom: 20
+            })
+            .backgroundColor('#f7f8f9')
+            .enableYAxisRight(true)
+            .enableLabels(true)
+            .labelsNumberFormat(',d')
+            .labelsSize(18)
+            .labelsSizeChild(14)
+            .labelsTotalCount( '75,000' )
+            .labelsFocusTitle('Some Focus Item Lorem Ipsum not CAPITAL ONE FINANCIAL CORPORATION')
+            .labelsInterval('month')
+            .downArrowColor( '#257675' )
+            .outerPadding(.1)
+            .colorSchema(colorScheme)
+            .isPrintMode(true)
+            .width( 1175 )
+            .height(height * 2)
+            .xTicks( 0 )
+            .yTicks( 0 )
+            .percentageAxisToMaxRatio(10000/800)
+            .pctChangeLabelSize(18)
+            .yAxisLineWrapLimit(2)
+            .yAxisPaddingBetweenChart(5);
+
+        rowContainer.datum(dataset).call(rowChart);
+    }
+}
+
 function createExportRowChart() {
     let rowChart = row(),
         rowContainer = d3Selection.select('.js-row-chart-export-container'),
@@ -53,13 +125,12 @@ function createExportRowChart() {
         const height = calculateHeight(dataset);
 
         rowChart
-            .isHorizontal(true)
             .isAnimated(true)
             .margin({
                 left: 400,
-                right: 97,
-                top: 0,
-                bottom: 0
+                right: 175,
+                top: 20,
+                bottom: 20
             })
             .backgroundColor('#f7f8f9')
             .enableYAxisRight(true)
@@ -72,7 +143,7 @@ function createExportRowChart() {
             .outerPadding(.1)
             .colorSchema(colorScheme)
             .isPrintMode(true)
-            .width(containerWidth)
+            .width( 1175 )
             .height(height * 2)
             .xTicks( 0 )
             .yTicks( 0 )
@@ -92,6 +163,24 @@ function createRowChartDataLens() {
         dataset;
 
     if (containerWidth) {
+        d3Selection.select('.js-download-focus-button').on('click', function() {
+            const scope = {
+                chartName: 'Focus Chart',
+                chartWidth: containerWidth - 50,
+                dateRange: { to: '9/23/1980', from: '9/23/2012' },
+                filters: [
+                    'EQUIFAX, INC.',
+                    'Experian Information Solutions',
+                    'CAPITAL ONE FINANCIAL CORPORATION',
+                    'Incorrect information on your report',
+                    'Problem with a credit reporting company\'s investigation' +
+                    ' into an existing problem',
+                    'not CAPITAL ONE FINANCIAL CORPORATION'
+                ]
+            };
+            appendExportDetails(rowChart, rowContainer, scope);
+        });
+
         dataset = aRowDataSet().withDataLens().build();
         const dataTarget = dataset;
         const colorScheme = dataTarget.map((o)=>{
@@ -101,7 +190,6 @@ function createRowChartDataLens() {
         // let out total count be 10000
         const height = calculateHeight(dataTarget);
         rowChart
-            .isHorizontal(true)
             .isAnimated(true)
             .margin({
                 left:250,
@@ -152,7 +240,6 @@ function createRowChartWithTooltip() {
 
         const height = calculateHeight(dataTarget);
         rowChart
-            .isHorizontal(true)
             .isAnimated(true)
             .margin({
                 left:140,
@@ -279,7 +366,6 @@ function createHorizontalRowChart() {
         const colorScheme = dataset.map((o)=>{ return '#20aa3f'; });
         const height = calculateHeight(dataset);
         rowChart
-            .isHorizontal(true)
             .isAnimated(true)
             .margin({
                 left: 200,
@@ -323,7 +409,6 @@ function createSimpleRowChart() {
             return o.parent ? '#addc91' : '#20aa3f';
         });
         rowChart
-            .isHorizontal(true)
             .isAnimated(true)
             .margin({
                 left: 140,
@@ -367,7 +452,6 @@ function createRow4ExpandedChart() {
         const colorScheme = dataset.map((o)=>{ return '#20aa3f'; });
         const height = calculateHeight(dataset);
         rowChart
-            .isHorizontal(true)
             .isAnimated(true)
             .margin({
                 left: 200,
@@ -409,7 +493,6 @@ function createLastExpandedChart() {
         const colorScheme = dataset.map((o)=>{ return '#20aa3f'; });
         const height = calculateHeight(dataset);
         rowChart
-            .isHorizontal(true)
             .isAnimated(true)
             .margin({
                 left: 200,
@@ -450,7 +533,6 @@ function createCollapsedChart() {
         const colorScheme = dataset.map((o)=>{ return '#20aa3f'; });
         const height = calculateHeight(dataset);
         rowChart
-            .isHorizontal(true)
             .isAnimated(true)
             .margin({
                 left: 200,
@@ -490,7 +572,6 @@ function createMassiveChart() {
         const colorScheme = dataset.map((o)=>{ return '#20aa3f'; });
         const height = calculateHeight(dataset);
         rowChart
-            .isHorizontal(true)
             .isAnimated(true)
             .margin({
                 left: 200,
@@ -556,11 +637,12 @@ function calculateHeight(data){
 
 // Show charts if container available
 if (d3Selection.select('.js-row-chart-tooltip-container').node()){
+    createFocusExportRowChart();
+    createExportRowChart();
     createRowChartWithTooltip();
     createRowChartDataLens();
     createHorizontalRowChart();
     createSimpleRowChart();
-    createExportRowChart();
     createRow4ExpandedChart();
     createLastExpandedChart();
     createCollapsedChart();
@@ -568,6 +650,8 @@ if (d3Selection.select('.js-row-chart-tooltip-container').node()){
 
     let redrawCharts = function() {
         d3Selection.selectAll( '.row-chart' ).remove();
+        createFocusExportRowChart();
+        createExportRowChart();
         createRowChartWithTooltip();
         createRowChartDataLens();
         createHorizontalRowChart();
@@ -575,7 +659,6 @@ if (d3Selection.select('.js-row-chart-tooltip-container').node()){
         createRow4ExpandedChart();
         createLastExpandedChart();
         createCollapsedChart();
-        createExportRowChart();
         createMassiveChart();
     };
 
@@ -643,7 +726,7 @@ export const appendDateRange = ( detailContainer, dateRange, detailWidth, padTop
 export const appendURL = ( detailContainer, detailWidth, padTop ) => {
     const inputUrl = 'http://192.168.99.100/#/complaints/q/trends?size=10&page=1&sort=Relevance&not_issue=Incorrect%20information%20on%20your%20report&not_product=Credit%20reporting,%20credit%20repair%20services,%20or%20other%20personal%20consumer%20reports&not_product=Debt%20collection&not_product=Credit%20card%20or%20prepaid%20card&interval=Month&lens=Overview&trend_depth=10&fields=All%20Data';
     const longURL = splitLongString( inputUrl, detailWidth, 18 );
-    return appendTextElement( detailContainer, 'URL:', longURL, detailWidth, padTop, 2 );
+    return appendTextElement( detailContainer, 'URL:', longURL, detailWidth, padTop, 1 );
 };
 
 function formatDateView(dateIn){

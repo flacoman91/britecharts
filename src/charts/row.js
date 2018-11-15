@@ -112,7 +112,6 @@ define(function(require) {
             },
             yAxisPaddingBetweenChart = 20,
             yAxisLineWrapLimit = 1,
-            isHorizontal = false,
             svg,
 
             hasSingleRowHighlight = true,
@@ -992,7 +991,7 @@ define(function(require) {
             const ua = window.navigator.userAgent;
             const isIE = ua.indexOf( 'Edge' ) > -1 || ua.indexOf( 'MSIE' ) > -1;
             // for EXPORT ONLY!
-            const xPatch = isIE && isPrintMode ? 50 : 0;
+            const xPatch = isIE && isPrintMode ? 0 : 0;
             const titleMarginTop = 10;
             if(labelsFocusTitle && focusCount) {
                 let focusTitle = `${labelsFocusTitle} ${focusCount.toLocaleString()}`;
@@ -1024,11 +1023,6 @@ define(function(require) {
                     .attr( 'font-weight', 600 );
 
                 let shiftFocus = focusWidth - focusTitleGroup.node().getBoundingClientRect().width - 5;
-                if(isPrintMode) {
-                    shiftFocus -= 20;
-                    if(isIE)
-                        shiftFocus -= 20;
-                }
 
                 focusTitleGroup.attr( 'x', shiftFocus );
 
@@ -1038,9 +1032,6 @@ define(function(require) {
                 const compCountTxt = `Total complaints ${labelsTotalCount}`;
                 let cw = textHelper.getTextWidth( compCountTxt, labelsSizeChild, 'sans-serif' );
                 let printPadding = 0;
-                if(isPrintMode) {
-                    printPadding += 20;
-                }
 
                 const ieTweak = isIE ? 5 :0;
                 const complaintTotalGroup = svg.select( '.title-group' ).append( 'text' )
@@ -1450,21 +1441,6 @@ define(function(require) {
                 return isAnimated;
             }
             isAnimated = _x;
-
-            return this;
-        };
-
-        /**
-         * Gets or Sets the horizontal direction of the chart
-         * @param  {number} _x Desired horizontal direction for the graph
-         * @return { isHorizontal | module} If it is horizontal or Chart module to chain calls
-         * @public
-         */
-        exports.isHorizontal = function(_x) {
-            if (!arguments.length) {
-                return isHorizontal;
-            }
-            isHorizontal = _x;
 
             return this;
         };
