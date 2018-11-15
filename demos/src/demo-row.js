@@ -264,6 +264,66 @@ function createRowChartWithTooltip() {
     }
 }
 
+function appendExportDetails(chart, container, scope) {
+    const chartName = scope.chartName,
+        dateRange = scope.dateRange,
+        elems = [],
+        filters = scope.filters,
+        detailWidth =  scope.chartWidth || 1100,
+        padBottom = 100,
+        padding = 10,
+        paddingTop = 30,
+        detailContainer = container.select( 'svg' )
+            .append( 'g' )
+            .classed( 'export-details', true )
+            .attr( 'transform', `translate(${ padding }, ${ paddingTop })` );
+    const contentWidth = detailWidth - 50;
+
+    // needs to be added first
+    // on the bottom adding height of the details.
+    detailContainer.append( 'rect' )
+        .classed( 'detail-wrapper', true )
+        .attr('fill','grey')
+        .attr( 'width', detailWidth );
+
+    const dr = appendDateRange( detailContainer, dateRange, contentWidth, 30 );
+    elems.push( dr );
+
+    const d = appendExportDate( detailContainer, contentWidth, sumHeight( elems ) );
+    elems.push( d );
+
+    const u = appendURL( detailContainer, contentWidth, sumHeight( elems ) );
+    elems.push( u );
+
+    const f = appendFilterDetails( detailContainer, filters, contentWidth, sumHeight( elems ) );
+    elems.push( f );
+
+    let newHeight = sumHeight( elems );
+    const detWrapper = detailContainer.select( 'rect.detail-wrapper' )
+        .attr( 'height', newHeight );
+
+    appendChartTitle( container, scope, getHeight( detWrapper ) );
+
+    // shift main chart down below details container
+    const detailHeight = getHeight( detWrapper ) + padBottom,
+        chartHeight = getHeight( container.select( '.container-group' ) ),
+        oldTransform = container.select( '.container-group' )
+            .attr( 'transform' );
+
+    newHeight = detailHeight + chartHeight + padBottom;
+    container.select( '.container-group' )
+        .attr( 'transform', `${ oldTransform } translate(0, ${ detailHeight })` );
+    // update the height for export
+    container.select( 'rect.export-wrapper' ).attr( 'height', newHeight );
+    container.select( 'svg' ).attr( 'height', newHeight );
+    chart.height( newHeight );
+    chart.exportChart( `${ chartName }.png` );
+
+    // clean up remnants
+    // comment this out for debugging to see the chart in the dom
+    // container.select( 'svg' ).remove();
+
+}
 function createHorizontalRowChart() {
     let rowChart = row(),
         rowContainer = d3Selection.select('.js-horizontal-row-chart-container'),
@@ -273,102 +333,21 @@ function createHorizontalRowChart() {
 
     if (containerWidth) {
         d3Selection.select('.js-download-button-123').on('click', function() {
-            const oH = rowContainer.select('svg').attr('height');
-            const padding = 10;
-            const detailContainer = rowContainer.select('svg')
-                .append('g')
-                .classed('export-details', true)
-                .attr('transform', 'translate('+ padding + ', ' + oH + ')');
-
-            const detailWidth = containerWidth - padding;
-
-            // filters
-            let y = 20;
-
-            detailContainer.append('text')
-
-                .text('Filters:')
-                .attr('class', 'text-title')
-                .attr('x', 0);
-
-            const tags = [
-                'EQUIFAX, INC.',
-                'Experian Information Solutions',
-                'CAPITAL ONE FINANCIAL CORPORATION',
-                'Incorrect information on your report',
-                'Problem with a credit reporting company\'s investigation' +
-                ' into an existing problem',
-                'not CAPITAL ONE FINANCIAL CORPORATION'
-            ];
-
-            const out = tags.join('; ');
-            detailContainer.append('text')
-                .text(out)
-                .classed('tags', true)
-                .attr('x', 0)
-                .attr('y', y)
-                .call(wrap, detailWidth);
-
-            const tagheight = detailContainer
-                .select('.tags').node().getBoundingClientRect().height;
-
-            y+= tagheight + 20;
-
-            // adding export date
-            // adding URL details
-            detailContainer.append('text')
-                .classed('export-date', true)
-                .text('Export Date: ' +  new Date().toLocaleDateString())
-                .attr('dy', '1.2em');
-            // .attr('y', y);
-
-            y+= 30;
-
-            // adding URL details
-            detailContainer.append('text')
-                .text('URL:')
-                .attr('y', y);
-
-            let url = 'http://192.168.33.110/#/complaints/q/trends?size=10&page=99&sort=Created%20Date&company=EQUIFAX,%20INC.&company=Experian%20Information%20Solutions%20Inc.&issue=Incorrect%20information%20on%20your%20report&issue=Problem%20with%20a%20credit%20reporting%20company\'s%20investigation%20into%20an%20existing%20problem&not_company=CAPITAL%20ONE%20FINANCIAL%20CORPORATION&interval=Month&fields=All%20Data';
-
-            let pieces = [];
-            while( textHelper.getTextWidth( url, 16, 'sans-serif') > detailWidth) {
-                for ( var i = 0; i < url.length; i++ ) {
-                    const w = textHelper.getTextWidth( url.substr( 0, i ), 16, 'sans-serif' );
-                    if ( w+ 20 > detailWidth ) {
-                        pieces.push( url.slice( 0, i ) );
-                        url = url.slice(i);
-                        break;
-                    }
-                }
-            }
-
-            pieces.push(url);
-
-            const longURL = pieces.join(' ');
-            detailContainer.append('text')
-                .text(longURL)
-                .classed('url', true)
-                .attr('x', 0)
-                .attr('dy', '1.2em')
-                // .attr('y', y)
-                .call(wrap, detailWidth );
-
-            // end url
-
-            const urlHeight = detailContainer
-                .select('.url').node().getBoundingClientRect().height;
-
-            y+= urlHeight + 30;
-            rowContainer.select('svg').attr('height', +oH + y + tagheight);
-
-            //const rcOheight = rowChart.height();
-            rowChart.height(+oH + y + tagheight);
-            rowChart.exportChart('horiz-rowchart.png', 'Britecharts Row Chart');
-
-            rowContainer.select('svg').attr('height', rcOheight);
-            // rowContainer.select('.export-details').remove();
-            //rowChart.height(rcOheight);
+            const scope = {
+                chartName: 'deez',
+                chartWidth: containerWidth - 50,
+                dateRange: { to: '9/23/1980', from: '9/23/2012' },
+                filters: [
+                    'EQUIFAX, INC.',
+                    'Experian Information Solutions',
+                    'CAPITAL ONE FINANCIAL CORPORATION',
+                    'Incorrect information on your report',
+                    'Problem with a credit reporting company\'s investigation' +
+                    ' into an existing problem',
+                    'not CAPITAL ONE FINANCIAL CORPORATION'
+                ]
+            };
+            appendExportDetails(rowChart, rowContainer, scope);
         });
 
         dataset = aRowDataSet().withColors().build();
@@ -651,56 +630,283 @@ function calculateHeight(data){
     return height;
 }
 
-function wrap(text, width){
-
-    text.each(function() {
-        var text = d3Selection.select(this),
-            words = text.text().split(/\s+/).reverse(),
-            word,
-            line = [],
-            lineNumber = 0,
-            lineHeight = 1.1, // ems
-            y = text.attr("y"),
-            dy = parseFloat(1),
-            tspan = text.text(null).append("tspan").attr("x", 0).attr("y", y).attr("dy", dy + "em");
-        while (word = words.pop()) {
-            line.push(word);
-            tspan.text(line.join(" "));
-            if (tspan.node().getComputedTextLength() > width) {
-                line.pop();
-                tspan.text(line.join(" "));
-                line = [word];
-                tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
-            }
-        }
-    });
-}
-
 // Show charts if container available
 if (d3Selection.select('.js-row-chart-tooltip-container').node()){
-    createRowChartWithTooltip();
-    createRowChartDataLens();
+    // createRowChartWithTooltip();
+    // createRowChartDataLens();
     createHorizontalRowChart();
-    createSimpleRowChart();
-    createExportRowChart();
-    createRow4ExpandedChart();
-    createLastExpandedChart();
-    createCollapsedChart();
-    createMassiveChart();
+    // createSimpleRowChart();
+    // createExportRowChart();
+    // createRow4ExpandedChart();
+    // createLastExpandedChart();
+    // createCollapsedChart();
+    // createMassiveChart();
 
     let redrawCharts = function() {
-        d3Selection.selectAll( '.row-chart' ).remove();
-        createRowChartWithTooltip();
-        createRowChartDataLens();
+        // d3Selection.selectAll( '.row-chart' ).remove();
+        // createRowChartWithTooltip();
+        // createRowChartDataLens();
         createHorizontalRowChart();
-        createSimpleRowChart();
-        createRow4ExpandedChart();
-        createLastExpandedChart();
-        createCollapsedChart();
-        createExportRowChart();
-        createMassiveChart();
+        // createSimpleRowChart();
+        // createRow4ExpandedChart();
+        // createLastExpandedChart();
+        // createCollapsedChart();
+        // createExportRowChart();
+        // createMassiveChart();
     };
 
     // Redraw charts on window resize
     PubSub.subscribe('resize', redrawCharts);
+}
+
+
+
+/**
+ * helper function to add title to chart
+ * @param {object} container d3 object selection
+ * @param {object} scope contains info about the chart
+ * @param {Number} detailContainerHeight contains info about the chart
+ */
+export const appendChartTitle = ( container, scope, detailContainerHeight ) => {
+    const yPos = detailContainerHeight + 70;
+    const marginLeft = 30;
+    const totalContainer = container.select( 'svg' )
+        .append( 'g' )
+        .classed( 'chart-title', true )
+        .attr( 'transform', `translate(${ marginLeft }, ${ yPos })` );
+
+    // adding total and interval to the PNG.
+    const titleNode = totalContainer.append( 'text' )
+        .classed( 'title', true );
+
+    titleNode.append( 'tspan' )
+        .text( scope.chartName )
+        .attr( 'font-size', '36px' );
+};
+
+/**
+ * adds date info to export details at the bottom of the chart
+ * @param {object} detailContainer container that wraps the date, filter info
+ * @param {number} detailWidth how wide to fit container in
+ * @param {number} padTop amount of padding above this element
+ * @returns {object} new appended element
+ */
+export const appendExportDate = ( detailContainer, detailWidth, padTop ) => {
+    const text = formatDateView( new Date() );
+    return appendTextElement( detailContainer, 'Export Date:', text, detailWidth, padTop );
+};
+
+/**
+ * adds date info to export details at the bottom of the chart
+ * @param {object} detailContainer container that wraps the date, filter info
+ * @param {object} dateRange contains the TO/From
+ * @param {number} detailWidth how wide to fit container in
+ * @param {number} padTop amount of padding above this element
+ * @returns {object} new appended element
+ */
+export const appendDateRange = ( detailContainer, dateRange, detailWidth, padTop ) => {
+    const text = formatDateView( dateRange.from ) + ' - ' + formatDateView( dateRange.to );
+    return appendTextElement( detailContainer, 'Date Range:', text, detailWidth, padTop );
+};
+
+/**
+ * appends URL to the chart
+ * @param {object} detailContainer d3 selection
+ * @param {number} detailWidth width of the container we are appending to
+ * @param {number} padTop offset of chart we want to append to
+ * @returns {object} appended text element
+ */
+export const appendURL = ( detailContainer, detailWidth, padTop ) => {
+    const longURL = splitLongString( window.location.href, detailWidth, 18 );
+    return appendTextElement( detailContainer, 'URL:', longURL,
+        detailWidth, padTop );
+};
+
+function formatDateView(dateIn){
+    return dateIn.toLocaleString();
+}
+
+/**
+ * generic function to add text element to a chart
+ * @param {object} container d3 selection object
+ * @param {string} title the Heading of a text element URL: Filters: etc
+ * @param {string} text the text under the heading
+ * @param {number} width how wide the box is in which we need to insert text
+ * @param {number} padTop offset of the top of the text.
+ * @returns {object} returns inserted element
+ */
+export const appendTextElement = ( container, title, text, width,
+                                   padTop = 30 ) => {
+    const padLeft = 20;
+    // TBD remove code
+    // this is only POC to fix IE not exporting corectly
+    // https://codepen.io/gapcode/pen/vEJNZN
+    const ua = window.navigator.userAgent;
+    const isIE = ua.indexOf( 'Edge' ) > -1 || ua.indexOf( 'MSIE' ) > -1;
+    // for EXPORT ONLY!
+    const yPatch = isIE ? '-25' : '0';
+    const textContainer = container.append( 'g' )
+        .classed( 'text-group', true )
+        .attr( 'transform', `translate(0, ${ padTop })` );
+
+    textContainer.append( 'text' )
+        .classed( 'title-text', true )
+        .text( title )
+        .attr( 'font-weight', 'bold' )
+        .attr( 'font-size', '12px' )
+        .attr( 'x', padLeft );
+
+    textContainer.append( 'text' )
+        .classed( 'sub-text', true )
+        .text( text )
+        .attr( 'font-size', '16px' )
+        .attr( 'y', yPatch )
+        .attr( 'dy', '1.2em' )
+        .call( wrap, width );
+
+    return textContainer;
+};
+
+/**
+ * helper function to get heights of containers in an array
+ * @param {array} elemList holds a bunch of containers
+ * @returns {number} height of the elements
+ */
+const sumHeight = elemList => {
+    let height = 0;
+    const padding = 30;
+    elemList.forEach( o => {
+        height += o ? getHeight( o ) + padding : 0;
+    } );
+    return height;
+};
+
+
+/**
+ * helper function to get height of a d3 selection
+ * @param {object} container d3selection
+ * @returns {number} height of selection
+ */
+function getHeight( container ) {
+    return container.node().getBoundingClientRect().height;
+}
+
+
+
+/**
+ *
+ * @param {string} input long string to process
+ * @param {number} width size of bounding box
+ * @param {number} fontSize size of font we measure
+ * @returns {string} the long string split with spaces
+ */
+export const splitLongString = ( input, width, fontSize ) => {
+    const pieces = [],
+        padding = 20 * 2;
+
+    while ( exports.getTextWidth( input, fontSize, 'sans-serif' ) > width ) {
+        for ( let i = 0; i < input.length; i++ ) {
+            const w = exports.getTextWidth( input.slice( 0, i ), fontSize,
+                'sans-serif' );
+            if ( w + padding > width ) {
+                pieces.push( input.slice( 0, i ) );
+                input = input.slice( i );
+                break;
+            }
+        }
+    }
+
+    pieces.push( input );
+    return pieces.join( ' ' );
+};
+
+
+
+/**
+ * Figures out an approximate of the text width by using a canvas element
+ * This avoids having to actually render the text to measure it from the DOM
+ * @param  {String} text     Text to measure
+ * @param  {Number} fontSize Fontsize (or default)
+ * @param  {String} fontFace Font familty (or default)
+ * @returns {String}          Approximate font size of the text
+ */
+export const getTextWidth = ( text, fontSize, fontFace ) => {
+    const a = document.createElement( 'canvas' ),
+        b = a.getContext( '2d' );
+
+    b.font = fontSize + 'px ' + fontFace;
+
+    return b.measureText( text ).width;
+}
+
+/**
+ * helper to wrap text
+ * @param  {object} d3Selection d3 selection node we are working with
+ * @param  {Number} width width of the box
+ */
+function wrap( d3Obj, width ){
+    d3Obj.each( function() {
+        const textNode = d3Selection.select( this ),
+            words = textNode.text().split( /\s+/ ).reverse();
+        appendTextSpan( words, textNode, width );
+    } );
+};
+
+
+/**
+ * Helper function so it's testable
+ * @param {Array} words string we want to append
+ * @param {Object}textNode the d3 node we are working with
+ * @param {number} width container size
+ */
+function appendTextSpan( words, textNode, width ){
+    const dy = parseFloat( textNode.attr( 'dy' ) ) || 0;
+
+    let word,
+        line = [],
+        tspan = textNode.text( null )
+            .append( 'tspan' )
+            .attr( 'x', 20 )
+            .attr( 'dy', dy + 'em' );
+
+    while ( typeof ( word = words.pop() ) !== 'undefined' ) {
+        line.push( word );
+        tspan.text( line.join( ' ' ) );
+        if ( tspan.node().getComputedTextLength() > width ) {
+            line.pop();
+            tspan.text( line.join( ' ' ) );
+            line = [ word ];
+            tspan = textNode.append( 'tspan' )
+                .attr( 'x', 20 )
+                .attr( 'dy', dy + 'em' )
+                .text( word );
+        }
+    }
+};
+
+/**
+ * add filter details to chart
+ * @param {object} detailContainer the grouping containing info
+ * @param {object} filters filters in state passed from scope
+ * @param {number} width box size
+ * @param {number} padTop amount of padding above this element
+ * @returns {object} element grouping with Filters: filter names, etc
+ */
+export const appendFilterDetails = ( detailContainer, filters, width, padTop ) => {
+    const allFilters = processFilters( filters );
+    let filterText = false;
+    if ( allFilters.length ) {
+        // append Filters first
+        filterText = allFilters.join( '; ' );
+    }
+
+    if ( !filterText ) {
+        return null;
+    }
+
+    return exports.appendTextElement( detailContainer, 'Filters:', filterText, width, padTop );
+};
+
+function processFilters(filters){
+    return filters;
 }
