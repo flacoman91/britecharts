@@ -23,98 +23,21 @@ function createExportRowChart() {
 
     if (containerWidth) {
         d3Selection.select('.js-download-button-export').on('click', function() {
-            const oH = rowContainer.select('svg').attr('height');
-            const padding = 10;
-            const detailContainer = rowContainer.select('svg')
-                .append('g')
-                .classed('export-details', true)
-                .attr('transform', 'translate('+ padding + ', ' + oH + ')');
-
-            const detailWidth = containerWidth - padding;
-
-            // filters
-            let y = 20;
-
-            detailContainer.append('text')
-                .text('Filters:')
-                .attr('x', 0);
-
-            const tags = [
-                'EQUIFAX, INC.',
-                'Experian Information Solutions',
-                'CAPITAL ONE FINANCIAL CORPORATION',
-                'Incorrect information on your report',
-                'Problem with a credit reporting company\'s investigation' +
-                ' into an existing problem',
-                'not CAPITAL ONE FINANCIAL CORPORATION'
-            ];
-
-            const out = tags.join('; ');
-            detailContainer.append('text')
-                .text(out)
-                .classed('tags', true)
-                .attr('x', 0)
-                .attr('y', y)
-                .call(wrap, detailWidth);
-
-            const tagheight = detailContainer
-                .select('.tags').node().getBoundingClientRect().height;
-
-            y+= tagheight + 20;
-
-            // adding export date
-            // adding URL details
-            detailContainer.append('text')
-                .classed('export-date', true)
-                .text('Export Date: ' +  new Date().toLocaleDateString())
-                .attr('y', y);
-
-            y+= 30;
-
-            // adding URL details
-            detailContainer.append('text')
-                .text('URL:')
-                .attr('y', y);
-
-            let url = 'http://192.168.33.110/#/complaints/q/trends?size=10&page=99&sort=Created%20Date&company=EQUIFAX,%20INC.&company=Experian%20Information%20Solutions%20Inc.&issue=Incorrect%20information%20on%20your%20report&issue=Problem%20with%20a%20credit%20reporting%20company\'s%20investigation%20into%20an%20existing%20problem&not_company=CAPITAL%20ONE%20FINANCIAL%20CORPORATION&interval=Month&fields=All%20Data';
-
-            let pieces = [];
-            while( textHelper.getTextWidth( url, 16, 'sans-serif') > detailWidth) {
-                for ( var i = 0; i < url.length; i++ ) {
-                    const w = textHelper.getTextWidth( url.substr( 0, i ), 16, 'sans-serif' );
-                    if ( w+ 20 > detailWidth ) {
-                        pieces.push( url.slice( 0, i ) );
-                        url = url.slice(i);
-                        break;
-                    }
-                }
-            }
-
-            pieces.push(url);
-
-            const longURL = pieces.join(' ');
-            detailContainer.append('text')
-                .text(longURL)
-                .classed('url', true)
-                .attr('x', 0)
-                .attr('y', y)
-                .call(wrap, detailWidth );
-
-            // end url
-
-            const urlHeight = detailContainer
-                .select('.url').node().getBoundingClientRect().height;
-
-            y+= urlHeight + 30;
-            rowContainer.select('svg').attr('height', +oH + y + tagheight);
-
-            //const rcOheight = rowChart.height();
-            rowChart.height(+oH + y + tagheight);
-            rowChart.exportChart('horiz-rowchart.png', 'Britecharts Row Chart');
-
-            rowContainer.select('svg').attr('height', rcOheight);
-            // rowContainer.select('.export-details').remove();
-            //rowChart.height(rcOheight);
+            const scope = {
+                chartName: 'deez',
+                chartWidth: containerWidth - 50,
+                dateRange: { to: '9/23/1980', from: '9/23/2012' },
+                filters: [
+                    'EQUIFAX, INC.',
+                    'Experian Information Solutions',
+                    'CAPITAL ONE FINANCIAL CORPORATION',
+                    'Incorrect information on your report',
+                    'Problem with a credit reporting company\'s investigation' +
+                    ' into an existing problem',
+                    'not CAPITAL ONE FINANCIAL CORPORATION'
+                ]
+            };
+            appendExportDetails(rowChart, rowContainer, scope);
         });
 
         dataset = aRowDataSet().withLongNames().build();
@@ -286,7 +209,8 @@ function appendExportDetails(chart, container, scope) {
         .attr('fill','grey')
         .attr( 'width', detailWidth );
 
-    const dr = appendDateRange( detailContainer, dateRange, contentWidth, 30 );
+    const topPad = isIE() ? 0 : paddingTop;
+    const dr = appendDateRange( detailContainer, dateRange, contentWidth, topPad );
     elems.push( dr );
 
     const d = appendExportDate( detailContainer, contentWidth, sumHeight( elems ) );
@@ -632,27 +556,27 @@ function calculateHeight(data){
 
 // Show charts if container available
 if (d3Selection.select('.js-row-chart-tooltip-container').node()){
-    // createRowChartWithTooltip();
-    // createRowChartDataLens();
+    createRowChartWithTooltip();
+    createRowChartDataLens();
     createHorizontalRowChart();
-    // createSimpleRowChart();
-    // createExportRowChart();
-    // createRow4ExpandedChart();
-    // createLastExpandedChart();
-    // createCollapsedChart();
-    // createMassiveChart();
+    createSimpleRowChart();
+    createExportRowChart();
+    createRow4ExpandedChart();
+    createLastExpandedChart();
+    createCollapsedChart();
+    createMassiveChart();
 
     let redrawCharts = function() {
-        // d3Selection.selectAll( '.row-chart' ).remove();
-        // createRowChartWithTooltip();
-        // createRowChartDataLens();
+        d3Selection.selectAll( '.row-chart' ).remove();
+        createRowChartWithTooltip();
+        createRowChartDataLens();
         createHorizontalRowChart();
-        // createSimpleRowChart();
-        // createRow4ExpandedChart();
-        // createLastExpandedChart();
-        // createCollapsedChart();
-        // createExportRowChart();
-        // createMassiveChart();
+        createSimpleRowChart();
+        createRow4ExpandedChart();
+        createLastExpandedChart();
+        createCollapsedChart();
+        createExportRowChart();
+        createMassiveChart();
     };
 
     // Redraw charts on window resize
@@ -717,9 +641,9 @@ export const appendDateRange = ( detailContainer, dateRange, detailWidth, padTop
  * @returns {object} appended text element
  */
 export const appendURL = ( detailContainer, detailWidth, padTop ) => {
-    const longURL = splitLongString( window.location.href, detailWidth, 18 );
-    return appendTextElement( detailContainer, 'URL:', longURL,
-        detailWidth, padTop );
+    const inputUrl = 'http://192.168.99.100/#/complaints/q/trends?size=10&page=1&sort=Relevance&not_issue=Incorrect%20information%20on%20your%20report&not_product=Credit%20reporting,%20credit%20repair%20services,%20or%20other%20personal%20consumer%20reports&not_product=Debt%20collection&not_product=Credit%20card%20or%20prepaid%20card&interval=Month&lens=Overview&trend_depth=10&fields=All%20Data';
+    const longURL = splitLongString( inputUrl, detailWidth, 18 );
+    return appendTextElement( detailContainer, 'URL:', longURL, detailWidth, padTop, 2 );
 };
 
 function formatDateView(dateIn){
@@ -733,18 +657,21 @@ function formatDateView(dateIn){
  * @param {string} text the text under the heading
  * @param {number} width how wide the box is in which we need to insert text
  * @param {number} padTop offset of the top of the text.
+ * @param {number} numElements number of elements
  * @returns {object} returns inserted element
  */
-export const appendTextElement = ( container, title, text, width,
-                                   padTop = 30 ) => {
+export const appendTextElement = ( container, title, text, width, padTop = 30, numElements = 1 ) => {
     const padLeft = 20;
     // TBD remove code
     // this is only POC to fix IE not exporting corectly
     // https://codepen.io/gapcode/pen/vEJNZN
-    const ua = window.navigator.userAgent;
-    const isIE = ua.indexOf( 'Edge' ) > -1 || ua.indexOf( 'MSIE' ) > -1;
     // for EXPORT ONLY!
-    const yPatch = isIE ? '-25' : '0';
+    const yPatch = isIE() ? -20 * numElements : '0';
+
+    if ( isIE() ) {
+        padTop += 20;
+    }
+
     const textContainer = container.append( 'g' )
         .classed( 'text-group', true )
         .attr( 'transform', `translate(0, ${ padTop })` );
@@ -909,4 +836,10 @@ export const appendFilterDetails = ( detailContainer, filters, width, padTop ) =
 
 function processFilters(filters){
     return filters;
+}
+
+
+function isIE(){
+    const ua = window.navigator.userAgent;
+    return ua.indexOf( 'Edge' ) > -1 || ua.indexOf( 'MSIE' ) > -1;
 }
