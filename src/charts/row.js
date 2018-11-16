@@ -996,7 +996,7 @@ define(function(require) {
             if(labelsFocusTitle && focusCount) {
                 let focusTitle = `${labelsFocusTitle} ${focusCount.toLocaleString()}`;
                 let w = textHelper.getTextWidth( focusTitle, labelsSizeChild, 'sans-serif' );
-                const moPadding = 40;
+                const moPadding = isPrintMode ? 100 : 40;
                 const availfocusTitleAreaWidth = margin.left + focusWidth - moPadding - xPatch;
                 let wasTrimmed = false;
                 while(w > availfocusTitleAreaWidth){
@@ -1011,7 +1011,7 @@ define(function(require) {
                     .attr( 'y', titleMarginTop );
 
                 labelsFocusTitle = wasTrimmed ? labelsFocusTitle + '...' : labelsFocusTitle;
-                focusTitleGroup.append('tspan')
+                const span1 = focusTitleGroup.append('tspan')
                     .text( labelsFocusTitle )
                     .attr('font-size', labelsSizeChild);
 
@@ -1022,7 +1022,13 @@ define(function(require) {
                     .attr('font-size', labelsSizeChild)
                     .attr( 'font-weight', 600 );
 
-                let shiftFocus = focusWidth - focusTitleGroup.node().getBoundingClientRect().width - 5;
+                let w1 = span1.node().getBoundingClientRect().width + 10;
+                if ( isPrintMode && isIE ) {
+                    // wasTrimmed
+                    w1 += 40;
+                }
+
+                let shiftFocus = focusWidth - w1 - 5;
 
                 focusTitleGroup.attr( 'x', shiftFocus );
 
@@ -1031,12 +1037,12 @@ define(function(require) {
             if(labelsTotalCount) {
                 const compCountTxt = `Total complaints ${labelsTotalCount}`;
                 let cw = textHelper.getTextWidth( compCountTxt, labelsSizeChild, 'sans-serif' );
-                let printPadding = 0;
+                let printPadding = isPrintMode && isIE ? 10 : 0;
 
                 const ieTweak = isIE ? 5 :0;
                 const complaintTotalGroup = svg.select( '.title-group' ).append( 'text' )
                     .text( null )
-                    .attr( 'x', chartWidth - cw - printPadding - 10 - ieTweak )
+                    .attr( 'x', chartWidth - cw - printPadding - 10 - ieTweak - 5)
                     .attr( 'y', titleMarginTop );
 
                 complaintTotalGroup.append('tspan')
@@ -1049,6 +1055,8 @@ define(function(require) {
                     .attr('dx', 5)
                     .attr( 'font-size', labelsSizeChild )
                     .attr( 'font-weight', 600 );
+
+                complaintTotalGroup.attr('x', chartWidth - complaintTotalGroup.node().getBoundingClientRect().width - 10 - printPadding)
 
             }
 
