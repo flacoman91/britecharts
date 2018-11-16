@@ -726,7 +726,7 @@ export const appendDateRange = ( detailContainer, dateRange, detailWidth, padTop
 export const appendURL = ( detailContainer, detailWidth, padTop ) => {
     const inputUrl = 'http://192.168.99.100/#/complaints/q/trends?size=10&page=1&sort=Relevance&not_issue=Incorrect%20information%20on%20your%20report&not_product=Credit%20reporting,%20credit%20repair%20services,%20or%20other%20personal%20consumer%20reports&not_product=Debt%20collection&not_product=Credit%20card%20or%20prepaid%20card&interval=Month&lens=Overview&trend_depth=10&fields=All%20Data';
     const longURL = splitLongString( inputUrl, detailWidth, 18 );
-    return appendTextElement( detailContainer, 'URL:', longURL, detailWidth, padTop, 1 );
+    return appendTextElement( detailContainer, 'URL:', longURL, detailWidth, padTop );
 };
 
 function formatDateView(dateIn){
@@ -740,16 +740,10 @@ function formatDateView(dateIn){
  * @param {string} text the text under the heading
  * @param {number} width how wide the box is in which we need to insert text
  * @param {number} padTop offset of the top of the text.
- * @param {number} numElements number of elements
  * @returns {object} returns inserted element
  */
-export const appendTextElement = ( container, title, text, width, padTop = 30, numElements = 1 ) => {
+export const appendTextElement = ( container, title, text, width, padTop = 30 ) => {
     const padLeft = 20;
-    // TBD remove code
-    // this is only POC to fix IE not exporting corectly
-    // https://codepen.io/gapcode/pen/vEJNZN
-    // for EXPORT ONLY!
-    const yPatch = isIE() ? -20 * numElements : '0';
 
     if ( isIE() ) {
         padTop += 20;
@@ -770,7 +764,7 @@ export const appendTextElement = ( container, title, text, width, padTop = 30, n
         .classed( 'sub-text', true )
         .text( text )
         .attr( 'font-size', '16px' )
-        .attr( 'y', yPatch )
+        .attr( 'y', 0 )
         .attr( 'dy', '1.2em' )
         .call( wrap, width );
 
