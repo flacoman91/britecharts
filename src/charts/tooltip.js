@@ -14,7 +14,7 @@ define(function(require){
         isInteger
     } = require('./helpers/number');
 
-    const {getTextWidth, wrapTextWithEllipses} = require('./helpers/text');
+    const {getTextWidth} = require('./helpers/text');
 
     /**
      * Tooltip Component reusable API class that renders a
@@ -61,11 +61,10 @@ define(function(require){
                 bottom: 2,
                 left: 2
             },
-            width = 270,
+            width = 250,
             height = 45,
 
             title = 'Tooltip title',
-            subTitle = 'Total',
             shouldShowDateInTitle = true,
             valueFormat = null,
 
@@ -80,16 +79,15 @@ define(function(require){
             tooltipDivider,
             tooltipBody,
             tooltipTitle,
-            tooltipSubTitle,
-            tooltipWidth = 270,
+            tooltipWidth = 250,
             tooltipHeight = 48,
             tooltipBorderRadius = 3,
             ttTextX = 0,
             ttTextY = 37,
             textHeight,
             entryLineLimit = 3,
-            initialTooltipTextXPosition = -40,
-            tooltipTextLinePadding = 8,
+            initialTooltipTextXPosition = -25,
+            tooltipTextLinePadding = 5,
             tooltipRightWidth,
             // Animations
             mouseChaseDuration = 100,
@@ -98,12 +96,11 @@ define(function(require){
             circleYOffset = 8,
 
             colorMap,
-            bodyFillColor = '#293037',
-            borderStrokeColor = '#293037',
-            titleFillColor = '#ffffff',
-            textFillColor = '#ffffff',
-            tooltipTextColor = '#ffffff',
-            tooltipTitleColor = '#101820',
+            bodyFillColor = '#FFFFFF',
+            borderStrokeColor = '#D2D6DF',
+            titleFillColor = '#6D717A',
+            textFillColor = '#282C35',
+            tooltipTextColor = '#000000',
 
             dateLabel = 'date',
             valueLabel = 'value',
@@ -188,8 +185,6 @@ define(function(require){
         function cleanContent(){
             tooltipBody.selectAll('text').remove();
             tooltipBody.selectAll('circle').remove();
-            tooltipBody.selectAll('line').remove();
-            tooltipSubTitle.selectAll('tspan').remove();
         }
 
         /**
@@ -205,7 +200,7 @@ define(function(require){
             tooltip = tooltipTextContainer
               .append('rect')
                 .classed('tooltip-text-container', true)
-                .attr('x', -tooltipWidth / 4 + tooltipTextLinePadding)
+                .attr('x', -tooltipWidth / 4 + 8)
                 .attr('y', 0)
                 .attr('width', tooltipWidth)
                 .attr('height', tooltipHeight)
@@ -215,46 +210,22 @@ define(function(require){
                 .style('stroke', borderStrokeColor)
                 .style('stroke-width', 1);
 
-            tooltipTextContainer.append('rect')
-                .classed('tooltip-title-container', true)
-                .attr('x', -tooltipWidth / 4 + tooltipTextLinePadding)
-                .attr('y', 0)
-                .attr('width', tooltipWidth)
-                .attr('height', tooltipHeight + 12)
-                .attr('rx', tooltipBorderRadius)
-                .attr('ry', tooltipBorderRadius)
-                .style('fill', tooltipTitleColor)
-                .style('stroke', tooltipTitleColor)
-                .style('stroke-width', 1);
-
             tooltipTitle = tooltipTextContainer
               .append('text')
                 .classed('tooltip-title', true)
-                .attr('x',0)
+                .attr('x', -tooltipWidth / 4 + 16)
                 .attr('dy', '.35em')
-                .attr('y', 12)
-                .attr('font-size', '12px')
-                .attr('font-weight', '600')
+                .attr('y', 16)
                 .style('fill', titleFillColor);
 
             tooltipDivider = tooltipTextContainer
-                .append('line')
+              .append('line')
                 .classed('tooltip-divider', true)
-                .attr('x1', -tooltipWidth / 4 + 10)
+                .attr('x1', -tooltipWidth / 4 + 16)
                 .attr('x2', 265)
-                .attr('y1', 25)
-                .attr('y2', 25)
+                .attr('y1', 31)
+                .attr('y2', 31)
                 .style('stroke', borderStrokeColor);
-
-            tooltipSubTitle = tooltipTextContainer
-                .append('text')
-                .classed('tooltip-subtitle', true)
-                .attr('x',0)
-                .attr('dy', '.35em')
-                .attr('y', ttTextY + 5)
-                .attr('font-size', '18px')
-                .attr('font-weight', '500')
-                .style('fill', titleFillColor);
 
             tooltipBody = tooltipTextContainer
               .append('g')
@@ -301,10 +272,10 @@ define(function(require){
             // show tooltip to the right
             if ((mouseX - tooltipWidth) < 0) {
                 // Tooltip on the right
-                tooltipX = tooltipWidth - 200;
+                tooltipX = tooltipWidth - 185;
             } else {
                 // Tooltip on the left
-                tooltipX = -(tooltipWidth - 45);
+                tooltipX = -205
             }
 
             if (mouseY) {
@@ -341,7 +312,7 @@ define(function(require){
          */
         function resetSizeAndPositionPointers() {
             tooltipHeight = 48;
-            ttTextY = 57;
+            ttTextY = 37;
             ttTextX = 0;
         }
 
@@ -367,11 +338,9 @@ define(function(require){
                 .attr('dy', '1em')
                 .attr('x', ttTextX)
                 .attr('y', ttTextY)
-                .attr('font-size', '12px')
-                .attr('font-weight', '500')
                 .style('fill', tooltipTextColor)
                 .text(tooltipLeftText)
-                .call(wrapTextWithEllipses, tooltipMaxTopicLength, initialTooltipTextXPosition, 1);
+                .call(textWrap, tooltipMaxTopicLength, initialTooltipTextXPosition);
 
             tooltipRight = tooltipBody
               .append('text')
@@ -379,8 +348,6 @@ define(function(require){
                 .attr('dy', '1em')
                 .attr('x', ttTextX)
                 .attr('y', ttTextY)
-                .attr('font-size', '12px')
-                .attr('font-weight', '500')
                 .style('fill', tooltipTextColor)
                 .text(tooltipRightText);
 
@@ -393,25 +360,16 @@ define(function(require){
             // update the width if it exists because IE renders the elements
             // too slow and cant figure out the width?
             tooltipRightWidth = tooltipRight.node().getBBox().width ? tooltipRight.node().getBBox().width : tooltipRightWidth;
-            tooltipRight.attr( 'x', tooltipWidth - tooltipRightWidth - tooltipWidth / 4 );
+            tooltipRight.attr( 'x', tooltipWidth - tooltipRightWidth - 10 - tooltipWidth / 4 );
 
             tooltipBody
                 .append('circle')
                 .classed('tooltip-circle', true)
-                .attr('cx', 18 - tooltipWidth / 4)
+                .attr('cx', 23 - tooltipWidth / 4)
                 .attr('cy', (ttTextY + circleYOffset))
-                .attr('r', 3)
+                .attr('r', 5)
                 .style('fill', colorMap[name])
-                .style('stroke-width', '1px');
-
-            tooltipBody
-                .append('line')
-                .classed('tooltip-divider', true)
-                .attr('x1', -tooltipWidth / 4 + 10)
-                .attr('x2',  tooltipWidth - (tooltipWidth / 4 - tooltipTextLinePadding))
-                .attr('y1',  (ttTextY + circleYOffset + 10))
-                .attr('y2',  (ttTextY + circleYOffset + 10))
-                .style('stroke', '#43484e');
+                .style('stroke-width', 1);
 
             ttTextY += textHeight + 7;
         }
@@ -427,7 +385,7 @@ define(function(require){
          * @private
          */
         function updatePositionAndSize(dataPoint, xPosition, yPosition){
-            let [tooltipX, tooltipY] = getTooltipPosition([xPosition, yPosition]);
+            let [tooltipX, tooltipY] = getTooltipPosition([xPosition, yPosition])
 
             tooltip
                 .attr('width', tooltipWidth)
@@ -439,7 +397,7 @@ define(function(require){
                 .attr('transform', `translate(${tooltipX}, ${tooltipY})`);
 
             tooltipDivider
-                .attr('x2', tooltipWidth - (tooltipWidth / 4 - tooltipTextLinePadding));
+                .attr('x2', tooltipWidth - 60);
         }
 
         /**
@@ -460,50 +418,9 @@ define(function(require){
                 tTitle = formattedDate;
             }
 
-            const titleWd = tooltipTitle.node().getBoundingClientRect().width;
-            //to align to the center of the tooltip
-            tooltipTitle.attr('x', (tooltipWidth/2 - titleWd/2)+(-tooltipWidth / 4 + 10));
             tooltipTitle.text(tTitle);
-
-            //tooltipTitleColor
         }
 
-        /**
-         * Updates value of tooltipTitle with the data meaning and the date
-         * @param  {Object} dataPoint Point of data to use as source
-         * @return void
-         * @private
-         */
-        function updateSubTitle(dataPoint) {
-            const total = dataPoint.values.reduce((acc, cur)=>{
-               return acc+ cur.value;
-            }, 0);
-
-            let tTitle = subTitle,
-                formattedTotal = getFormattedValue(total).toString(),
-                subtitleRight;
-
-            if (tTitle.length) {
-                tTitle = `${tTitle}`;
-            }
-
-            tooltipSubTitle
-                .append('tspan')
-                .classed('tooltip-right-title', true)
-                .attr('x', -tooltipWidth / 4 + 13)
-                .text(tTitle);
-
-            subtitleRight = tooltipSubTitle
-                .append('tspan')
-                .classed('tooltip-left-title', true)
-                .attr('x', 0 )
-                .text(formattedTotal);
-
-            let rightST =
-                subtitleRight.node().getBoundingClientRect().width ? subtitleRight.node().getBoundingClientRect().width : subtitleRight;
-
-            subtitleRight.attr( 'x', tooltipWidth - rightST - 10);
-        }
         /**
          * Figures out which date format to use when showing the date of the current data entry
          * @param {Date} date   Date object to format
@@ -649,7 +566,6 @@ define(function(require){
 
             cleanContent();
             updateTitle(dataPoint);
-            updateSubTitle(dataPoint);
             resetSizeAndPositionPointers();
             topics.forEach(updateTopicContent);
         }

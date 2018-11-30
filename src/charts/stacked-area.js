@@ -227,6 +227,7 @@ define(function(require){
                     drawHoverOverlay();
                     drawVerticalMarker();
                     addMouseEvents();
+                    initVerticalMarker();
                 }
             });
         }
@@ -973,6 +974,25 @@ define(function(require){
         }
 
         /**
+         * initializes and draws the vertical marker on chart draw.
+         * It also resets the container of the vertical marker
+         * @private
+         */
+        function initVerticalMarker(){
+            epsilon || setEpsilon();
+            let dataPoint = getNearestDataPoint(chartWidth),
+                dataPointXPosition;
+
+            if (dataPoint) {
+                dataPointXPosition = xScale(new Date( dataPoint.key ));
+                // Move verticalMarker to that datapoint
+                moveVerticalMarker(dataPointXPosition);
+                // Add data points highlighting
+                highlightDataPoints(dataPoint);
+            }
+        }
+
+        /**
          * MouseOut handler, hides overlay and removes active class on verticalMarkerLine
          * It also resets the container of the vertical marker
          * @private
@@ -980,7 +1000,8 @@ define(function(require){
         function handleMouseOut(e, d) {
             overlay.style('display', 'none');
             verticalMarkerLine.classed('bc-is-active', false);
-            verticalMarkerContainer.attr('transform', 'translate(9999, 0)');
+            // don't hide vertical marker
+            //verticalMarkerContainer.attr('transform', 'translate(9999, 0)');
 
             dispatcher.call('customMouseOut', e, d, d3Selection.mouse(e));
         }
