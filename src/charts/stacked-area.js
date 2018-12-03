@@ -116,7 +116,6 @@ define(function(require){
             highlightCircleActiveRadius = highlightCircleRadius + 2,
             highlightCircleActiveStrokeWidth = 5,
             highlightCircleActiveStrokeOpacity = 0.6,
-
             areaOpacity = 0.24,
             categoryColorMap,
             order,
@@ -151,7 +150,7 @@ define(function(require){
             pointsSize            = 1.5,
             pointsColor           = '#c0c6cc',
             pointsBorderColor     = '#ffffff',
-
+            initializeVerticalMarker = false,
             isAnimated = false,
             ease = d3Ease.easeQuadInOut,
             areaAnimationDuration = 1000,
@@ -227,6 +226,9 @@ define(function(require){
                     drawHoverOverlay();
                     drawVerticalMarker();
                     addMouseEvents();
+                }
+
+                if(initializeVerticalMarker){
                     initVerticalMarker();
                 }
             });
@@ -1240,6 +1242,24 @@ define(function(require){
                 width = Math.ceil(_x / aspectRatio);
             }
             height = _x;
+
+            return this;
+        };
+
+        /**
+         * Gets or Sets the initializeVerticalMarker property of the chart,
+         * making vertical marker appear when chart renders.
+         * By default this is 'false'
+         *
+         * @param  {Boolean} _x Desired animation flag
+         * @return {Boolean | module} Current isAnimated flag or Chart module
+         * @public
+         */
+        exports.initializeVerticalMarker = function(_x) {
+            if (!arguments.length) {
+                return initializeVerticalMarker;
+            }
+            initializeVerticalMarker = _x;
 
             return this;
         };
