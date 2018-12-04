@@ -150,6 +150,7 @@ define(function(require){
             topicColorMap,
             linearGradient,
             lineGradientId = uniqueId('one-line-gradient'),
+            areaOpacity = 0.24,
 
             highlightFilter = null,
             highlightFilterId = null,
@@ -165,7 +166,6 @@ define(function(require){
             xTicks = null,
             xAxisCustomFormat = null,
             locale,
-
             shouldShowAllDataPoints = false,
             isAnimated = false,
             ease = d3Ease.easeQuadInOut,
@@ -176,7 +176,7 @@ define(function(require){
 
             dataByTopic,
             dataByDate,
-
+            dataRange,
             dateLabel = 'date',
             valueLabel = 'value',
             topicLabel = 'topic',
@@ -200,8 +200,15 @@ define(function(require){
             verticalGridLines,
             horizontalGridLines,
             grid = null,
+            isUsingFakeData = false,
 
             baseLine,
+            areaCurve = 'monotoneX',
+            area,
+            layers,
+            layersInitial,
+            areaOutline,
+            series,
 
             pathYCache = {},
 
@@ -229,9 +236,12 @@ define(function(require){
          */
         function exports(_selection) {
             _selection.each(function(_data) {
+                console.log('data');
+                console.log(_data);
                 ({
                     dataByTopic,
-                    dataByDate
+                    dataByDate,
+                    dataRange
                 } = cleanData(_data));
 
                 chartWidth = width - margin.left - margin.right;
@@ -242,7 +252,9 @@ define(function(require){
                 buildAxis();
                 drawAxis();
                 buildGradient();
+                drawStackedAreas();
                 drawLines();
+
                 createMaskingClip();
 
                 if (shouldShowTooltip()) {
@@ -493,7 +505,7 @@ define(function(require){
          * @param  {obj} dataByTopic    Raw data grouped by topic
          * @return {obj}                Parsed data with dataByTopic and dataByDate
          */
-        function cleanData({dataByTopic, dataByDate}) {
+        function cleanData({dataByTopic, dataByDate, dataRange}) {
             if (!dataByTopic) {
                 throw new Error('Data needs to have a dataByTopic property');
             }
@@ -529,6 +541,11 @@ define(function(require){
                 return d;
             });
 
+            dataRange = dataRange.map((d) => {
+                d.date = new Date(d.date);
+                return d;
+            });
+
             const normalizedDataByTopic = dataByTopic.reduce((accum, topic) => {
                 let {dates, ...restProps} = topic;
 
@@ -544,7 +561,8 @@ define(function(require){
 
             return {
                 dataByTopic: normalizedDataByTopic,
-                dataByDate
+                dataByDate,
+                dataRange
             };
         }
 
@@ -667,6 +685,32 @@ define(function(require){
             lines
                 .exit()
                 .remove();
+        }
+
+        /**
+         * Draws the different areas into the chart-group element
+         * @private
+         */
+        function drawStackedAreas() {
+            // define the area
+            const area = d3Shape.area()
+                .curve(curveMap[lineCurve])
+                .x(({date}) => xScale(date))
+                .y0(({min}) => yScale(min))
+                .y1(({max}) => yScale(max));
+
+             // scale the range of the data
+
+            console.log('DR');
+            console.log(dataRange);
+             // add the area
+            const areaGroup = svg.select('.chart-group').append('g')
+                .attr('class', 'area');
+            areaGroup.append("path")
+                .data([dataRange])
+                .style('opacity', .1)
+                .attr("class", "area")
+                .attr("d", area);
         }
 
         /**

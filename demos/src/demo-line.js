@@ -66,11 +66,11 @@ function createLineChart(optionalColorSchema, optionalData) {
             lineChart1.exportChart('linechart.png', 'Britecharts Line Chart');
         });
 
-        dataset = aTestDataSet().with5Topics().build();
+        dataset = aTestDataSet().withTruncatedTopics().build();
+
         // LineChart Setup and start
         lineChart1
             .isAnimated(true)
-            .aspectRatio(0.5)
             .grid('horizontal')
             .tooltipThreshold(600)
             .width(containerWidth)
@@ -249,9 +249,9 @@ function isInRange(d0, d1, d) {
 if (d3Selection.select('.js-line-chart-container').node()) {
     createLineChart();
     createBrushChart();
-    createLineChartWithSingleLine();
-    createLineChartWithFixedHeight();
-    createLoadingState();
+    // createLineChartWithSingleLine();
+    // createLineChartWithFixedHeight();
+    // createLoadingState();
 
     redrawCharts = function(){
         d3Selection.selectAll('.line-chart').remove();
