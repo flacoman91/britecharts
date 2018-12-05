@@ -541,10 +541,12 @@ define(function(require){
                 return d;
             });
 
-            dataRange = dataRange.map((d) => {
-                d.date = new Date(d.date);
-                return d;
-            });
+            if(dataRange) {
+                dataRange = dataRange.map( ( d ) => {
+                    d.date = new Date( d.date );
+                    return d;
+                } );
+            }
 
             const normalizedDataByTopic = dataByTopic.reduce((accum, topic) => {
                 let {dates, ...restProps} = topic;
@@ -680,7 +682,10 @@ define(function(require){
                 .attr('d', ({dates}) => topicLine(dates))
                 .style('stroke', (d) => (
                     dataByTopic.length === 1 ? `url(#${lineGradientId})` : getLineColor(d)
-                ));
+                ))
+                .style('stroke-dasharray', (d)=>{
+                    return d.topicName === 'Los Angeles' ? [1, 5] : false;
+                });
 
             lines
                 .exit()
@@ -693,16 +698,14 @@ define(function(require){
          */
         function drawStackedAreas() {
             // define the area
+            if(!dataRange)
+                return;
             const area = d3Shape.area()
                 .curve(curveMap[lineCurve])
                 .x(({date}) => xScale(date))
                 .y0(({min}) => yScale(min))
                 .y1(({max}) => yScale(max));
 
-             // scale the range of the data
-
-            console.log('DR');
-            console.log(dataRange);
              // add the area
             const areaGroup = svg.select('.chart-group').append('g')
                 .attr('class', 'area');
@@ -990,6 +993,7 @@ define(function(require){
                                     .style('stroke-width', () => (
                                         shouldShowAllDataPoints ? highlightCircleStrokeAll : highlightCircleStroke
                                     ))
+                                    .style('fill', topicColorMap[d.name])
                                     .style('stroke', topicColorMap[d.name])
                                     .style('cursor', 'pointer')
                                     .on('click', function () {

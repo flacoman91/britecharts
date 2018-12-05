@@ -27,7 +27,7 @@ function createBrushChart(optionalColorSchema) {
         dataset;
 
     if (containerWidth) {
-        dataset = aTestDataSet().with5Topics().build();
+        dataset = aTestDataSet().withTruncatedTopics().build();
         brushChart
             .width(containerWidth)
             .height(100)
@@ -89,6 +89,7 @@ function createLineChart(optionalColorSchema, optionalData) {
             lineChart1.colorSchema(optionalColorSchema);
         }
 
+    console.log(dataset);
         if (optionalData) {
             container.datum(optionalData).call(lineChart1);
         } else {
@@ -134,6 +135,8 @@ function createLineChartWithSingleLine() {
             })
             .on('customMouseOut', chartTooltip.hide);
 
+        console.log('single')
+        console.log(dataset)
         container.datum(dataset).call(lineChart2);
 
         // Tooltip Setup and start
@@ -249,7 +252,7 @@ function isInRange(d0, d1, d) {
 if (d3Selection.select('.js-line-chart-container').node()) {
     createLineChart();
     createBrushChart();
-    // createLineChartWithSingleLine();
+    createLineChartWithSingleLine();
     // createLineChartWithFixedHeight();
     // createLoadingState();
 
