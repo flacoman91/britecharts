@@ -236,8 +236,6 @@ define(function(require){
          */
         function exports(_selection) {
             _selection.each(function(_data) {
-                console.log('data');
-                console.log(_data);
                 ({
                     dataByTopic,
                     dataByDate,
@@ -684,7 +682,7 @@ define(function(require){
                     dataByTopic.length === 1 ? `url(#${lineGradientId})` : getLineColor(d)
                 ))
                 .style('stroke-dasharray', (d)=>{
-                    return d.topicName === 'Los Angeles' ? [1, 5] : false;
+                    return d.dashed ? [1, 5] : false;
                 });
 
             lines
@@ -968,6 +966,11 @@ define(function(require){
                 return acc;
             }, {});
 
+            const dashedPoints = dataByTopic.filter( o => {
+                    return o.dashed;
+                } )
+                .map(o=>{ return o.topicName; });
+
             // Group corresponding path node with its topic, and
             // sorting the topics based on the order of the colors,
             // so that the order always stays constant
@@ -980,7 +983,6 @@ define(function(require){
                                         .sort((a, b) => topicColorMap[a.topic.name] < topicColorMap[b.topic.name])
 
             dataPoint.topics = topicsWithNode.map(({topic}) => topic);
-
             dataPoint.topics.forEach((d, index) => {
                 let marker = verticalMarkerContainer
                               .append('g')
@@ -993,7 +995,11 @@ define(function(require){
                                     .style('stroke-width', () => (
                                         shouldShowAllDataPoints ? highlightCircleStrokeAll : highlightCircleStroke
                                     ))
-                                    .style('fill', topicColorMap[d.name])
+                                    .style( 'fill', () => {
+                                        if (! dashedPoints.includes(d.topicName) ) {
+                                            return topicColorMap[ d.name ];
+                                        }
+                                    })
                                     .style('stroke', topicColorMap[d.name])
                                     .style('cursor', 'pointer')
                                     .on('click', function () {

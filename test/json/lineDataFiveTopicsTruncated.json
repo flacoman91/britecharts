@@ -2,6 +2,7 @@
     "dataByTopic": [
         {
             "topic": 103,
+            "dashed": true,
             "dates": [
                 {
                     "date": "2015-06-27T16:00:00-08:00",
@@ -247,6 +248,7 @@
         {
             "topic": 0,
             "topicName": "Other",
+            "dashed": true,
             "dates": [
                 {
                     "date": "2015-06-27T16:00:00-08:00",
