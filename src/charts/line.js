@@ -681,6 +681,9 @@ define(function(require){
                 .style('stroke', (d) => (
                     dataByTopic.length === 1 ? `url(#${lineGradientId})` : getLineColor(d)
                 ))
+                .style('opacity', (d)=>{
+                    return d.hide ? 0 : 1;
+                })
                 .style('stroke-dasharray', (d)=>{
                     return d.dashed ? [1, 5] : false;
                 });
@@ -971,6 +974,11 @@ define(function(require){
                 } )
                 .map(o=>{ return o.topicName; });
 
+            const hiddenPoints = dataByTopic.filter( o => {
+                    return o.hide;
+                } )
+                .map(o=>{ return o.topicName; });
+
             // Group corresponding path node with its topic, and
             // sorting the topics based on the order of the colors,
             // so that the order always stays constant
@@ -999,6 +1007,9 @@ define(function(require){
                                         if (! dashedPoints.includes(d.topicName) ) {
                                             return topicColorMap[ d.name ];
                                         }
+                                    })
+                                    .style( 'opacity', () => {
+                                        return hiddenPoints.includes(d.topicName) ? 0 : 1;
                                     })
                                     .style('stroke', topicColorMap[d.name])
                                     .style('cursor', 'pointer')
