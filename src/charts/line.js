@@ -682,7 +682,7 @@ define(function(require){
                     dataByTopic.length === 1 ? `url(#${lineGradientId})` : getLineColor(d)
                 ))
                 .style('opacity', (d)=>{
-                    return d.hide ? 0 : 1;
+                    return d.show ? 1 : 0;
                 })
                 .style('stroke-dasharray', (d)=>{
                     return d.dashed ? [1, 5] : false;
@@ -975,7 +975,7 @@ define(function(require){
                 .map(o=>{ return o.topicName; });
 
             const hiddenPoints = dataByTopic.filter( o => {
-                    return o.hide;
+                    return !o.show;
                 } )
                 .map(o=>{ return o.topicName; });
 

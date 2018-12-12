@@ -3,7 +3,7 @@
         {
             "topic": 103,
             "dashed": true,
-            "hide": true,
+            "show": false,
             "dates": [
                 {
                     "date": "2015-06-27T16:00:00-08:00",
@@ -65,7 +65,8 @@
         },
         {
             "topic": 149,
-            "hide": true,
+            "show": false,
+            "dashed": true,
             "dates": [
                 {
                     "date": "2015-06-27T16:00:00-08:00",
@@ -127,6 +128,8 @@
         },
         {
             "topic": 60,
+            "dashed": false,
+            "show": true,
             "dates": [
                 {
                     "date": "2015-06-27T16:00:00-08:00",
@@ -188,6 +191,8 @@
         },
         {
             "topic": 81,
+            "dashed": false,
+            "show": true,
             "dates": [
                 {
                     "date": "2015-06-27T16:00:00-08:00",
@@ -251,6 +256,7 @@
             "topic": 0,
             "topicName": "Other",
             "dashed": true,
+            "show": true,
             "dates": [
                 {
                     "date": "2015-06-27T16:00:00-08:00",
