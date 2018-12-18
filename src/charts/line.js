@@ -168,6 +168,7 @@ define(function(require){
             locale,
             shouldShowAllDataPoints = false,
             isAnimated = false,
+            initializeVerticalMarker = false,
             ease = d3Ease.easeQuadInOut,
             animationDuration = 1500,
             maskingRectangle,
@@ -200,6 +201,7 @@ define(function(require){
             verticalGridLines,
             horizontalGridLines,
             grid = null,
+            enableSingleLineGradient = false,
             isUsingFakeData = false,
 
             baseLine,
@@ -266,6 +268,10 @@ define(function(require){
                 }
 
                 addTouchEvents();
+
+                if(initializeVerticalMarker){
+                    initVerticalMarker();
+                }
             });
         }
 
@@ -679,7 +685,8 @@ define(function(require){
                 .attr('id', ({topic}) => topic)
                 .attr('d', ({dates}) => topicLine(dates))
                 .style('stroke', (d) => (
-                    dataByTopic.length === 1 ? `url(#${lineGradientId})` : getLineColor(d)
+                    dataByTopic.length === 1 && enableSingleLineGradient
+                        ? `url(#${lineGradientId})` : getLineColor(d)
                 ))
                 .style('opacity', (d)=>{
                     return d.show ? 1 : 0;
@@ -913,6 +920,24 @@ define(function(require){
         }
 
         /**
+         * initializes and draws the vertical marker on chart draw.
+         * It also resets the container of the vertical marker
+         * @private
+         */
+        function initVerticalMarker(){
+            let dataPoint = getNearestDataPoint(chartWidth),
+                dataPointXPosition;
+
+            if (dataPoint) {
+                dataPointXPosition = xScale(new Date( dataPoint.date ));
+                // Move verticalMarker to that datapoint
+                moveVerticalMarker(dataPointXPosition);
+                // Add data points highlighting
+                highlightDataPoints(dataPoint);
+            }
+        }
+
+        /**
          * MouseOut handler, hides overlay and removes active class on verticalMarkerLine
          * It also resets the container of the vertical marker
          * @private
@@ -1120,6 +1145,21 @@ define(function(require){
         };
 
         /**
+         * Gets or Sets whether single line gradient is enabled
+         * @param  {Boolean} _x Desired aspect ratio for the graph
+         * @return { (Boolean | Module) } Current aspect ratio or Line Chart module to chain calls
+         * @public
+         */
+        exports.enableSingleLineGradient = function(_x) {
+            if (!arguments.length) {
+                return enableSingleLineGradient;
+            }
+            enableSingleLineGradient = _x;
+
+            return this;
+        };
+
+        /**
          * Gets or Sets the label of the X axis of the chart
          * @param  {String} _x Desired label for the X axis
          * @return { (String | Module) } Current label of the X axis or Line Chart module to chain calls
@@ -1264,6 +1304,25 @@ define(function(require){
 
             return this;
         };
+
+        /**
+         * Gets or Sets the initializeVerticalMarker property of the chart,
+         * making vertical marker appear when chart renders.
+         * By default this is 'false'
+         *
+         * @param  {Boolean} _x Desired animation flag
+         * @return {Boolean | module} Current isAnimated flag or Chart module
+         * @public
+         */
+        exports.initializeVerticalMarker = function(_x) {
+            if (!arguments.length) {
+                return initializeVerticalMarker;
+            }
+            initializeVerticalMarker = _x;
+
+            return this;
+        };
+
 
         /**
          * Gets or Sets the isAnimated property of the chart, making it to animate when render.

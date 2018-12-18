@@ -75,6 +75,7 @@ function createLineChart(optionalColorSchema, optionalData) {
             .tooltipThreshold(600)
             .width(containerWidth)
             .margin(lineMargin)
+            .initializeVerticalMarker(true)
             .dateLabel('fullDate')
             .on('customMouseOver', chartTooltip.show)
             .on('customMouseMove', chartTooltip.update)
@@ -86,6 +87,7 @@ function createLineChart(optionalColorSchema, optionalData) {
 
 
         if (optionalColorSchema) {
+            console.log(optionalColorSchema);
             lineChart1.colorSchema(optionalColorSchema);
         }
 
@@ -124,6 +126,7 @@ function createLineChartWithSingleLine() {
         lineChart2
             .tooltipThreshold(600)
             .height(300)
+            .initializeVerticalMarker(true)
             .margin(lineMargin)
             .lineCurve('basis')
             .grid('vertical')
