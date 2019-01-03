@@ -10,7 +10,7 @@ const line = require('./../../src/charts/line');
 const tooltip = require('./../../src/charts/tooltip');
 const dataBuilder = require('./../../test/fixtures/lineChartDataBuilder');
 const colorSelectorHelper = require('./helpers/colorSelector');
-
+const constants = require('./../../src/charts/helpers/constants');
 const lineMargin = {top:60, bottom: 50, left: 50, right: 30};
 let redrawCharts;
 
@@ -77,6 +77,7 @@ function createLineChart(optionalColorSchema, optionalData) {
             .margin(lineMargin)
             .initializeVerticalMarker(true)
             .dateLabel('fullDate')
+            .xAxisFormat(constants.axisTimeCombinations.MONTH_YEAR)
             .on('customMouseOver', chartTooltip.show)
             .on('customMouseMove', chartTooltip.update)
             .on('customMouseOut', chartTooltip.hide)

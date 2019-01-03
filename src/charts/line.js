@@ -945,7 +945,7 @@ define(function(require){
         function handleMouseOut(e, d){
             overlay.style('display', 'none');
             verticalMarkerLine.classed('bc-is-active', false);
-            verticalMarkerContainer.attr('transform', 'translate(9999, 0)');
+            //verticalMarkerContainer.attr('transform', 'translate(9999, 0)');
 
             dispatcher.call('customMouseOut', e, d, d3Selection.mouse(e));
         }
