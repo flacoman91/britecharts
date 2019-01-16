@@ -225,6 +225,17 @@
 .grouped-bar .tick line {
   display: none; }
 
+.grouped-row .x-axis-group path,
+.grouped-row .y-axis-group path {
+  display: none; }
+
+.grouped-row .y-axis-group .tick text {
+  font-size: 14px; }
+
+.grouped-row .tick line,
+.grouped-row .tick line {
+  display: none; }
+
 .step-chart .step {
   fill: #8FDAD8;
   stroke-width: 0;

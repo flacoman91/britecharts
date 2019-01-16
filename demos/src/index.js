@@ -3,6 +3,7 @@ require('./demo-stacked-area');
 require('./demo-bar');
 require('./demo-stacked-bar');
 require('./demo-grouped-bar');
+require('./demo-grouped-row');
 require('./demo-donut');
 require('./demo-line');
 require('./demo-sparkline');

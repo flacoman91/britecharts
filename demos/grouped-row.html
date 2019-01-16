@@ -2,13 +2,13 @@
     <div class="container">
         <div class="row">
             <div class="col-md-8">
-                <h2 class="tutorial__heading">Grouped Bar Chart with Tooltip</h2>
-                <div class="js-grouped-bar-chart-tooltip-container card--chart"></div>
+                <h2 class="tutorial__heading">Grouped Row Chart with Tooltip</h2>
+                <div class="js-grouped-row-chart-tooltip-container card--chart"></div>
             </div>
-            <div class="col-md-4 sidebar">
+            <div class="col-md-4 siderow">
                 <h3>The code</h3>
                 <pre><code class="language-javascript">
-groupedBar
+groupedRow
     .tooltipThreshold(400)
     .width(containerWidth)
     .isAnimated(true)
@@ -20,7 +20,7 @@ groupedBar
         chartTooltip.update(dataPoint, topicColorMap, dataPointXPosition);
     })
     .on('customMouseOut', chartTooltip.hide);
-container.datum(dataset.data).call(groupedBar);
+container.datum(dataset.data).call(groupedRow);
 
 chartTooltip
     .title('Testing tooltip');
@@ -31,25 +31,25 @@ tooltipContainer.datum([]).call(chartTooltip);
                 <label class="control-label">You can also check other color schemas:</label>
                 <div class="js-color-selector-container"></div>
                 <h4>Data Input</h4>
-                <p>Check the <a href="/britecharts/global.html#GroupedBarChartData__anchor">data input schema</a> of this chart.</p>
+                <p>Check the <a href="/britecharts/global.html#GroupedRowChartData__anchor">data input schema</a> of this chart.</p>
                 <h4>Export Chart</h4>
                 <p>You can also export this chart by pressing: <input id="button" type="button" value="Export" class="btn btn-sm btn-primary" /></p>
                 <h4>Demo Code</h4>
-                <p>Read the whole code of this demo <a href="https://github.com/eventbrite/britecharts/blob/master/demos/src/demo-grouped-bar.js">in github</a></p>
+                <p>Read the whole code of this demo <a href="https://github.com/eventbrite/britecharts/blob/master/demos/src/demo-grouped-row.js">in github</a></p>
             </div>
         </div>
     </div>
     <div class="container">
         <div class="row">
             <div class="col-md-8">
-                <h2 class="tutorial__heading">Horizontal Grouped Bar Chart</h2>
-                <div class="js-grouped-bar-chart-fixed-container card--chart"></div>
+                <h2 class="tutorial__heading">Horizontal Grouped Row Chart</h2>
+                <div class="js-grouped-row-chart-fixed-container card--chart"></div>
             </div>
-            <div class="col-md-4 sidebar">
+            <div class="col-md-4 siderow">
                 <h3>The code</h3>
                 <pre><code class="language-javascript">
-// groupedBarChart Setup and start
-groupedBar
+// groupedRowChart Setup and start
+groupedRow
     .isHorizontal(true)
     .tooltipThreshold(400)
     .width(containerWidth)
@@ -72,7 +72,7 @@ groupedBar
     .on('customMouseOut', function() {
         chartTooltip.hide();
     });
-container.datum(dataset.data).call(groupedBar);
+container.datum(dataset.data).call(groupedRow);
 
 // Tooltip Setup and start
 chartTooltip
@@ -84,7 +84,7 @@ tooltipContainer = d3.select('.metadata-group');
 tooltipContainer.datum([]).call(chartTooltip);
                 </code></pre>
                 <h4>Demo Code</h4>
-                <p>Read the whole code of this demo <a href="https://github.com/eventbrite/britecharts/blob/master/demos/src/demo-grouped-bar.js">in github</a></p>
+                <p>Read the whole code of this demo <a href="https://github.com/eventbrite/britecharts/blob/master/demos/src/demo-grouped-row.js">in github</a></p>
             </div>
         </div>
     </div>
