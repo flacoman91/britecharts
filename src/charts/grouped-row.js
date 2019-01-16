@@ -27,7 +27,7 @@ define(function (require) {
      */
 
     /**
-     * @typedef GroupedBarChartData
+     * @typedef GroupedRowChartData
      * @type {Object[]}
      * @property {String} name         Name of the entry
      * @property {String} group        group of the entry
@@ -53,14 +53,14 @@ define(function (require) {
      *  d3-interpolate, d3-scale, d3-selection, lodash assign
      *
      * @example
-     * let groupedBar = GroupedBar();
+     * let groupedRow = GroupedRow();
      *
-     * groupedBar
+     * groupedRow
      *     .width(containerWidth);
      *
      * d3Selection.select('.css-selector')
      *     .datum(dataset.data)
-     *     .call(groupedBar);
+     *     .call(groupedRow);
      *
      */
     return function module() {
@@ -155,7 +155,7 @@ define(function (require) {
          * This function creates the graph using the selection and data provided
          * @param {D3Selection} _selection A d3 selection that represents
          * the container(s) where the chart(s) will be rendered
-         * @param {GroupedBarChartData} _data The data to attach and generate the chart
+         * @param {GroupedRowChartData} _data The data to attach and generate the chart
          */
         function exports(_selection) {
             _selection.each(function (_data) {
@@ -170,7 +170,7 @@ define(function (require) {
                 drawGridLines();
                 buildAxis();
                 drawAxis();
-                drawGroupedBar();
+                drawGroupedRow();
                 addMouseEvents();
             });
         }
@@ -355,8 +355,8 @@ define(function (require) {
         /**
          * Cleaning data casting the values, groups, topic names and names to the proper type while keeping
          * the rest of properties on the data
-         * @param  {GroupedBarChartData} originalData   Raw data from the container
-         * @return {GroupedBarChartData}                Parsed data with values and dates
+         * @param  {GroupedRowChartData} originalData   Raw data from the container
+         * @return {GroupedRowChartData}                Parsed data with values and dates
          * @private
          */
         function cleanData(originalData) {
@@ -575,7 +575,7 @@ define(function (require) {
          * Draws the different areas into the chart-group element
          * @private
          */
-        function drawGroupedBar() {
+        function drawGroupedRow() {
             // Not ideal, we need to figure out how to call exit for nested elements
             if (layerElements) {
                 svg.selectAll('.layer').remove();
@@ -1117,7 +1117,7 @@ define(function (require) {
          * @param  {String} _x Desired label string
          * @return {String | module} Current yAxisLabel or Chart module to chain calls
          * @public
-         * @example groupedBar.yAxisLabel('Ticket Sales')
+         * @example groupedRow.yAxisLabel('Ticket Sales')
          */
         exports.yAxisLabel = function (_x) {
             if (!arguments.length) {
@@ -1135,7 +1135,7 @@ define(function (require) {
          * @param  {Number} _x Desired offset for the label
          * @return {Number | module} Current yAxisLabelOffset or Chart module to chain calls
          * @public
-         * @example groupedBar.yAxisLabelOffset(-55)
+         * @example groupedRow.yAxisLabelOffset(-55)
          */
         exports.yAxisLabelOffset = function (_x) {
             if (!arguments.length) {
