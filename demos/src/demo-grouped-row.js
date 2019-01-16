@@ -12,6 +12,57 @@ let redrawCharts;
 
 require('./helpers/resizeHelper');
 
+const data = [
+    {
+        name: 'Credit reporting, credit repair services, or other personal consumer reports',
+        value: 7370,
+        group: 'EQUIFAX, INC.'
+    }, {
+        name: 'Debt collection',
+        value: 96,
+        group: 'EQUIFAX, INC.'
+    }, {
+        name: 'Credit card or prepaid card',
+        value: 8,
+        group: 'EQUIFAX, INC.'
+    }, {
+        name: 'Vehicle loan or lease',
+        value: 3,
+        group: 'EQUIFAX, INC.'
+    }, {
+        name: 'Credit reporting, credit repair services, or other personal consumer reports',
+        value: 5493,
+        group: 'Average of comparable companies'
+    }, {
+        name: 'Debt collection',
+        value: 75,
+        group: 'Average of comparable companies'
+    }, {
+        name: 'Credit card or prepaid card',
+        value: 7,
+        group: 'Average of comparable companies'
+    }, {
+        name: 'Vehicle loan or lease',
+        value: 3,
+        group: 'Average of comparable companies'
+    }, {
+        name: 'Credit reporting, credit repair services, or other personal consumer reports',
+        value: 16480,
+        group: 'Sum of comparable companies'
+    }, {
+        name: 'Debt collection',
+        value: 226,
+        group: 'Sum of comparable companies'
+    }, {
+        name: 'Credit card or prepaid card',
+        value: 20,
+        group: 'Sum of comparable companies'
+    }, {
+        name: 'Vehicle loan or lease',
+        value: 7,
+        group: 'Sum of comparable companies'
+    } ];
+
 function creategroupedRowChartWithTooltip(optionalColorSchema) {
     let groupedRow = groupedRowChart(),
         chartTooltip = tooltip(),
@@ -80,21 +131,23 @@ function createHorizontalgroupedRowChart(optionalColorSchema) {
         dataset = testDataSet.with3Sources().build();
 
         // StackedAreChart Setup and start
+        const ratio = 16749/16480;
         groupedRow
             .tooltipThreshold(600)
             .grid('vertical')
             .width(containerWidth)
+            .percentageAxisToMaxRatio(ratio)
             .isHorizontal(true)
             .isAnimated(true)
             .margin({
-                left: 80,
+                left: 200,
                 top: 40,
                 right: 30,
                 bottom: 20
             })
-            .nameLabel('date')
-            .valueLabel('views')
-            .groupLabel('stack')
+            // .nameLabel('date')
+            // .valueLabel('views')
+            // .groupLabel('stack')
             .on('customMouseOver', function() {
                 chartTooltip.show();
             })
@@ -109,7 +162,7 @@ function createHorizontalgroupedRowChart(optionalColorSchema) {
             groupedRow.colorSchema(optionalColorSchema);
         }
 
-        container.datum(dataset.data).call(groupedRow);
+        container.datum(data).call(groupedRow);
 
         // Tooltip Setup and start
         chartTooltip
