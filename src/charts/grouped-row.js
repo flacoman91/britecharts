@@ -44,11 +44,11 @@ define(function (require) {
      */
 
     /**
-     * Grouped Bar Chart reusable API module that allows us
-     * rendering a multi grouped bar and configurable chart.
+     * Grouped Row Chart reusable API module that allows us
+     * rendering a multi grouped Row and configurable chart.
      *
-     * @module Grouped-bar
-     * @tutorial grouped-bar
+     * @module Grouped-row
+     * @tutorial grouped-row
      * @requires d3-array, d3-axis, d3-color, d3-collection, d3-dispatch, d3-ease,
      *  d3-interpolate, d3-scale, d3-selection, lodash assign
      *
@@ -342,7 +342,7 @@ define(function (require) {
             if (!svg) {
                 svg = d3Selection.select(container)
                     .append('svg')
-                    .classed('britechart grouped-bar', true);
+                    .classed('britechart grouped-row', true);
 
                 buildContainerGroups();
             }
