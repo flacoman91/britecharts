@@ -91,6 +91,7 @@ define(function (require) {
 
             yTicks = 5,
             xTicks = 5,
+            percentageAxisToMaxRatio = 1,
             baseLine,
 
             colorSchema = colorHelper.colorSchemas.britecharts,
@@ -282,10 +283,11 @@ define(function (require) {
          */
         function buildScales() {
             let yMax = d3Array.max(data.map(getValue));
+            let percentageAxis = Math.min(percentageAxisToMaxRatio * d3Array.max(data, getValue))
 
             if (isHorizontal) {
                 xScale = d3Scale.scaleLinear()
-                    .domain([0, yMax])
+                    .domain([0, percentageAxis])
                     .rangeRound([0, chartWidth - 1]);
                 // 1 pix for edge tick
 
@@ -1012,6 +1014,23 @@ define(function (require) {
 
             return value === dispatcher ? exports : value;
         };
+
+
+        /**
+         * Configurable extension of the x axis
+         * if your max point was 50% you might want to show x axis to 60%, pass 1.2
+         * @param  {number} _x ratio to max data point to add to the x axis
+         * @return {ratio | module} Current ratio or Chart module to chain calls
+         * @public
+         */
+        exports.percentageAxisToMaxRatio = function(_x) {
+            if (!arguments.length) {
+                return percentageAxisToMaxRatio;
+            }
+            percentageAxisToMaxRatio = _x;
+
+            return this;
+        }
 
         /**
          * Gets or Sets the minimum width of the graph in order to show the tooltip
