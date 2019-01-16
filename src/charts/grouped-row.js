@@ -27,7 +27,7 @@ define(function (require) {
      */
 
     /**
-     * @typedef GroupedBarChartData
+     * @typedef GroupedRowChartData
      * @type {Object[]}
      * @property {String} name         Name of the entry
      * @property {String} group        group of the entry
@@ -44,23 +44,23 @@ define(function (require) {
      */
 
     /**
-     * Grouped Bar Chart reusable API module that allows us
-     * rendering a multi grouped bar and configurable chart.
+     * Grouped Row Chart reusable API module that allows us
+     * rendering a multi grouped row and configurable chart.
      *
-     * @module Grouped-bar
-     * @tutorial grouped-bar
+     * @module Grouped-row
+     * @tutorial grouped-row
      * @requires d3-array, d3-axis, d3-color, d3-collection, d3-dispatch, d3-ease,
      *  d3-interpolate, d3-scale, d3-selection, lodash assign
      *
      * @example
-     * let groupedBar = GroupedBar();
+     * let groupedRow = GroupedRow();
      *
-     * groupedBar
+     * groupedRow
      *     .width(containerWidth);
      *
      * d3Selection.select('.css-selector')
      *     .datum(dataset.data)
-     *     .call(groupedBar);
+     *     .call(groupedRow);
      *
      */
     return function module() {
@@ -73,7 +73,7 @@ define(function (require) {
             },
             width = 960,
             height = 500,
-            loadingState = bar,
+            loadingState = row,
 
             xScale,
             xScale2,
@@ -124,7 +124,7 @@ define(function (require) {
             yAxisLabelEl,
             yAxisLabelOffset = -60,
 
-            barOpacity = 0.24,
+            rowOpacity = 0.24,
 
             animationDelayStep = 20,
             animationDelays,
@@ -155,7 +155,7 @@ define(function (require) {
          * This function creates the graph using the selection and data provided
          * @param {D3Selection} _selection A d3 selection that represents
          * the container(s) where the chart(s) will be rendered
-         * @param {GroupedBarChartData} _data The data to attach and generate the chart
+         * @param {GroupedRowChartData} _data The data to attach and generate the chart
          */
         function exports(_selection) {
             _selection.each(function (_data) {
@@ -170,7 +170,7 @@ define(function (require) {
                 drawGridLines();
                 buildAxis();
                 drawAxis();
-                drawGroupedBar();
+                drawGroupedRow();
                 addMouseEvents();
             });
         }
@@ -196,12 +196,12 @@ define(function (require) {
                     });;
             }
 
-            svg.selectAll('.bar')
+            svg.selectAll('.row')
                 .on('mouseover', function(d) {
-                    handleBarsMouseOver(this, d);
+                    handleRowsMouseOver(this, d);
                 })
                 .on('mouseout', function(d) {
-                    handleBarsMouseOut(this, d);
+                    handleRowsMouseOut(this, d);
                 });
         }
 
@@ -342,7 +342,7 @@ define(function (require) {
             if (!svg) {
                 svg = d3Selection.select(container)
                     .append('svg')
-                    .classed('britechart grouped-bar', true);
+                    .classed('britechart grouped-row', true);
 
                 buildContainerGroups();
             }
@@ -355,8 +355,8 @@ define(function (require) {
         /**
          * Cleaning data casting the values, groups, topic names and names to the proper type while keeping
          * the rest of properties on the data
-         * @param  {GroupedBarChartData} originalData   Raw data from the container
-         * @return {GroupedBarChartData}                Parsed data with values and dates
+         * @param  {GroupedRowChartData} originalData   Raw data from the container
+         * @return {GroupedRowChartData}                Parsed data with values and dates
          * @private
          */
         function cleanData(originalData) {
@@ -491,11 +491,11 @@ define(function (require) {
         }
 
         /**
-         * Draws the bars along the x axis
+         * Draws the rows along the x axis
          * @param  {D3Selection} layersSelection Selection of layers
          * @return {void}
          */
-        function drawHorizontalBars(layersSelection) {
+        function drawHorizontalRows(layersSelection) {
             let layerJoin = layersSelection
                 .data(layers);
 
@@ -505,38 +505,38 @@ define(function (require) {
                     .attr('transform', ({key}) => `translate(0,${yScale(key)})`)
                     .classed('layer', true);
 
-            let barJoin = layerElements
-                .selectAll('.bar')
+            let rowJoin = layerElements
+                .selectAll('.row')
                 .data(({values}) => values);
 
             // Enter + Update
-            let bars = barJoin
+            let rows = rowJoin
                     .enter()
                       .append('rect')
-                        .classed('bar', true)
+                        .classed('row', true)
                         .attr('x', 1)
                         .attr('y', (d) => yScale2(getGroup(d)))
                         .attr('height', yScale2.bandwidth())
                         .attr('fill', (({group}) => categoryColorMap[group]));
 
             if (isAnimated) {
-                bars.style('opacity', barOpacity)
+                rows.style('opacity', rowOpacity)
                     .transition()
                     .delay((_, i) => animationDelays[i])
                     .duration(animationDuration)
                     .ease(ease)
-                    .tween('attr.width', horizontalBarsTween);
+                    .tween('attr.width', horizontalRowsTween);
             } else {
-                bars.attr('width', (d) => xScale(getValue(d)));
+                rows.attr('width', (d) => xScale(getValue(d)));
             }
         }
 
         /**
-         * Draws the bars along the y axis
+         * Draws the rows along the y axis
          * @param  {D3Selection} layersSelection Selection of layers
          * @return {void}
          */
-        function drawVerticalBars(layersSelection) {
+        function drawVerticalRows(layersSelection) {
             let layerJoin = layersSelection
                 .data(layers);
 
@@ -546,28 +546,28 @@ define(function (require) {
                   .attr('transform', ({key}) => `translate(${xScale(key)},0)`)
                   .classed('layer', true);
 
-            let barJoin = layerElements
-                  .selectAll('.bar')
+            let rowJoin = layerElements
+                  .selectAll('.row')
                   .data(({values}) => values);
 
-            let bars = barJoin
+            let rows = rowJoin
                   .enter()
                     .append('rect')
-                      .classed('bar', true)
+                      .classed('row', true)
                       .attr('x', (d) => xScale2(getGroup(d)))
                       .attr('y', ({value}) => yScale(value))
                       .attr('width', xScale2.bandwidth)
                       .attr('fill', (({group}) => categoryColorMap[group]));
 
             if (isAnimated) {
-                bars.style('opacity', barOpacity)
+                rows.style('opacity', rowOpacity)
                     .transition()
                     .delay((_, i) => animationDelays[i])
                     .duration(animationDuration)
                     .ease(ease)
-                    .tween('attr.height', verticalBarsTween);
+                    .tween('attr.height', verticalRowsTween);
             } else {
-                bars.attr('height', (d) => chartHeight - yScale(getValue(d)));
+                rows.attr('height', (d) => chartHeight - yScale(getValue(d)));
             }
         }
 
@@ -575,7 +575,7 @@ define(function (require) {
          * Draws the different areas into the chart-group element
          * @private
          */
-        function drawGroupedBar() {
+        function drawGroupedRow() {
             // Not ideal, we need to figure out how to call exit for nested elements
             if (layerElements) {
                 svg.selectAll('.layer').remove();
@@ -585,9 +585,9 @@ define(function (require) {
 
             animationDelays = d3Array.range(animationDelayStep, (layers.length + 1) * animationDelayStep, animationDelayStep)
             if (isHorizontal) {
-                drawHorizontalBars(series);
+                drawHorizontalRows(series);
             } else {
-                drawVerticalBars(series);
+                drawVerticalRows(series);
             }
 
             // Exit
@@ -655,23 +655,23 @@ define(function (require) {
         }
 
         /**
-         * Handles a mouseover event on top of a bar
+         * Handles a mouseover event on top of a row
          * @param  {obj} e the fired event
-         * @param  {obj} d data of bar
+         * @param  {obj} d data of row
          * @return {void}
          */
-        function handleBarsMouseOver(e, d) {
+        function handleRowsMouseOver(e, d) {
             d3Selection.select(e)
                 .attr('fill', () => d3Color.color(categoryColorMap[d.group]).darker());
         }
 
         /**
-         * Handles a mouseout event out of a bar
+         * Handles a mouseout event out of a row
          * @param  {obj} e the fired event
-         * @param  {obj} d data of bar
+         * @param  {obj} d data of row
          * @return {void}
          */
-        function handleBarsMouseOut(e, d) {
+        function handleRowsMouseOut(e, d) {
             d3Selection.select(e)
                 .attr('fill', () => categoryColorMap[d.group])
         }
@@ -734,11 +734,11 @@ define(function (require) {
         }
 
         /**
-         * Animation tween of horizontal bars
-         * @param  {obj} d data of bar
+         * Animation tween of horizontal rows
+         * @param  {obj} d data of row
          * @return {void}
          */
-        function horizontalBarsTween(d) {
+        function horizontalRowsTween(d) {
             let node = d3Selection.select(this),
                 i = d3Interpolate.interpolateRound(0, xScale(getValue(d))),
                 j = d3Interpolate.interpolateNumber(0, 1);
@@ -799,11 +799,11 @@ define(function (require) {
         }
 
         /**
-         * Animation tween of vertical bars
-         * @param  {obj} d data of bar
+         * Animation tween of vertical rows
+         * @param  {obj} d data of row
          * @return {void}
          */
-        function verticalBarsTween(d) {
+        function verticalRowsTween(d) {
             let node = d3Selection.select(this),
                 i = d3Interpolate.interpolateRound(0, chartHeight - yScale(getValue(d))),
                 y = d3Interpolate.interpolateRound(chartHeight, yScale(getValue(d))),
@@ -909,7 +909,7 @@ define(function (require) {
         /**
          * Gets or Sets the horizontal direction of the chart
          * @param  {number} _x Desired horizontal direction for the graph
-         * @return { isHorizontal | module} If it is horizontal or Bar Chart module to chain calls
+         * @return { isHorizontal | module} If it is horizontal or Row Chart module to chain calls
          * @public
          */
         exports.isHorizontal = function (_x) {
@@ -1006,7 +1006,7 @@ define(function (require) {
          * We are going to expose this events:
          * customMouseOver, customMouseMove, customMouseOut, and customClick
          *
-         * @return {module} Bar Chart
+         * @return {module} Row Chart
          * @public
          */
         exports.on = function () {
@@ -1116,7 +1116,7 @@ define(function (require) {
          * @param  {String} _x Desired label string
          * @return {String | module} Current yAxisLabel or Chart module to chain calls
          * @public
-         * @example groupedBar.yAxisLabel('Ticket Sales')
+         * @example groupedRow.yAxisLabel('Ticket Sales')
          */
         exports.yAxisLabel = function (_x) {
             if (!arguments.length) {
@@ -1134,7 +1134,7 @@ define(function (require) {
          * @param  {Number} _x Desired offset for the label
          * @return {Number | module} Current yAxisLabelOffset or Chart module to chain calls
          * @public
-         * @example groupedBar.yAxisLabelOffset(-55)
+         * @example groupedRow.yAxisLabelOffset(-55)
          */
         exports.yAxisLabelOffset = function (_x) {
             if (!arguments.length) {
