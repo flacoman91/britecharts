@@ -95,6 +95,9 @@ function creategroupedRowChartWithTooltip(optionalColorSchema) {
             });
 
         if (optionalColorSchema) {
+
+            console.log(optionalColorSchema);
+
             groupedRow.colorSchema(optionalColorSchema);
         }
 
@@ -113,7 +116,7 @@ function creategroupedRowChartWithTooltip(optionalColorSchema) {
         tooltipContainer.datum([]).call(chartTooltip);
 
         d3Selection.select('#button').on('click', function() {
-            groupedRow.exportChart('grouped-bar.png', 'Britecharts Grouped Row');
+            groupedRow.exportChart('grouped-row.png', 'Britecharts Grouped Row');
         });
     }
 }
@@ -186,7 +189,7 @@ if (d3Selection.select('.js-grouped-row-chart-tooltip-container').node()){
     // For getting a responsive behavior on our chart,
     // we'll need to listen to the window resize event
     redrawCharts = () => {
-        d3Selection.selectAll('.grouped-bar').remove();
+        d3Selection.selectAll('.grouped-row').remove();
 
         creategroupedRowChartWithTooltip();
         createHorizontalgroupedRowChart();
@@ -196,5 +199,5 @@ if (d3Selection.select('.js-grouped-row-chart-tooltip-container').node()){
     PubSub.subscribe('resize', redrawCharts);
 
     // Color schema selector
-    colorSelectorHelper.createColorSelector('.js-color-selector-container', '.grouped-bar', creategroupedRowChartWithTooltip);
+    colorSelectorHelper.createColorSelector('.js-color-selector-container', '.grouped-row', creategroupedRowChartWithTooltip);
 }
