@@ -14,54 +14,67 @@ require('./helpers/resizeHelper');
 
 const data = [
     {
-        name: 'Credit reporting, credit repair services, or other personal consumer reports',
-        value: 7370,
-        group: 'EQUIFAX, INC.'
-    }, {
-        name: 'Debt collection',
-        value: 96,
-        group: 'EQUIFAX, INC.'
-    }, {
         name: 'Credit card or prepaid card',
-        value: 8,
-        group: 'EQUIFAX, INC.'
-    }, {
-        name: 'Vehicle loan or lease',
-        value: 3,
-        group: 'EQUIFAX, INC.'
-    }, {
-        name: 'Credit reporting, credit repair services, or other personal consumer reports',
-        value: 5493,
-        group: 'Average of comparable companies'
-    }, {
-        name: 'Debt collection',
-        value: 75,
-        group: 'Average of comparable companies'
-    }, {
-        name: 'Credit card or prepaid card',
-        value: 7,
-        group: 'Average of comparable companies'
-    }, {
-        name: 'Vehicle loan or lease',
-        value: 3,
-        group: 'Average of comparable companies'
-    }, {
-        name: 'Credit reporting, credit repair services, or other personal consumer reports',
-        value: 16480,
+        value: 200,
         group: 'Sum of comparable companies'
-    }, {
+    },
+    {
+        name: 'Credit card or prepaid card',
+        value: 700,
+        group: 'Average of comparable companies'
+    },
+    {
+        name: 'Credit card or prepaid card',
+        value: 800,
+        group: 'EQUIFAX, INC.'
+    },
+    {
+        name: 'Vehicle loan or lease',
+        value: 700,
+        group: 'Sum of comparable companies'
+    },
+    {
+        name: 'Vehicle loan or lease',
+        value: 300,
+        group: 'Average of comparable companies'
+    },
+    {
+        name: 'Vehicle loan or lease',
+        value: 300,
+        group: 'EQUIFAX, INC.'
+    },
+    {
         name: 'Debt collection',
         value: 226,
         group: 'Sum of comparable companies'
-    }, {
-        name: 'Credit card or prepaid card',
-        value: 20,
+    },
+    {
+        name: 'Debt collection',
+        value: 750,
+        group: 'Average of comparable companies'
+    },
+
+    {
+        name: 'Debt collection',
+        value: 960,
+        group: 'EQUIFAX, INC.'
+    },
+    {
+        name: 'Credit reporting, credit repair services, or other personal consumer reports',
+        value: 16480,
         group: 'Sum of comparable companies'
-    }, {
-        name: 'Vehicle loan or lease',
-        value: 7,
-        group: 'Sum of comparable companies'
-    } ];
+    },
+    {
+        name: 'Credit reporting, credit repair services, or other personal consumer reports',
+        value: 5000,
+        group: 'Average of comparable companies'
+    },
+    {
+        name: 'Credit reporting, credit repair services, or other personal consumer reports',
+        value: 7500,
+        group: 'EQUIFAX, INC.'
+    }
+];
 
 function creategroupedRowChartWithTooltip(optionalColorSchema) {
     let groupedRow = groupedRowChart(),
@@ -95,9 +108,6 @@ function creategroupedRowChartWithTooltip(optionalColorSchema) {
             });
 
         if (optionalColorSchema) {
-
-            console.log(optionalColorSchema);
-
             groupedRow.colorSchema(optionalColorSchema);
         }
 
@@ -161,9 +171,10 @@ function createHorizontalgroupedRowChart(optionalColorSchema) {
                 chartTooltip.hide();
             });
 
-        if (optionalColorSchema) {
-            groupedRow.colorSchema(optionalColorSchema);
-        }
+        groupedRow.colorSchema(['red', 'yellow', 'blue']);
+        //if (optionalColorSchema) {
+            //groupedRow.colorSchema(optionalColorSchema);
+        //}
 
         container.datum(data).call(groupedRow);
 

@@ -96,8 +96,7 @@ define(function (require) {
 
             colorSchema = colorHelper.colorSchemas.britecharts,
 
-            colorScale,
-            categoryColorMap,
+            categoryColorMap = {},
 
             layers,
 
@@ -316,22 +315,13 @@ define(function (require) {
                     .nice();
             }
 
-            colorScale = d3Scale.scaleOrdinal()
-                .range(colorSchema)
-                .domain(data.map(getGroup));
+            const gr = data.map(getGroup);
+            const group = uniq(gr);
 
-            categoryColorMap = colorScale
-                .domain(data.map(getName)).domain()
-                .reduce((memo, item) => {
-                    data.forEach(function (v) {
-                        if (getName(v) == item) {
-                            memo[v.name] = colorScale(v.group)
-                            memo[v.group] = colorScale(v.group)
-                            memo[v.group + item] = colorScale(v.group)
-                        }
-                    })
-                    return memo;
-                }, {});
+            for(let i=0; i< group.length; i++){
+                categoryColorMap[group[i]] = colorSchema[i];
+            }
+
         }
 
         /**
