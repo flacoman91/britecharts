@@ -16,63 +16,74 @@ const data = [
     {
         name: 'Credit card or prepaid card',
         value: 200,
-        group: 'Sum of comparable companies'
+        group: 'Sum of comparable companies',
+        striped: false
     },
     {
         name: 'Credit card or prepaid card',
         value: 700,
-        group: 'Average of comparable companies'
+        group: 'Average of comparable companies',
+        striped: true
     },
     {
         name: 'Credit card or prepaid card',
         value: 800,
-        group: 'EQUIFAX, INC.'
+        group: 'EQUIFAX, INC.',
+        striped: false
     },
     {
         name: 'Vehicle loan or lease',
         value: 700,
-        group: 'Sum of comparable companies'
+        group: 'Sum of comparable companies',
+        striped: false
     },
     {
         name: 'Vehicle loan or lease',
         value: 300,
-        group: 'Average of comparable companies'
+        group: 'Average of comparable companies',
+        striped: true
     },
     {
         name: 'Vehicle loan or lease',
         value: 300,
-        group: 'EQUIFAX, INC.'
+        group: 'EQUIFAX, INC.',
+        striped: false
     },
     {
         name: 'Debt collection',
         value: 226,
-        group: 'Sum of comparable companies'
+        group: 'Sum of comparable companies',
+        striped: false
     },
     {
         name: 'Debt collection',
         value: 750,
-        group: 'Average of comparable companies'
+        group: 'Average of comparable companies',
+        striped: true
     },
-
     {
         name: 'Debt collection',
         value: 960,
-        group: 'EQUIFAX, INC.'
+        group: 'EQUIFAX, INC.',
+        striped: false
     },
     {
         name: 'Credit reporting, credit repair services, or other personal consumer reports',
         value: 16480,
-        group: 'Sum of comparable companies'
+        group: 'Sum of comparable companies',
+        striped: false
     },
     {
         name: 'Credit reporting, credit repair services, or other personal consumer reports',
         value: 5000,
-        group: 'Average of comparable companies'
+        group: 'Average of comparable companies',
+        striped: true
     },
     {
         name: 'Credit reporting, credit repair services, or other personal consumer reports',
         value: 7500,
-        group: 'EQUIFAX, INC.'
+        group: 'EQUIFAX, INC.',
+        striped: false
     }
 ];
 

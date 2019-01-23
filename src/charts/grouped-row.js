@@ -140,6 +140,7 @@ define(function (require) {
             getName = ({name}) => name,
             getValue = ({value}) => value,
             getGroup = ({group}) => group,
+            getStriped = ({striped}) => striped,
             isAnimated = false,
 
             // events
@@ -192,7 +193,7 @@ define(function (require) {
                     })
                     .on('click',  function(d) {
                         handleCustomClick(this, d);
-                    });;
+                    });
             }
 
             svg.selectAll('.bar')
@@ -241,6 +242,21 @@ define(function (require) {
                 .append('g')
                 .classed('container-group', true)
                 .attr('transform', `translate(${margin.left},${margin.top})`);
+
+            // append def for the striped fill
+            container.append('g')
+                .append('defs')
+                .append('pattern')
+                .attr('id', 'diagonalHatch')
+                .attr('patternUnits', 'userSpaceOnUse')
+                .attr('patternTransform', 'rotate(45)')
+                .attr('width', 10)
+                .attr('height', 100)
+                .append('rect')
+                .attr('width', 5)
+                .attr('height', 100)
+                .attr('transform', 'translate(0,0)')
+                .attr('fill', 'white');
 
             container
                 .append('g').classed('x-axis-group', true)
@@ -499,6 +515,11 @@ define(function (require) {
                 .selectAll('.bar')
                 .data(({values}) => values);
 
+            // only have ones with striped values render bars
+            let barJoinStriped = layerElements
+                .selectAll('.bar')
+                .data(({values}) => values.filter(o=>o.striped));
+
             // Enter + Update
             let bars = barJoin
                 .enter()
@@ -509,6 +530,15 @@ define(function (require) {
                 .attr('height', yScale2.bandwidth())
                 .attr('fill', (({group}) => categoryColorMap[group]));
 
+            let bars2 = barJoinStriped
+                .enter()
+                .append('rect')
+                .classed('striped', true)
+                .attr('x', 1)
+                .attr('y', (d) => yScale2(getGroup(d)))
+                .attr('height', yScale2.bandwidth())
+                .attr('fill', 'url(#diagonalHatch)');
+
             if (isAnimated) {
                 bars.style('opacity', barOpacity)
                     .transition()
@@ -516,8 +546,15 @@ define(function (require) {
                     .duration(animationDuration)
                     .ease(ease)
                     .tween('attr.width', horizontalBarsTween);
+                bars2.style('opacity', barOpacity)
+                    .transition()
+                    .delay((_, i) => animationDelays[i])
+                    .duration(animationDuration)
+                    .ease(ease)
+                    .tween('attr.width', horizontalBarsTween);
             } else {
                 bars.attr('width', (d) => xScale(getValue(d)));
+                bars2.attr('width', (d) => xScale(getValue(d)));
             }
         }
 
