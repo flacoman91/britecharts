@@ -7,6 +7,7 @@ define(function (require) {
     const d3Collection = require('d3-collection');
     const d3Dispatch = require('d3-dispatch');
     const d3Ease = require('d3-ease');
+    const d3Format = require('d3-format');
     const d3Interpolate = require('d3-interpolate');
     const d3Scale = require('d3-scale');
     const d3Selection = require('d3-selection');
@@ -17,6 +18,7 @@ define(function (require) {
     const { exportChart } = require('./helpers/export');
     const colorHelper = require('./helpers/color');
     const {bar} = require('./helpers/load');
+    const numberHelper = require('./helpers/number');
 
     const NUMBER_FORMAT = ',f';
     const uniq = (arrArg) => arrArg.filter((elem, pos, arr) => arr.indexOf(elem) == pos);
@@ -480,6 +482,45 @@ define(function (require) {
         }
 
         /**
+         * Draws a vertical line on the right side
+         * @return {void}
+         */
+        function drawVerticalEndLine() {
+            let w = textHelper.getTextWidth('100%', 16);
+
+            let label = svg.select('.grid-lines-group')
+                .selectAll('line.start-label')
+                .data([0])
+                .enter()
+                .append('text')
+                .attr('class', 'start-label')
+                .text('0%')
+                .attr('y', 0)
+                .attr('x', 0);
+
+            label = svg.select('.grid-lines-group')
+                .selectAll('line.end-label')
+                .data([0])
+                .enter()
+                .append('text')
+                .attr('class', 'end-label')
+                .text('100%')
+                .attr('y', 0)
+                .attr('x', chartWidth - w - 10);
+
+            baseLine = svg.select('.grid-lines-group')
+                .selectAll('line.extended-end-line')
+                .data([0])
+                .enter()
+                .append('line')
+                .attr('class', 'extended-end-line')
+                .attr('y1', -20)
+                .attr('y2', chartHeight + 10)
+                .attr('x1', chartWidth)
+                .attr('x2', chartWidth);
+        }
+
+        /**
          * Draws grid lines on the background of the chart
          * @return void
          */
@@ -518,6 +559,7 @@ define(function (require) {
 
             if (isHorizontal) {
                 drawVerticalExtendedLine();
+                drawVerticalEndLine();
             } else {
                 drawHorizontalExtendedLine();
             }
@@ -556,6 +598,15 @@ define(function (require) {
                 .attr('y', (d) => yScale2(getGroup(d)))
                 .attr('height', yScale2.bandwidth())
                 .attr('fill', (({group}) => categoryColorMap[group]));
+
+            let format = d3Format.format('.2f');
+            let labels = barJoin
+                .enter()
+                .append('text')
+                .classed('percentage-label', true)
+                .attr('x', (d)=>  xScale(getValue(d)) + 5)
+                .attr('y', (d) => yScale2(getGroup(d)) + 16)
+                .text((d)=> format(getValue(d)) + '%');
 
             let bars2 = barJoinStriped
                 .enter()

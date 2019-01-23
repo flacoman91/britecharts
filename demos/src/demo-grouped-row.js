@@ -275,12 +275,13 @@ function createHorizontalgroupedRowChart(optionalColorSchema) {
         groupedRow
             .tooltipThreshold(600)
             .grid('vertical')
+            .height(3*10*30)
             .width(containerWidth)
             .percentageAxisToMaxRatio(ratio)
             .isHorizontal(true)
             .isAnimated(true)
             .margin({
-                left: 200,
+                left: 250,
                 top: 40,
                 right: 30,
                 bottom: 20
