@@ -13,6 +13,7 @@ define(function (require) {
     const assign = require('lodash.assign');
     const d3Transition = require('d3-transition');
 
+    const textHelper = require('./helpers/text');
     const { exportChart } = require('./helpers/export');
     const colorHelper = require('./helpers/color');
     const {bar} = require('./helpers/load');
@@ -378,6 +379,18 @@ define(function (require) {
         }
 
         /**
+         * Utility function that wraps a text into the given width
+         * @param  {D3Selection} text         Text to write
+         * @param  {Number} containerWidth
+         * @private
+         */
+        function wrapTextWithEllipses(text, containerWidth) {
+            const yAxisLineWrapLimit = 2;
+            const lineHeight = .8;
+            textHelper.wrapTextWithEllipses(text, containerWidth, -10, yAxisLineWrapLimit, lineHeight);
+        }
+
+        /**
          * Draws the x and y axis on the svg object within their
          * respective groups
          * @private
@@ -391,6 +404,20 @@ define(function (require) {
                 svg.select('.y-axis-group.axis')
                     .attr('transform', `translate( ${-xAxisPadding.left}, 0)`)
                     .call(yAxis);
+
+
+                svg.selectAll('.y-axis-group.axis .tick text')
+                    //.classed('print-mode', isPrintMode)
+                    // .on( 'mouseover', function( d ) {
+                    //     rowHoverOver(d);
+                    // } )
+                    // .on('mouseout', function(d) {
+                    //     rowHoverOut(d);
+                    // })
+                    // move text right so we have room for the eyeballs
+                    .call(wrapTextWithEllipses, margin.left)
+                    .selectAll('tspan');
+
             } else {
                 svg.select('.x-axis-group .axis.x')
                     .attr('transform', `translate( 0, ${chartHeight} )`)

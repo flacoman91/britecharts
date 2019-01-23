@@ -232,6 +232,9 @@
 .grouped-row .y-axis-group .tick text {
   font-size: 14px; }
 
+.grouped-row .y-axis-group .adjust-upwards {
+  transform: translate(0, -10px); }
+
 .grouped-row .tick line,
 .grouped-row .tick line {
   display: none; }
