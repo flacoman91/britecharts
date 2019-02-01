@@ -129,6 +129,7 @@ define(function(require) {
             highlightRowFunction = (rowSelection) => rowSelection.attr('fill', ({name}) => d3Color.color(colorMap(name)).darker()),
             orderingFunction,
             labelsFocusTitle = '',
+            labelsTotalText = 'Total complaints',
             labelsTotalCount = '',
             labelsInterval = '',
             valueLabel = 'value',
@@ -1035,7 +1036,7 @@ define(function(require) {
             }
 
             if(labelsTotalCount) {
-                const compCountTxt = `Total complaints ${labelsTotalCount}`;
+                const compCountTxt = labelsTotalText + ' ' + labelsTotalCount;
                 let cw = textHelper.getTextWidth( compCountTxt, labelsSizeChild, 'sans-serif' );
                 let printPadding = isPrintMode && isIE ? 10 : 0;
 
@@ -1046,7 +1047,7 @@ define(function(require) {
                     .attr( 'y', titleMarginTop );
 
                 complaintTotalGroup.append('tspan')
-                    .text('Total complaints')
+                    .text(labelsTotalText)
                     .attr( 'font-size', labelsSizeChild );
 
                 complaintTotalGroup.append('tspan')
@@ -1787,6 +1788,23 @@ define(function(require) {
                 return labelsTotalCount;
             }
             labelsTotalCount = _x;
+
+            return this;
+        };
+
+        /**
+         * Gets or Sets the labelsTotalText of the chart. Companion text for
+         * the count.  Total complaints XXXXXX
+         * @param {String} _x Desired labelsTotalText for the graph
+         * @return { String | module} Current labelsTotalText or Chart
+         * module to chain calls
+         * @public
+         */
+        exports.labelsTotalText = function(_x) {
+            if (!arguments.length) {
+                return labelsTotalText;
+            }
+            labelsTotalText = _x;
 
             return this;
         };
