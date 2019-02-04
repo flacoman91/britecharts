@@ -110,6 +110,7 @@ define(function (require) {
             chartWidth, chartHeight,
             data,
             groups,
+            names,
             layerElements,
 
             transformedData,
@@ -309,11 +310,13 @@ define(function (require) {
                     .rangeRound([0, chartWidth - 1]);
                 // 1 pix for edge tick
 
+                // names of bars on right side
                 yScale = d3Scale.scaleBand()
                     .domain(data.map(getName))
                     .rangeRound([chartHeight, 0])
                     .padding(0.1);
 
+                // group on left side of chart
                 yScale2 = d3Scale.scaleBand()
                     .domain(data.map(getGroup))
                     .rangeRound([yScale.bandwidth(), 0])
@@ -407,6 +410,9 @@ define(function (require) {
                     .attr('transform', `translate( ${-xAxisPadding.left}, 0)`)
                     .call(yAxis);
 
+
+                svg.selectAll( '.y-axis-group.axis .tick' )
+                    .call( addVisibilityToggle );
 
                 svg.selectAll('.y-axis-group.axis .tick text')
                     //.classed('print-mode', isPrintMode)
@@ -580,6 +586,10 @@ define(function (require) {
                 .attr('transform', ({key}) => `translate(0,${yScale(key)})`)
                 .classed('layer', true);
 
+            let bgJoin = layerElements
+                .selectAll('.bar')
+                .data([0]);
+
             let barJoin = layerElements
                 .selectAll('.bar')
                 .data(({values}) => values);
@@ -588,6 +598,18 @@ define(function (require) {
             let barJoinStriped = layerElements
                 .selectAll('.bar')
                 .data(({values}) => values.filter(o=>o.striped));
+
+            // Enter + Update
+            let barbg = bgJoin
+                .enter()
+                .append('rect')
+                .classed('bg-hover', true)
+                .attr('x', -margin.left)
+                .attr('y', (d) => yScale2(getGroup(d)))
+                .attr('height', yScale2.bandwidth() * groups.length + groups.length * 5)
+                .attr('width', chartWidth + margin.left)
+                .attr('fill', 'aqua')
+                .attr('fill-opacity', .9);
 
             // Enter + Update
             let bars = barJoin
@@ -870,6 +892,7 @@ define(function (require) {
          */
         function prepareData(data) {
             groups = uniq(data.map((d) => getGroup(d)));
+            names = uniq(data.map((d) => getName(d)));
             transformedData = d3Collection.nest()
                 .key(getName)
                 .rollup(function (values) {
@@ -920,6 +943,50 @@ define(function (require) {
             }
         }
 
+        // eyeball
+        function addVisibilityToggle(elem){
+            elem.each( function() {
+                elem = d3Selection.select( this );
+                let textHgt = elem.node().getBBox().height/2;
+                let group = elem.append('svg')
+                    .attr('class', (d) => {
+                        return 'visibility visibility-' + getIndex(d);
+                    })
+                    .attr('x', -(margin.left-5))
+                    .attr('y', -textHgt)
+                    .attr('width', '300')
+                    .attr('height', '300')
+                    .attr('viewBox', '0 0 600 600')
+                    .attr('fill', 'none')
+                    .attr('opacity', 1);
+
+                group.append( 'rect' )
+                    .attr('x', -10)
+                    .attr('y', -10)
+                    .attr('height', '50')
+                    .attr('width', '50')
+                    //.attr('fill', backgroundHoverColor)
+                    // .on( 'mouseover', function( d ) {
+                    //     rowHoverOver(d);
+                    // } )
+                    // .on('mouseout', function(d) {
+                    //     rowHoverOut(d);
+                    // });
+
+                group.append( 'path' )
+                    .attr('d', 'M 10,10 L 30,30 M 30,10 L 10,30')
+                    .attr('stroke', '#0072ce')
+                    .attr('stroke-width', '2');
+
+            } );
+        }
+
+
+        function getIndex(name){
+            return data.findIndex((o)=>{
+                return o.name === name;
+            });
+        }
         // API
 
         /**

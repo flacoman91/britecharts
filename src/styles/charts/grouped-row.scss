@@ -3,9 +3,11 @@
 .grouped-row {
 
     // Axes
-    .x-axis-group path,
-    .y-axis-group path {
+    .x-axis-group path {
         display: none;
+    }
+    .y-axis-group path {
+
     }
 
     .y-axis-group {
