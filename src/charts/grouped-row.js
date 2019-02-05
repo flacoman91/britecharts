@@ -385,12 +385,12 @@ define(function (require) {
 
             svg.selectAll('.y-axis-group.axis .tick text')
                 //.classed('print-mode', isPrintMode)
-                // .on( 'mouseover', function( d ) {
-                //     rowHoverOver(d);
-                // } )
-                // .on('mouseout', function(d) {
-                //     rowHoverOut(d);
-                // })
+                .on( 'mouseover', function( d ) {
+                    rowHoverOver(d);
+                } )
+                .on('mouseout', function(d) {
+                    rowHoverOut(d);
+                })
                 // move text right so we have room for the eyeballs
                 .call(wrapTextWithEllipses, margin.left - 50)
                 .selectAll('tspan');
@@ -576,7 +576,7 @@ define(function (require) {
                 } )
                 .attr('x', -margin.left)
                 .attr('y', (d) => yScale2(getGroup(d)))
-                .attr('height', yScale2.bandwidth() * groups.length + groups.length * 2)
+                .attr('height', yScale2.bandwidth() * groups.length + groups.length * 4)
                 .attr('width', chartWidth + margin.left)
                 .attr('fill', backgroundHoverColor)
                 .attr('fill-opacity', 0)
@@ -742,14 +742,16 @@ define(function (require) {
             if(this) {
                 layerName = d3Selection.select( this.parentNode ).attr( 'class' );
                 ind = layerName.replace('layer layer-', '');
-                layerName = layerName.replace('layer ', '');
             }
 
-            if(ind === null)
-                return;
-
-            d3Selection.select(containerRoot).select('.tick svg.visibility-' + ind).attr('opacity', 1);
-            d3Selection.select(containerRoot).select('g.' + layerName +' .bg-hover').attr('fill-opacity', .3);
+            if(ind === null) {
+                ind = getIndex(d);
+            }
+            console.log(ind);
+            if(parseInt(ind) > -1) {
+                d3Selection.select( containerRoot ).select( '.tick svg.visibility-' + ind ).attr( 'opacity', 1 );
+                d3Selection.select( containerRoot ).select( 'g .layer-' + ind + ' .bg-hover' ).attr( 'fill-opacity', .3 );
+            }
         }
 
         function rowHoverOut(d, i) {
@@ -760,14 +762,15 @@ define(function (require) {
             if(this) {
                 layerName = d3Selection.select( this.parentNode ).attr( 'class' );
                 ind = layerName.replace('layer layer-', '');
-                layerName = layerName.replace('layer ', '');
             }
 
-            if(ind === null)
-                return;
-
-            d3Selection.select(containerRoot).select('.tick svg.visibility-' + ind).attr('opacity', 0);
-            d3Selection.select(containerRoot).select('g.' + layerName +' .bg-hover').attr('fill-opacity', 0);
+            if(ind === null) {
+                ind = getIndex(d);
+            }
+            if(parseInt(ind) > -1) {
+                d3Selection.select( containerRoot ).select( '.tick svg.visibility-' + ind ).attr( 'opacity', 0 );
+                d3Selection.select( containerRoot ).select( 'g .layer-' + ind + ' .bg-hover' ).attr( 'fill-opacity', 0 );
+            }
         }
 
         /**
