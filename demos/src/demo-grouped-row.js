@@ -286,38 +286,23 @@ function createHorizontalgroupedRowChart(optionalColorSchema) {
                 right: 30,
                 bottom: 20
             })
-            .xTicks(10)
+            .xTicks(10);
             // .nameLabel('date')
             // .valueLabel('views')
             // .groupLabel('stack')
-            .on('customMouseOver', function() {
-                chartTooltip.show();
-            })
-            .on('customMouseMove', function(dataPoint, topicColorMap, x, y) {
-                chartTooltip.update(dataPoint, topicColorMap, x, y);
-            })
-            .on('customMouseOut', function() {
-                chartTooltip.hide();
-            });
+            // .on('customMouseOver', function() {
+            //     chartTooltip.show();
+            // })
+            // .on('customMouseMove', function(dataPoint, topicColorMap, x, y) {
+            //     chartTooltip.update(dataPoint, topicColorMap, x, y);
+            // })
+            // .on('customMouseOut', function() {
+            //     chartTooltip.hide();
+            // });
 
         groupedRow.colorSchema(['red', 'yellow', 'blue']);
-        //if (optionalColorSchema) {
-            //groupedRow.colorSchema(optionalColorSchema);
-        //}
 
         container.datum(data).call(groupedRow);
-
-        // Tooltip Setup and start
-        chartTooltip
-            .topicLabel('values')
-            .dateLabel('key')
-            .nameLabel('stack')
-            .title('Tooltip Title');
-
-        // Note that if the viewport width is less than the tooltipThreshold value,
-        // this container won't exist, and the tooltip won't show up
-        tooltipContainer = d3Selection.select('.js-grouped-row-chart-fixed-container .metadata-group');
-        tooltipContainer.datum([]).call(chartTooltip);
     }
 }
 
