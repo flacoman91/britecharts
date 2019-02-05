@@ -74,12 +74,12 @@ define(function (require) {
                 bottom: 60,
                 left: 70
             },
+            containerRoot,
             width = 960,
             height = 500,
             loadingState = bar,
 
             xScale,
-            xScale2,
             xAxis,
             yScale,
             yScale2,
@@ -96,7 +96,7 @@ define(function (require) {
             xTicks = 5,
             percentageAxisToMaxRatio = 1,
             baseLine,
-
+            backgroundHoverColor = '#d6e8fa',
             colorSchema = colorHelper.colorSchemas.britecharts,
 
             categoryColorMap = {},
@@ -173,8 +173,8 @@ define(function (require) {
                 buildSVG(this);
                 drawGridLines();
                 buildAxis();
-                drawAxis();
                 drawGroupedRow();
+                drawAxis();
                 addMouseEvents();
             });
         }
@@ -209,30 +209,15 @@ define(function (require) {
                 });
         }
 
-        /**
-         * Adjusts the position of the y axis' ticks
-         * @param  {D3Selection} selection Y axis group
-         * @return void
-         */
-        function adjustYTickLabels(selection) {
-            selection.selectAll('.tick text')
-                .attr('transform', `translate(${yTickTextOffset['x']}, ${yTickTextOffset['y']})`);
-        }
 
         /**
          * Creates the d3 x and y axis, setting orientations
          * @private
          */
         function buildAxis() {
-            if (isHorizontal) {
-                xAxis = d3Axis.axisBottom(xScale)
-                    .ticks(xTicks, valueLabelFormat);
-                yAxis = d3Axis.axisLeft(yScale)
-            } else {
-                xAxis = d3Axis.axisBottom(xScale)
-                yAxis = d3Axis.axisLeft(yScale)
-                    .ticks(yTicks, valueLabelFormat)
-            }
+            xAxis = d3Axis.axisBottom(xScale)
+                .ticks(xTicks, valueLabelFormat);
+            yAxis = d3Axis.axisLeft(yScale)
         }
 
         /**
@@ -268,13 +253,13 @@ define(function (require) {
             container.selectAll('.x-axis-group')
                 .append('g').classed('month-axis', true);
             container
-                .append('g').classed('y-axis-group axis', true);
-            container
-                .append('g').classed('y-axis-label', true);
-            container
                 .append('g').classed('grid-lines-group', true);
             container
                 .append('g').classed('chart-group', true);
+            container
+                .append('g').classed('y-axis-group axis', true);
+            container
+                .append('g').classed('y-axis-label', true);
             container
                 .append('g').classed('metadata-group', true);
         }
@@ -304,38 +289,22 @@ define(function (require) {
             let yMax = d3Array.max(data.map(getValue));
             let percentageAxis = Math.min(percentageAxisToMaxRatio * d3Array.max(data, getValue))
 
-            if (isHorizontal) {
-                xScale = d3Scale.scaleLinear()
-                    .domain([0, percentageAxis])
-                    .rangeRound([0, chartWidth - 1]);
-                // 1 pix for edge tick
+            xScale = d3Scale.scaleLinear()
+                .domain([0, percentageAxis])
+                .rangeRound([0, chartWidth - 1]);
+            // 1 pix for edge tick
 
-                // names of bars on right side
-                yScale = d3Scale.scaleBand()
-                    .domain(data.map(getName))
-                    .rangeRound([chartHeight, 0])
-                    .padding(0.1);
+            // names of bars on right side
+            yScale = d3Scale.scaleBand()
+                .domain(data.map(getName))
+                .rangeRound([chartHeight, 0])
+                .padding(0.1);
 
-                // group on left side of chart
-                yScale2 = d3Scale.scaleBand()
-                    .domain(data.map(getGroup))
-                    .rangeRound([yScale.bandwidth(), 0])
-                    .padding(0.1);
-            } else {
-                xScale = d3Scale.scaleBand()
-                    .domain(data.map(getName))
-                    .rangeRound([0, chartWidth])
-                    .padding(0.1);
-                xScale2 = d3Scale.scaleBand()
-                    .domain(data.map(getGroup))
-                    .rangeRound([0, xScale.bandwidth()])
-                    .padding(0.1);
-
-                yScale = d3Scale.scaleLinear()
-                    .domain([0, yMax])
-                    .rangeRound([chartHeight, 0])
-                    .nice();
-            }
+            // group on left side of chart
+            yScale2 = d3Scale.scaleBand()
+                .domain(data.map(getGroup))
+                .rangeRound([yScale.bandwidth(), 0])
+                .padding(0.1);
 
             const gr = data.map(getGroup);
             const group = uniq(gr);
@@ -351,6 +320,7 @@ define(function (require) {
          * @private
          */
         function buildSVG(container) {
+            containerRoot = container;
             if (!svg) {
                 svg = d3Selection.select(container)
                     .append('svg')
@@ -401,41 +371,29 @@ define(function (require) {
          * @private
          */
         function drawAxis() {
-            if (isHorizontal) {
-                svg.select('.x-axis-group .axis.x')
-                    .attr('transform', `translate( 0, ${chartHeight} )`)
-                    .call(xAxis);
+            svg.select('.x-axis-group .axis.x')
+                .attr('transform', `translate( 0, ${chartHeight} )`)
+                .call(xAxis);
 
-                svg.select('.y-axis-group.axis')
-                    .attr('transform', `translate( ${-xAxisPadding.left}, 0)`)
-                    .call(yAxis);
+            svg.select('.y-axis-group.axis')
+                .attr('transform', `translate( ${-xAxisPadding.left}, 0)`)
+                .call(yAxis);
 
 
-                svg.selectAll( '.y-axis-group.axis .tick' )
-                    .call( addVisibilityToggle );
+            svg.selectAll( '.y-axis-group.axis .tick' )
+                .call( addVisibilityToggle );
 
-                svg.selectAll('.y-axis-group.axis .tick text')
-                    //.classed('print-mode', isPrintMode)
-                    // .on( 'mouseover', function( d ) {
-                    //     rowHoverOver(d);
-                    // } )
-                    // .on('mouseout', function(d) {
-                    //     rowHoverOut(d);
-                    // })
-                    // move text right so we have room for the eyeballs
-                    .call(wrapTextWithEllipses, margin.left)
-                    .selectAll('tspan');
-
-            } else {
-                svg.select('.x-axis-group .axis.x')
-                    .attr('transform', `translate( 0, ${chartHeight} )`)
-                    .call(xAxis);
-
-                svg.select('.y-axis-group.axis')
-                    .attr('transform', `translate( ${-xAxisPadding.left}, 0)`)
-                    .call(yAxis)
-                    .call(adjustYTickLabels);
-            }
+            svg.selectAll('.y-axis-group.axis .tick text')
+                //.classed('print-mode', isPrintMode)
+                // .on( 'mouseover', function( d ) {
+                //     rowHoverOver(d);
+                // } )
+                // .on('mouseout', function(d) {
+                //     rowHoverOut(d);
+                // })
+                // move text right so we have room for the eyeballs
+                .call(wrapTextWithEllipses, margin.left - 50)
+                .selectAll('tspan');
 
             if (yAxisLabel) {
                 if (yAxisLabelEl) {
@@ -451,23 +409,6 @@ define(function (require) {
                     .attr('transform', 'rotate(270 0 0)')
                     .text(yAxisLabel)
             }
-        }
-
-        /**
-         * Draws a vertical line to extend x-axis till the edges
-         * @return {void}
-         */
-        function drawHorizontalExtendedLine() {
-            baseLine = svg.select('.grid-lines-group')
-                .selectAll('line.extended-x-line')
-                .data([0])
-                .enter()
-                .append('line')
-                .attr('class', 'extended-x-line')
-                .attr('x1', (xAxisPadding.left))
-                .attr('x2', chartWidth)
-                .attr('y1', chartHeight)
-                .attr('y2', chartHeight);
         }
 
         /**
@@ -531,7 +472,7 @@ define(function (require) {
          * @return void
          */
         function drawGridLines() {
-            let scale = isHorizontal ? xScale : yScale;
+            let scale = xScale;
 
             svg.select('.grid-lines-group')
                 .selectAll('line')
@@ -563,12 +504,8 @@ define(function (require) {
                     .attr('x2', (d) => xScale(d));
             }
 
-            if (isHorizontal) {
-                drawVerticalExtendedLine();
-                drawVerticalEndLine();
-            } else {
-                drawHorizontalExtendedLine();
-            }
+            drawVerticalExtendedLine();
+            drawVerticalEndLine();
         }
 
         /**
@@ -584,10 +521,12 @@ define(function (require) {
                 .enter()
                 .append('g')
                 .attr('transform', ({key}) => `translate(0,${yScale(key)})`)
-                .classed('layer', true);
+                .attr('class', (d, i)=>{
+                    return 'layer layer-' + i;
+                });
 
             let bgJoin = layerElements
-                .selectAll('.bar')
+                .selectAll('.bg-hover')
                 .data([0]);
 
             let barJoin = layerElements
@@ -598,18 +537,6 @@ define(function (require) {
             let barJoinStriped = layerElements
                 .selectAll('.bar')
                 .data(({values}) => values.filter(o=>o.striped));
-
-            // Enter + Update
-            let barbg = bgJoin
-                .enter()
-                .append('rect')
-                .classed('bg-hover', true)
-                .attr('x', -margin.left)
-                .attr('y', (d) => yScale2(getGroup(d)))
-                .attr('height', yScale2.bandwidth() * groups.length + groups.length * 5)
-                .attr('width', chartWidth + margin.left)
-                .attr('fill', 'aqua')
-                .attr('fill-opacity', .9);
 
             // Enter + Update
             let bars = barJoin
@@ -639,6 +566,24 @@ define(function (require) {
                 .attr('height', yScale2.bandwidth())
                 .attr('fill', 'url(#diagonalHatch)');
 
+            // Enter + Update
+            let barbg = bgJoin
+                .enter()
+                .append('rect')
+                .classed( 'bg-hover', true )
+                .on( 'click', function( d ) {
+                    handleCustomClick( this, d );
+                } )
+                .attr('x', -margin.left)
+                .attr('y', (d) => yScale2(getGroup(d)))
+                .attr('height', yScale2.bandwidth() * groups.length + groups.length * 2)
+                .attr('width', chartWidth + margin.left)
+                .attr('fill', backgroundHoverColor)
+                .attr('fill-opacity', 0)
+                .on( 'mouseover', rowHoverOver )
+                .on('mouseout', rowHoverOut);
+
+
             if (isAnimated) {
                 bars.style('opacity', barOpacity)
                     .transition()
@@ -659,46 +604,6 @@ define(function (require) {
         }
 
         /**
-         * Draws the bars along the y axis
-         * @param  {D3Selection} layersSelection Selection of layers
-         * @return {void}
-         */
-        function drawVerticalBars(layersSelection) {
-            let layerJoin = layersSelection
-                .data(layers);
-
-            layerElements = layerJoin
-                .enter()
-                .append('g')
-                .attr('transform', ({key}) => `translate(${xScale(key)},0)`)
-                .classed('layer', true);
-
-            let barJoin = layerElements
-                .selectAll('.bar')
-                .data(({values}) => values);
-
-            let bars = barJoin
-                .enter()
-                .append('rect')
-                .classed('bar', true)
-                .attr('x', (d) => xScale2(getGroup(d)))
-                .attr('y', ({value}) => yScale(value))
-                .attr('width', xScale2.bandwidth)
-                .attr('fill', (({group}) => categoryColorMap[group]));
-
-            if (isAnimated) {
-                bars.style('opacity', barOpacity)
-                    .transition()
-                    .delay((_, i) => animationDelays[i])
-                    .duration(animationDuration)
-                    .ease(ease)
-                    .tween('attr.height', verticalBarsTween);
-            } else {
-                bars.attr('height', (d) => chartHeight - yScale(getValue(d)));
-            }
-        }
-
-        /**
          * Draws the different areas into the chart-group element
          * @private
          */
@@ -711,11 +616,7 @@ define(function (require) {
             let series = svg.select('.chart-group').selectAll('.layer');
 
             animationDelays = d3Array.range(animationDelayStep, (layers.length + 1) * animationDelayStep, animationDelayStep)
-            if (isHorizontal) {
-                drawHorizontalBars(series);
-            } else {
-                drawVerticalBars(series);
-            }
+            drawHorizontalBars(series);
 
             // Exit
             series.exit()
@@ -732,30 +633,6 @@ define(function (require) {
          */
         function getMousePosition(event) {
             return d3Selection.mouse(event);
-        }
-
-        /**
-         * Finds out the data entry that is closer to the given position on pixels
-         * @param  {Number} mouseX X position of the mouse
-         * @return {obj}        Data entry that is closer to that x axis position
-         */
-        function getNearestDataPoint(mouseX) {
-            let adjustedMouseX = mouseX - margin.left,
-                epsilon = xScale2.bandwidth(),
-                nearest = [];
-
-            layers.forEach(function (data) {
-                let found = data.values.find((d2) => Math.abs(adjustedMouseX >= xScale(d2[nameLabel]) + xScale2(d2[groupLabel])) && Math.abs(adjustedMouseX - xScale2(d2[groupLabel]) - xScale(d2[nameLabel]) <= epsilon));
-
-                if (found) {
-                    found.values = data.values;
-                    found.key = found.name;
-                    nearest.push(found);
-                }
-
-            });
-
-            return nearest.length ? nearest[0] : undefined;
         }
 
         /**
@@ -811,19 +688,15 @@ define(function (require) {
          */
         function handleMouseMove(e) {
             let [mouseX, mouseY] = getMousePosition(e),
-                dataPoint = isHorizontal ? getNearestDataPoint2(mouseY) : getNearestDataPoint(mouseX),
+                dataPoint = getNearestDataPoint2(mouseY),
                 x,
                 y;
 
             if (dataPoint) {
                 // Move verticalMarker to that datapoint
-                if (isHorizontal) {
-                    x = mouseX - margin.left;
-                    y = yScale(dataPoint.key) + yScale.bandwidth() / 2;
-                } else {
-                    x = xScale(dataPoint.key) + xScale2(dataPoint[groupLabel]);
-                    y = mouseY - margin.bottom;
-                }
+                x = mouseX - margin.left;
+                y = yScale(dataPoint.key) + yScale.bandwidth() / 2;
+
                 moveTooltipOriginXY(x, y);
 
                 // Emit event with xPosition for tooltip or similar feature
@@ -837,7 +710,7 @@ define(function (require) {
          */
         function handleCustomClick (e, d) {
             let [mouseX, mouseY] = getMousePosition(e);
-            let dataPoint = isHorizontal ? getNearestDataPoint2(mouseY) : getNearestDataPoint(mouseX);
+            let dataPoint = getNearestDataPoint2(mouseY);
 
             dispatcher.call('customClick', e, dataPoint, d3Selection.mouse(e));
         }
@@ -858,6 +731,43 @@ define(function (require) {
          */
         function handleMouseOver(e, d) {
             dispatcher.call('customMouseOver', e, d, d3Selection.mouse(e));
+
+            // eyeball fill-opacity
+            rowHoverOver(d);
+        }
+
+        function rowHoverOver(d, i) {
+            let ind = null;
+            let layerName = '';
+            if(this) {
+                layerName = d3Selection.select( this.parentNode ).attr( 'class' );
+                ind = layerName.replace('layer layer-', '');
+                layerName = layerName.replace('layer ', '');
+            }
+
+            if(ind === null)
+                return;
+
+            d3Selection.select(containerRoot).select('.tick svg.visibility-' + ind).attr('opacity', 1);
+            d3Selection.select(containerRoot).select('g.' + layerName +' .bg-hover').attr('fill-opacity', .3);
+        }
+
+        function rowHoverOut(d, i) {
+            // eyeball fill-opacity 0
+            // we should find the index of the currently hovered over row
+            let ind = null;
+            let layerName = '';
+            if(this) {
+                layerName = d3Selection.select( this.parentNode ).attr( 'class' );
+                ind = layerName.replace('layer layer-', '');
+                layerName = layerName.replace('layer ', '');
+            }
+
+            if(ind === null)
+                return;
+
+            d3Selection.select(containerRoot).select('.tick svg.visibility-' + ind).attr('opacity', 0);
+            d3Selection.select(containerRoot).select('g.' + layerName +' .bg-hover').attr('fill-opacity', 0);
         }
 
         /**
@@ -926,23 +836,6 @@ define(function (require) {
             return width > tooltipThreshold;
         }
 
-        /**
-         * Animation tween of vertical bars
-         * @param  {obj} d data of bar
-         * @return {void}
-         */
-        function verticalBarsTween(d) {
-            let node = d3Selection.select(this),
-                i = d3Interpolate.interpolateRound(0, chartHeight - yScale(getValue(d))),
-                y = d3Interpolate.interpolateRound(chartHeight, yScale(getValue(d))),
-                j = d3Interpolate.interpolateNumber(0, 1);
-
-            return function (t) {
-                node.attr('y', y(t))
-                    .attr('height', i(t)).style('opacity', j(t));
-            }
-        }
-
         // eyeball
         function addVisibilityToggle(elem){
             elem.each( function() {
@@ -958,20 +851,21 @@ define(function (require) {
                     .attr('height', '300')
                     .attr('viewBox', '0 0 600 600')
                     .attr('fill', 'none')
-                    .attr('opacity', 1);
+                    .attr('opacity', 0);
 
                 group.append( 'rect' )
                     .attr('x', -10)
                     .attr('y', -10)
                     .attr('height', '50')
                     .attr('width', '50')
-                    //.attr('fill', backgroundHoverColor)
-                    // .on( 'mouseover', function( d ) {
-                    //     rowHoverOver(d);
-                    // } )
-                    // .on('mouseout', function(d) {
-                    //     rowHoverOut(d);
-                    // });
+                    .attr('fill', backgroundHoverColor)
+                    .on( 'mouseover', function( d ) {
+                        rowHoverOver(d);
+                    } )
+                    .on('mouseout', function(d) {
+                        rowHoverOut(d);
+                    })
+                    .attr('opacity', 0);
 
                 group.append( 'path' )
                     .attr('d', 'M 10,10 L 30,30 M 30,10 L 10,30')
@@ -983,9 +877,7 @@ define(function (require) {
 
 
         function getIndex(name){
-            return data.findIndex((o)=>{
-                return o.name === name;
-            });
+            return names.indexOf(name);
         }
         // API
 
