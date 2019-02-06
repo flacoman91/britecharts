@@ -747,7 +747,6 @@ define(function (require) {
             if(ind === null) {
                 ind = getIndex(d);
             }
-            console.log(ind);
             if(parseInt(ind) > -1) {
                 d3Selection.select( containerRoot ).select( '.tick svg.visibility-' + ind ).attr( 'opacity', 1 );
                 d3Selection.select( containerRoot ).select( 'g .layer-' + ind + ' .bg-hover' ).attr( 'fill-opacity', .3 );
