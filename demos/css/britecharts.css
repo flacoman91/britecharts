@@ -225,8 +225,7 @@
 .grouped-bar .tick line {
   display: none; }
 
-.grouped-row .x-axis-group path,
-.grouped-row .y-axis-group path {
+.grouped-row .x-axis-group path {
   display: none; }
 
 .grouped-row .y-axis-group .tick text {
