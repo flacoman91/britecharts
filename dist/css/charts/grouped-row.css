@@ -10,3 +10,7 @@
 .grouped-row .tick line,
 .grouped-row .tick line {
   display: none; }
+
+.grouped-row .chart-group .group-background {
+  fill: lightgrey;
+  fill-opacity: .4; }
