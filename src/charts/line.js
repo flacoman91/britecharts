@@ -719,7 +719,6 @@ define(function(require){
                 .attr('class', 'area');
             areaGroup.append("path")
                 .data([dataRange])
-                .style('opacity', .1)
                 .attr("class", "area")
                 .attr("d", area);
         }

@@ -525,6 +525,10 @@ define(function (require) {
                     return 'layer layer-' + i;
                 });
 
+            let bgColor = layerElements
+                .selectAll('.group-background')
+                .data([0]);
+
             let bgJoin = layerElements
                 .selectAll('.bg-hover')
                 .data([0]);
@@ -537,6 +541,18 @@ define(function (require) {
             let barJoinStriped = layerElements
                 .selectAll('.bar')
                 .data(({values}) => values.filter(o=>o.striped));
+
+            let barbgCol = bgColor
+                .enter()
+                .append('rect')
+                .classed( 'group-background', true )
+                .attr('x', 0)
+                .attr('y', (d) => yScale2(getGroup(d)))
+                .attr('height', yScale2.bandwidth() * groups.length + groups.length * 4)
+                .attr('width', chartWidth);
+                // set these in css
+                // .attr('fill', backgroundHoverColor)
+                // .attr('fill-opacity', .4);
 
             // Enter + Update
             let bars = barJoin
