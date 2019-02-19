@@ -105,7 +105,7 @@ define(function (require) {
 
             ease = d3Ease.easeQuadInOut,
             isHorizontal = false,
-
+            isStacked = false,
             svg,
             chartWidth, chartHeight,
             data,
@@ -142,6 +142,7 @@ define(function (require) {
 
             // getters
             getName = ({name}) => name,
+            getParentValue = ({parentVal}) => parentVal,
             getValue = ({value}) => value,
             getGroup = ({group}) => group,
             getStriped = ({striped}) => striped,
@@ -287,7 +288,8 @@ define(function (require) {
          */
         function buildScales() {
             let yMax = d3Array.max(data.map(getValue));
-            let percentageAxis = Math.min(percentageAxisToMaxRatio * d3Array.max(data, getValue))
+            let percentageAxis = isStacked ? Math.min(percentageAxisToMaxRatio * d3Array.max(data, getParentValue)) :
+                Math.min(percentageAxisToMaxRatio * d3Array.max(data, getValue));
 
             xScale = d3Scale.scaleLinear()
                 .domain([0, percentageAxis])
@@ -533,6 +535,10 @@ define(function (require) {
                 .selectAll('.bg-hover')
                 .data([0]);
 
+            let barJoinOverall = layerElements
+                .selectAll('.bar-overall')
+                .data(({values}) => values);
+
             let barJoin = layerElements
                 .selectAll('.bar')
                 .data(({values}) => values);
@@ -555,6 +561,16 @@ define(function (require) {
                 // .attr('fill-opacity', .4);
 
             // Enter + Update
+            let barsOverall = barJoinOverall
+                .enter()
+                .append('rect')
+                .classed('bar-overall', true)
+                .attr('x', 1)
+                .attr('y', (d) => yScale2(getGroup(d)))
+                .attr('height', yScale2.bandwidth())
+                .attr('fill', (({group}) => categoryColorMap[group]))
+                .attr('fill-opacity', .3);
+
             let bars = barJoin
                 .enter()
                 .append('rect')
@@ -569,11 +585,14 @@ define(function (require) {
                 .enter()
                 .append('text')
                 .classed('percentage-label', true)
-                .attr('x', (d)=>  xScale(getValue(d)) + 5)
+                .attr( 'x', ( d ) => {
+                    return isStacked ? xScale( getParentValue( d ) ) + 5 :
+                        xScale( getValue( d ) ) + 5;
+                } )
                 .attr('y', (d) => yScale2(getGroup(d)) + 16)
                 .text((d)=> format(getValue(d)) + '%');
 
-            let bars2 = barJoinStriped
+            let barsStriped = barJoinStriped
                 .enter()
                 .append('rect')
                 .classed('striped', true)
@@ -607,15 +626,39 @@ define(function (require) {
                     .duration(animationDuration)
                     .ease(ease)
                     .tween('attr.width', horizontalBarsTween);
-                bars2.style('opacity', barOpacity)
+
+                if(isStacked) {
+                    barsOverall.style( 'opacity', barOpacity )
+                        .transition()
+                        .delay( ( _, i ) => animationDelays[ i ] )
+                        .duration( animationDuration )
+                        .ease( ease )
+                        .tween( 'attr.width', horizontalParentBarsTween );
+                }
+
+                barsStriped.style('opacity', barOpacity)
                     .transition()
                     .delay((_, i) => animationDelays[i])
                     .duration(animationDuration)
                     .ease(ease)
                     .tween('attr.width', horizontalBarsTween);
             } else {
-                bars.attr('width', (d) => xScale(getValue(d)));
-                bars2.attr('width', (d) => xScale(getValue(d)));
+                bars.attr( 'width', ( d ) => {
+                    if(isStacked){
+                        return xScale( getValue( d ) / 100 * getParentValue( d ) );
+                    }
+                    return xScale( getValue( d ) );
+                } );
+
+                if(isStacked) {
+                    barsOverall.attr( 'width', ( d ) => xScale( getParentValue( d ) ) );
+                }
+                barsStriped.attr('width', (d) => {
+                    if(isStacked) {
+                        return xScale( getValue( d ) / 100 * getParentValue( d ) );
+                    }
+                    return xScale( getValue( d ) );
+                });
             }
         }
 
@@ -795,7 +838,24 @@ define(function (require) {
          */
         function horizontalBarsTween(d) {
             let node = d3Selection.select(this),
-                i = d3Interpolate.interpolateRound(0, xScale(getValue(d))),
+                j = d3Interpolate.interpolateNumber(0, 1);
+
+            let i = isStacked ? d3Interpolate.interpolateRound( 0, xScale( getValue( d ) / 100 * getParentValue( d ) ) )
+                : d3Interpolate.interpolateRound(0, xScale(getValue(d)));
+            return function (t) {
+                node.attr('width', i(t))
+                    .style('opacity', j(t));
+            }
+        }
+
+        /**
+         * Animation tween of horizontal overall bars
+         * @param  {obj} d data of bar
+         * @return {void}
+         */
+        function horizontalParentBarsTween(d) {
+            let node = d3Selection.select(this),
+                i = d3Interpolate.interpolateRound(0, xScale(getParentValue(d))),
                 j = d3Interpolate.interpolateNumber(0, 1);
 
             return function (t) {
@@ -803,6 +863,7 @@ define(function (require) {
                     .style('opacity', j(t));
             }
         }
+
 
         /**
          * Helper method to update the x position of the vertical marker
@@ -999,6 +1060,21 @@ define(function (require) {
                 return isHorizontal;
             }
             isHorizontal = _x;
+
+            return this;
+        };
+
+        /**
+         * Is this a stacked bar chart
+         * @param  {number} _x Desired horizontal direction for the graph
+         * @return { isStacked | module} If it is horizontal or Bar Chart module to chain calls
+         * @public
+         */
+        exports.isStacked = function (_x) {
+            if (!arguments.length) {
+                return isStacked;
+            }
+            isStacked = _x;
 
             return this;
         };
