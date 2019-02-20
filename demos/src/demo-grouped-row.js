@@ -227,8 +227,8 @@ const data = [ {
     "readOnly": true,
     "show": true,
     "striped": false,
-    "value": 25.671641791044774,
-    "parentVal": 50,
+    "value": 100,
+    "parentVal": 100,
     "group": "BANK OF AMERICA, NATIONAL ASSOCIATION"
 } ];
 

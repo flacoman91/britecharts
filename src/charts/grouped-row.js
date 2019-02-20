@@ -587,8 +587,17 @@ define(function (require) {
                 .append('text')
                 .classed('percentage-label', true)
                 .attr( 'x', ( d ) => {
-                    return isStacked ? xScale( getScaledValue( d ) ) + 5 :
-                        xScale( getValue( d ) ) + 5;
+                    let width = 0;
+                    if ( isStacked ) {
+                        width = xScale( getScaledValue( d ) ) + 5;
+                    } else {
+                        width = xScale( getValue( d ) ) + 5;
+                    }
+                    const textWidth = textHelper.getTextWidth(getValue(d), 16);
+                    if(width + textWidth > chartWidth){
+                        return chartWidth - textWidth - 40;
+                    }
+                    return width;
                 } )
                 .attr('y', (d) => yScale2(getGroup(d)) + 16)
                 .text((d)=> format(getValue(d)) + '%');
@@ -950,7 +959,13 @@ define(function (require) {
                 group.append( 'path' )
                     .attr('d', 'M 10,10 L 30,30 M 30,10 L 10,30')
                     .attr('stroke', '#0072ce')
-                    .attr('stroke-width', '2');
+                    .attr('stroke-width', '2')
+                    .on( 'mouseover', function( d ) {
+                        rowHoverOver(d);
+                    } )
+                    .on('mouseout', function(d) {
+                        rowHoverOut(d);
+                    });
 
             } );
         }
