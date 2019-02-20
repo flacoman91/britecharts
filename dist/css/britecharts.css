@@ -239,7 +239,7 @@
   display: none; }
 
 .grouped-row .chart-group .group-background {
-  fill: lightgrey;
+  fill: #e7e8e9;
   fill-opacity: .4; }
 
 .step-chart .step {
