@@ -219,8 +219,8 @@ const data = [ {
     "show": true,
     "striped": true,
     "readOnly": true,
-    "value": 41.89274447949527,
-    "parentVal": 46.89274447949527,
+    "value": 98.46,
+    "parentVal": 98.75,
     "group": "Average of comparable companies"
 }, {
     "name": "Credit card or prepaid card",

@@ -593,9 +593,9 @@ define(function (require) {
                     } else {
                         width = xScale( getValue( d ) ) + 5;
                     }
-                    const textWidth = textHelper.getTextWidth(getValue(d), 16);
+                    const textWidth = textHelper.getTextWidth(format(getValue(d)) + '%', 16);
                     if(width + textWidth > chartWidth){
-                        return chartWidth - textWidth - 40;
+                        return width - textWidth - 10;
                     }
                     return width;
                 } )
