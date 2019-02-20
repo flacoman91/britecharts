@@ -145,6 +145,7 @@ define(function (require) {
             getParentValue = ({parentVal}) => parentVal,
             getValue = ({value}) => value,
             getGroup = ({group}) => group,
+            getScaledValue = (d) => getValue( d ) / 100 * getParentValue( d ),
             getStriped = ({striped}) => striped,
             isAnimated = false,
 
@@ -586,7 +587,7 @@ define(function (require) {
                 .append('text')
                 .classed('percentage-label', true)
                 .attr( 'x', ( d ) => {
-                    return isStacked ? xScale( getParentValue( d ) ) + 5 :
+                    return isStacked ? xScale( getScaledValue( d ) ) + 5 :
                         xScale( getValue( d ) ) + 5;
                 } )
                 .attr('y', (d) => yScale2(getGroup(d)) + 16)
@@ -645,7 +646,7 @@ define(function (require) {
             } else {
                 bars.attr( 'width', ( d ) => {
                     if(isStacked){
-                        return xScale( getValue( d ) / 100 * getParentValue( d ) );
+                        return xScale( getScaledValue(d) );
                     }
                     return xScale( getValue( d ) );
                 } );
@@ -655,7 +656,7 @@ define(function (require) {
                 }
                 barsStriped.attr('width', (d) => {
                     if(isStacked) {
-                        return xScale( getValue( d ) / 100 * getParentValue( d ) );
+                        return xScale( getScaledValue( d ) );
                     }
                     return xScale( getValue( d ) );
                 });
@@ -840,7 +841,7 @@ define(function (require) {
             let node = d3Selection.select(this),
                 j = d3Interpolate.interpolateNumber(0, 1);
 
-            let i = isStacked ? d3Interpolate.interpolateRound( 0, xScale( getValue( d ) / 100 * getParentValue( d ) ) )
+            let i = isStacked ? d3Interpolate.interpolateRound( 0, xScale( getScaledValue( d ) ) )
                 : d3Interpolate.interpolateRound(0, xScale(getValue(d)));
             return function (t) {
                 node.attr('width', i(t))
