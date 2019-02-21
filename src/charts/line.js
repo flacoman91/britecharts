@@ -692,7 +692,7 @@ define(function(require){
                     return d.show ? 1 : 0;
                 })
                 .style('stroke-dasharray', (d)=>{
-                    return d.dashed ? [1, 5] : false;
+                    return d.dashed ? [.5, 4] : false;
                 });
 
             lines
