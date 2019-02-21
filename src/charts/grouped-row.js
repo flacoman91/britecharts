@@ -145,7 +145,9 @@ define(function (require) {
             getParentValue = ({parentVal}) => parentVal,
             getValue = ({value}) => value,
             getGroup = ({group}) => group,
-            getScaledValue = (d) => getValue( d ) / 100 * getParentValue( d ),
+//            getScaledValue = (d) => getValue( d ) / 100 * getParentValue( d ),
+            getScaledValue = (d) => getValue( d ),
+
             getStriped = ({striped}) => striped,
             isAnimated = false,
 
