@@ -145,11 +145,11 @@ define(function (require) {
             getParentValue = ({parentVal}) => parentVal,
             getValue = ({value}) => value,
             getGroup = ({group}) => group,
-//            getScaledValue = (d) => getValue( d ) / 100 * getParentValue( d ),
             getScaledValue = (d) => getValue( d ),
 
             getStriped = ({striped}) => striped,
             isAnimated = false,
+            isPrintMode = false,
 
             // events
             dispatcher = d3Dispatch.dispatch(
@@ -559,9 +559,6 @@ define(function (require) {
                 .attr('y', (d) => yScale2(getGroup(d)))
                 .attr('height', yScale2.bandwidth() * groups.length + groups.length * 4)
                 .attr('width', chartWidth);
-                // set these in css
-                // .attr('fill', backgroundHoverColor)
-                // .attr('fill-opacity', .4);
 
             // Enter + Update
             let barsOverall = barJoinOverall
@@ -1078,6 +1075,22 @@ define(function (require) {
                 return isHorizontal;
             }
             isHorizontal = _x;
+
+            return this;
+        };
+
+
+        /**
+         * Gets or Sets whether the chart should show the expand toggles/eyeball
+         * @param  {boolean} _x Should we show the expand toggles?
+         * @return {boolean | module} do we expand toggles
+         * @public
+         */
+        exports.isPrintMode = function(_x) {
+            if (!arguments.length) {
+                return isPrintMode;
+            }
+            isPrintMode = _x;
 
             return this;
         };

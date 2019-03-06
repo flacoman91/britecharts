@@ -218,7 +218,8 @@ define(function(require) {
          */
         function exports(_selection) {
             _selection.each(function(_data) {
-                chartWidth = width - margin.left - margin.right - (yAxisPaddingBetweenChart * 1.2) - 50;
+                const printWidth = isPrintMode ? 200 : 0;
+                chartWidth = width - margin.left - margin.right - (yAxisPaddingBetweenChart * 1.2) - 50 - printWidth;
                 chartHeight = height - margin.top - margin.bottom;
                 ({data, dataZeroed} = sortData(cleanData(_data)));
                 buildScales();
@@ -229,6 +230,7 @@ define(function(require) {
                 drawChartTitleLabels();
                 drawRows();
                 drawAxis();
+                drawLegend();
                 updateChartHeight();
             });
         }
@@ -261,6 +263,11 @@ define(function(require) {
 
             container
                 .append('g').classed('chart-group', true);
+
+            if(isPrintMode) {
+                container
+                    .append( 'g' ).classed( 'legend-group', true );
+            }
 
             container
                 .append('g').classed('title-group', true);
@@ -925,6 +932,24 @@ define(function(require) {
                 .attr( 'width', ( { value } ) => xScale( value ) );
         }
 
+        function drawLegend() {
+            if(!isPrintMode)
+                return;
+            let rows;
+            rows = svg.select( '.legend-group' ).selectAll( '.row' )
+                .data( dataZeroed );
+            const pos = Number.parseInt(chartWidth) + Number.parseInt(margin.right);
+            const legendGroup = svg.select( '.legend-group' )
+                .append('g')
+                .attr('transform', 'translate(' + pos + ", 0)");
+            legendGroup.append('rect')
+                .attr('fill', 'grey')
+                .attr('height', 100)
+                .attr('width', 100);
+
+            legendGroup.append('text')
+                .text('shit');
+        }
         /**
          * Draws the row elements within the chart group
          * @private

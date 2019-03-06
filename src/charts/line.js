@@ -944,8 +944,6 @@ define(function(require){
         function handleMouseOut(e, d){
             overlay.style('display', 'none');
             verticalMarkerLine.classed('bc-is-active', false);
-            //verticalMarkerContainer.attr('transform', 'translate(9999, 0)');
-
             dispatcher.call('customMouseOut', e, d, d3Selection.mouse(e));
         }
 
@@ -1028,9 +1026,7 @@ define(function(require){
                                         shouldShowAllDataPoints ? highlightCircleStrokeAll : highlightCircleStroke
                                     ))
                                     .style( 'fill', () => {
-                                        if (! dashedPoints.includes(d.topicName) ) {
-                                            return topicColorMap[ d.name ];
-                                        }
+                                        return topicColorMap[ d.name ];
                                     })
                                     .style( 'opacity', () => {
                                         return hiddenPoints.includes(d.topicName) ? 0 : 1;
