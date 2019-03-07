@@ -111,6 +111,9 @@
 .bar-chart .percentage-label {
   fill: #666A73; }
 
+.line-chart .area {
+  fill: #EFF2F5; }
+
 .line-chart .data-point-mark {
   fill: #ffffff; }
 

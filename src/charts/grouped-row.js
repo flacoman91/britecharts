@@ -492,11 +492,12 @@ define(function (require) {
                 .append('text')
                 .classed('tooltip-left-text', true)
                 .attr('dy', '1em')
-                .attr('x', ttTextX)
+                .attr('dx', ttTextX)
                 .attr('y', ttTextY)
                 .style('fill', tooltipTextColor)
+                .style('font-size', '12px')
                 .text(tooltipLeftText)
-                .call(textWrap, tooltipMaxTopicLength, initialTooltipTextXPosition);
+                .call(textWrap, tooltipMaxTopicLength, 12, initialTooltipTextXPosition);
 
 
             // IE11 give us sometimes a height of 0 when hovering on top of the vertical marker
@@ -529,7 +530,7 @@ define(function (require) {
          * @private
          *
          */
-        function textWrap(text, width, xpos = 0) {
+        function textWrap(text, width, fontSize, xpos = 0) {
             text.each(function() {
                 var words,
                     word,
@@ -560,7 +561,7 @@ define(function (require) {
                     tspan.text(line.join(' '));
 
                     // fixes for IE wrap text issue
-                    const textWidth = textHelper.getTextWidth(line.join(' '), 16, 'Karla, sans-serif');
+                    const textWidth = textHelper.getTextWidth(line.join(' '), fontSize, 'Karla, sans-serif');
 
                     if (textWidth > width) {
                         line.pop();

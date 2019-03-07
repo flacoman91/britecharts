@@ -53,6 +53,44 @@ function createBrushChart(optionalColorSchema) {
     }
 }
 
+function createExportLineChart(optionalColorSchema, optionalData) {
+    let lineChart1 = line(),
+        container = d3Selection.select('.js-export-line-chart-container'),
+        containerWidth = container.node() ? container.node().getBoundingClientRect().width : false,
+        dataset;
+
+    if (containerWidth) {
+        dataset = aTestDataSet().withTruncatedTopics().build();
+
+        // LineChart Setup and start
+        lineChart1
+            .isAnimated(true)
+            .isPrintMode(true)
+            .grid('horizontal')
+            .width(1175)
+            .margin( {
+                top: 60,
+                bottom: 50,
+                left: 50,
+                right: 60
+            } )
+            .dateLabel('fullDate')
+            .xAxisFormat(constants.axisTimeCombinations.MONTH_YEAR);
+
+        if (optionalColorSchema) {
+            console.log(optionalColorSchema);
+            lineChart1.colorSchema(optionalColorSchema);
+        }
+
+        console.log(dataset);
+        if (optionalData) {
+            container.datum(optionalData).call(lineChart1);
+        } else {
+            container.datum(dataset).call(lineChart1);
+        }
+    }
+}
+
 function createLineChart(optionalColorSchema, optionalData) {
     let lineChart1 = line(),
         chartTooltip = tooltip(),
@@ -84,7 +122,7 @@ function createLineChart(optionalColorSchema, optionalData) {
             .on('customDataEntryClick', function(d, mousePosition) {
                 // eslint-disable-next-line no-console
                 console.log('Data entry marker clicked', d, mousePosition);
-            })
+            });
 
 
         if (optionalColorSchema) {
@@ -92,7 +130,6 @@ function createLineChart(optionalColorSchema, optionalData) {
             lineChart1.colorSchema(optionalColorSchema);
         }
 
-    console.log(dataset);
         if (optionalData) {
             container.datum(optionalData).call(lineChart1);
         } else {
@@ -254,15 +291,17 @@ function isInRange(d0, d1, d) {
 
 // Show charts if container available
 if (d3Selection.select('.js-line-chart-container').node()) {
+    createExportLineChart();
     createLineChart();
     createBrushChart();
     createLineChartWithSingleLine();
-    // createLineChartWithFixedHeight();
-    // createLoadingState();
+    createLineChartWithFixedHeight();
+    createLoadingState();
 
     redrawCharts = function(){
         d3Selection.selectAll('.line-chart').remove();
         d3Selection.selectAll('.brush-chart').remove();
+        createExportLineChart();
         createLineChart();
         createBrushChart();
         createLineChartWithSingleLine();

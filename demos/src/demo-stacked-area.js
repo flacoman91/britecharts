@@ -77,6 +77,42 @@ function createStackedAreaChartWithTooltip(optionalColorSchema) {
     }
 }
 
+function createStackedAreaChartExport(optionalColorSchema) {
+    let stackedArea = stackedAreaChart(),
+        container = d3Selection.select('.js-stacked-area-chart-export-container'),
+        containerWidth = container.node() ? container.node().getBoundingClientRect().width : false,
+        dataset;
+
+    if (containerWidth) {
+        dataset = aTestDataSet().with6Sources().build();
+
+
+        // StackedAreChart Setup and start
+        stackedArea
+            .isAnimated(true)
+            .isPrintMode(true)
+            .margin( {
+                top: 60,
+                bottom: 50,
+                left: 50,
+                right: 60
+            } )
+            .tooltipThreshold(600)
+            .height(564)
+            .width(1175)
+            .dateLabel('dateUTC')
+            .valueLabel('views')
+            .grid('horizontal');
+
+        stackedArea.colorSchema(['red', 'blue', 'green', 'yellow', 'purple', 'pink', 'black', 'grey', 'orange']);
+
+        // if (optionalColorSchema) {
+        //     stackedArea.colorSchema(optionalColorSchema);
+        // }
+
+        container.datum(dataset.data).call(stackedArea);
+    }
+}
 
 function createStackedAreaJumping() {
     let stackedArea = stackedAreaChart(),
@@ -264,6 +300,7 @@ function createLoadingState() {
 
 if (d3Selection.select('.js-stacked-area-chart-tooltip-container').node()){
     // Chart creation
+    createStackedAreaChartExport();
     createStackedAreaChartWithTooltip();
     createStackedAreaJumping();
     createStackedAreaChartWithFixedAspectRatio();
@@ -274,6 +311,7 @@ if (d3Selection.select('.js-stacked-area-chart-tooltip-container').node()){
     // we'll need to listen to the window resize event
     redrawCharts = function(){
         d3Selection.selectAll('.stacked-area').remove();
+        createStackedAreaChartExport();
         createStackedAreaChartWithTooltip();
         createStackedAreaJumping();
         createStackedAreaChartWithFixedAspectRatio();

@@ -12,6 +12,7 @@ define(function(require){
     const d3Transition = require('d3-transition');
     const d3TimeFormat = require('d3-time-format');
     const assign = require('lodash.assign');
+    const textHelper = require('./helpers/text');
 
     const {exportChart} = require('./helpers/export');
     const colorHelper = require('./helpers/color');
@@ -152,6 +153,7 @@ define(function(require){
             pointsBorderColor     = '#ffffff',
             initializeVerticalMarker = false,
             isAnimated = false,
+            isPrintMode = false,
             ease = d3Ease.easeQuadInOut,
             areaAnimationDuration = 1000,
 
@@ -187,6 +189,29 @@ define(function(require){
 
             isUsingFakeData = false,
 
+            // legend stuff
+            circleYOffset = 8,
+            entryLineLimit = 5,
+            initialTooltipTextXPosition = -25,
+            tooltipTextLinePadding = 5,
+            tooltipRightWidth,
+            tooltipMaxTopicLength = 200,
+            tooltipTextContainer,
+            tooltipDivider,
+            tooltipBody,
+            tooltipTitle,
+            tooltipWidth = 300,
+            tooltipHeight = 48,
+            tooltipBorderRadius = 3,
+            ttTextX = -15,
+            ttTextY = 37,
+            textHeight,
+            bodyFillColor = '#FFFFFF',
+            borderStrokeColor = '#D2D6DF',
+            titleFillColor = '#6D717A',
+            textFillColor = '#282C35',
+            tooltipTextColor = '#000000',
+
             // getters
             getName = ({name}) => name,
             getDate = ({date}) => date,
@@ -208,7 +233,8 @@ define(function(require){
          */
         function exports(_selection) {
             _selection.each(function(_data) {
-                chartWidth = width - margin.left - margin.right;
+                const printWidth = isPrintMode ? tooltipWidth : 0;
+                chartWidth = width - margin.left - margin.right - printWidth;
                 chartHeight = height - margin.top - margin.bottom;
                 data = cleanData(_data);
                 dataByDate = getDataByDate(data);
@@ -219,6 +245,7 @@ define(function(require){
                 buildAxis();
                 drawAxis();
                 drawStackedAreas();
+                drawLegend();
 
                 addTouchEvents();
 
@@ -369,6 +396,13 @@ define(function(require){
               .append('g').classed('y-axis-label', true);
             container
               .append('g').classed('chart-group', true);
+
+            if(isPrintMode) {
+                container
+                    .append( 'g' ).classed( 'legend-group', true );
+            }
+
+
             container
               .append('g').classed('metadata-group', true);
         }
@@ -637,6 +671,205 @@ define(function(require){
         }
 
         /**
+         * Figures out which date format to use when showing the date of the current data entry
+         * @param {Date} date   Date object to format
+         * @return {Function}   The proper date formatting function
+         * @private
+         */
+        function formatDate(date) {
+            const d = new Date(date);
+            return d.toLocaleDateString();
+        }
+
+        /**
+         * Updates value of tooltipTitle with the data meaning and the date
+         * @param  {Object} dataPoint Point of data to use as source
+         * @return void
+         * @private
+         */
+        function updateTitle(min, max) {
+            const title = formatDate(min.date) + ' - ' + formatDate(max.date);
+            tooltipTitle.text(title);
+        }
+
+        /**
+         * Draws the data entries inside the tooltip for a given topic
+         * @param  {Object} topic Topic to extract data from
+         * @return void
+         * @private
+         */
+        function updateTopicContent(topic){
+            let name = topic.name,
+                tooltipRight,
+                tooltipLeftText,
+                tooltipRightText,
+                elementText;
+
+            tooltipLeftText = name;
+            tooltipRightText = topic.sum.toLocaleString();
+
+            elementText = tooltipBody
+                .append('text')
+                .classed('tooltip-left-text', true)
+                .attr('dy', '1em')
+                .attr('x', ttTextX)
+                .attr('y', ttTextY)
+                .style('fill', tooltipTextColor)
+                .style('font-size', '12px')
+                .text(tooltipLeftText)
+                .call(textWrap, tooltipMaxTopicLength, 12, initialTooltipTextXPosition);
+
+            tooltipRight = tooltipBody
+                .append('text')
+                .classed('tooltip-right-text', true)
+                .attr('dy', '1em')
+                .attr('x', ttTextX)
+                .attr('y', ttTextY)
+                .style('fill', tooltipTextColor)
+                .style('font-size', '12px')
+                .text(tooltipRightText);
+
+            // IE11 give us sometimes a height of 0 when hovering on top of the vertical marker
+            // This hack fixes it for some cases, but it doesn't work in multiline (they won't wrap)
+            // Let's remove this once we stop supporting IE11
+            textHeight = elementText.node().getBBox().height ? elementText.node().getBBox().height : textHeight;
+
+            tooltipHeight += textHeight + tooltipTextLinePadding;
+            // update the width if it exists because IE renders the elements
+            // too slow and cant figure out the width?
+            tooltipRightWidth = tooltipRight.node().getBBox().width ? tooltipRight.node().getBBox().width : tooltipRightWidth;
+            tooltipRight.attr( 'x', tooltipWidth - tooltipRightWidth - tooltipWidth / 4 );
+            tooltipBody
+                .append('circle')
+                .classed('tooltip-circle', true)
+                .attr('cx', ttTextX - 20)
+                .attr('cy', (ttTextY + circleYOffset))
+                .attr('r', 5)
+                .style('fill', categoryColorMap[topic.name])
+                .style('stroke-width', 1);
+
+            ttTextY += textHeight + 7;
+        }
+
+        function updateTotal(total){
+            let tooltipRight,
+                tooltipLeftText,
+                tooltipRightText,
+                elementText;
+
+            tooltipLeftText = 'Total';
+            tooltipRightText = total.toLocaleString();
+
+            tooltipDivider = tooltipBody
+                .append('line')
+                .classed('tooltip-divider', true)
+                .attr('x1', ttTextX - 28)
+                .attr('x2', 225)
+                .attr('y1', ttTextY)
+                .attr('y2', ttTextY)
+                .style('stroke', borderStrokeColor);
+
+            elementText = tooltipBody
+                .append('text')
+                .classed('tooltip-left-text', true)
+                .attr('dy', '1em')
+                .attr('dx', ttTextX )
+                .attr('y', ttTextY + 5)
+                .style('fill', tooltipTextColor)
+                .style('font-size', '14px')
+                .style('font-weight', '800')
+                .text(tooltipLeftText)
+                .call(textWrap, tooltipMaxTopicLength, 14, initialTooltipTextXPosition);
+
+            tooltipRight = tooltipBody
+                .append('text')
+                .classed('tooltip-right-text', true)
+                .attr('dy', '1em')
+                .attr('x', ttTextX)
+                .attr('y', ttTextY + 5)
+                .style('fill', tooltipTextColor)
+                .style('font-size', '14px')
+                .style('font-weight', '800')
+                .text(tooltipRightText);
+
+            // IE11 give us sometimes a height of 0 when hovering on top of the vertical marker
+            // This hack fixes it for some cases, but it doesn't work in multiline (they won't wrap)
+            // Let's remove this once we stop supporting IE11
+            textHeight = elementText.node().getBBox().height ? elementText.node().getBBox().height : textHeight;
+
+            tooltipHeight += textHeight + tooltipTextLinePadding;
+            // update the width if it exists because IE renders the elements
+            // too slow and cant figure out the width?
+            tooltipRightWidth = tooltipRight.node().getBBox().width ? tooltipRight.node().getBBox().width : tooltipRightWidth;
+            tooltipRight.attr( 'x', tooltipWidth - tooltipRightWidth - tooltipWidth / 4 );
+
+            ttTextY += textHeight + 7;
+        }
+
+        /**
+         * Wraps a text given the text, width, x position and textFormatter function
+         * @param  {D3Selection} text  Selection with the text to wrap inside
+         * @param  {Number} width Desired max width for that line
+         * @param  {Number} fontSize size of font for that line
+         * @param  {Number} xpos  Initial x position of the text
+         * REF: http://bl.ocks.org/mbostock/7555321
+         * More discussions on https://github.com/mbostock/d3/issues/1642
+         * @private
+         *
+         */
+        function textWrap(text, width, fontSize, xpos = 0) {
+            text.each(function() {
+                var words,
+                    word,
+                    line,
+                    lineNumber,
+                    lineHeight,
+                    y,
+                    dy,
+                    tspan;
+
+                text = d3Selection.select(this);
+
+                words = text.text().split(/\s+/).reverse();
+                line = [];
+                lineNumber = 0;
+                lineHeight = 1.2;
+                y = text.attr('y');
+                dy = parseFloat(text.attr('dy'));
+                tspan = text
+                    .text(null)
+                    .append('tspan')
+                    .attr('x', xpos)
+                    .attr('y', y)
+                    .attr('dy', dy + 'em');
+
+                while ((word = words.pop())) {
+                    line.push(word);
+                    tspan.text(line.join(' '));
+
+                    // fixes for IE wrap text issue
+                    const textWidth = textHelper.getTextWidth(line.join(' '), fontSize, 'Karla, sans-serif');
+
+                    if (textWidth > width) {
+                        line.pop();
+                        tspan.text(line.join(' '));
+
+                        if (lineNumber < entryLineLimit - 1) {
+                            line = [word];
+                            tspan = text.append('tspan')
+                                .attr('x', xpos)
+                                .attr('y', y)
+                                .attr('dy', ++lineNumber * lineHeight + dy + 'em')
+                                .text(word);
+                        }
+                    }
+                }
+            });
+
+        }
+
+
+        /**
          * Draws grid lines on the background of the chart
          * @return void
          */
@@ -847,6 +1080,60 @@ define(function(require){
                 .transition()
                 .style('opacity', 0)
                 .remove();
+        }
+
+        function drawLegend() {
+            if(!isPrintMode)
+                return;
+            const pos = Number.parseInt(chartWidth) + Number.parseInt(margin.right);
+
+            tooltipTextContainer = svg.selectAll('.legend-group')
+                .append('g')
+                .attr('transform', 'translate(' + pos + ", 0)")
+                .classed('tooltip-text', true);
+
+            tooltipTitle = tooltipTextContainer
+                .append('text')
+                .classed('tooltip-title', true)
+                .attr('x', ttTextX - 28)
+                .attr('dy', '.35em')
+                .attr('y', 16)
+                .style('fill', textFillColor)
+                .style('font-size', '12px');
+
+            tooltipDivider = tooltipTextContainer
+                .append('line')
+                .classed('tooltip-divider', true)
+                .attr('x1', ttTextX - 28)
+                .attr('x2', 225)
+                .attr('y1', 31)
+                .attr('y2', 31)
+                .style('stroke', borderStrokeColor);
+
+            tooltipBody = tooltipTextContainer
+                .append('g')
+                .classed('tooltip-body', true)
+                .style('transform', 'translateY(8px)')
+                .style('fill', textFillColor);
+
+            const uniqNames = [...new Set(data.map(o=>o.name))];
+            const keys = [];
+            for(let i=0; i< uniqNames.length; i++){
+                const item = {};
+                const name =uniqNames[i];
+                item.name = name;
+                item.sum = data.filter(o=>o.name === uniqNames[i])
+                    .reduce((a, b)=>a + b.value, 0);
+                keys.push(item);
+            }
+
+            const min = dataByDate[0];
+            const last = dataByDate.length - 1;
+            const max = dataByDate[last];
+            updateTitle(min, max);
+            const total = keys.reduce((a, b)=>a + b.sum, 0);
+            keys.forEach(updateTopicContent);
+            updateTotal(total);
         }
 
         /**
@@ -1277,6 +1564,21 @@ define(function(require){
                 return isAnimated;
             }
             isAnimated = _x;
+
+            return this;
+        };
+
+        /**
+         * Gets or Sets whether the chart should show the expand toggles/eyeball
+         * @param  {boolean} _x Should we show the expand toggles?
+         * @return {boolean | module} do we expand toggles
+         * @public
+         */
+        exports.isPrintMode = function(_x) {
+            if (!arguments.length) {
+                return isPrintMode;
+            }
+            isPrintMode = _x;
 
             return this;
         };
