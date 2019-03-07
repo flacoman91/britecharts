@@ -150,12 +150,12 @@ define(function(require) {
                 x: 0
             },
 
-            circleYOffset = 8,
-
+            circleYOffset = 10,
+            entryLineLimit = 5,
             initialTooltipTextXPosition = -25,
             tooltipTextLinePadding = 5,
             tooltipRightWidth,
-            tooltipMaxTopicLength = 170,
+            tooltipMaxTopicLength = 200,
             tooltipTextContainer,
             tooltipDivider,
             tooltipBody,
@@ -979,17 +979,8 @@ define(function(require) {
                 .style('transform', 'translateY(8px)')
                 .style('fill', textFillColor);
 
-            updateTopicContent( {
-                name: 'Brilliant',
-                topicName: 'Brilliant',
-                value: 12344
-            } );
-            updateTopicContent( {
-                name: 'Shining',
-                topicName: 'Shining',
-                value: 12344
-            } );
-
+            const keys = data.filter(o=>o.isParent);
+            keys.forEach(updateTopicContent);
         }
 
         /**
@@ -1018,14 +1009,14 @@ define(function(require) {
                 .text(tooltipLeftText)
                 .call(textWrap, tooltipMaxTopicLength, initialTooltipTextXPosition);
 
-            tooltipRight = tooltipBody
-                .append('text')
-                .classed('tooltip-right-text', true)
-                .attr('dy', '1em')
-                .attr('x', ttTextX)
-                .attr('y', ttTextY)
-                .style('fill', tooltipTextColor)
-                .text(tooltipRightText);
+            // tooltipRight = tooltipBody
+            //     .append('text')
+            //     .classed('tooltip-right-text', true)
+            //     .attr('dy', '1em')
+            //     .attr('x', ttTextX)
+            //     .attr('y', ttTextY)
+            //     .style('fill', tooltipTextColor)
+            //     .text(tooltipRightText);
 
             // IE11 give us sometimes a height of 0 when hovering on top of the vertical marker
             // This hack fixes it for some cases, but it doesn't work in multiline (they won't wrap)
@@ -1035,10 +1026,9 @@ define(function(require) {
             tooltipHeight += textHeight + tooltipTextLinePadding;
             // update the width if it exists because IE renders the elements
             // too slow and cant figure out the width?
-            tooltipRightWidth = tooltipRight.node().getBBox().width ? tooltipRight.node().getBBox().width : tooltipRightWidth;
-            tooltipRight.attr( 'x', tooltipWidth - tooltipRightWidth - 10 - tooltipWidth / 4 );
+            // tooltipRightWidth = tooltipRight.node().getBBox().width ? tooltipRight.node().getBBox().width : tooltipRightWidth;
+            // tooltipRight.attr( 'x', tooltipWidth - tooltipRightWidth - 10 - tooltipWidth / 4 );
 
-            console.log(colorMap);
             tooltipBody
                 .append('circle')
                 .classed('tooltip-circle', true)
