@@ -14,7 +14,8 @@ require('./helpers/resizeHelper');
 const getParentValue = ({parentVal}) => parentVal,
     getValue = ({value}) => value;
 
-const data = [ {
+const data = [
+    {
     "name": "Student loan",
     "show": true,
     "striped": false,
@@ -289,12 +290,8 @@ function creategroupedRowChartWithTooltip(optionalColorSchema) {
 
 function createHorizontalgroupedRowChart(optionalColorSchema) {
     let groupedRow = groupedRowChart(),
-        chartTooltip = tooltip(),
-        testDataSet = new groupedDataBuilder.GroupedRowChartDataBuilder(),
         container = d3Selection.select('.js-grouped-row-chart-fixed-container'),
-        containerWidth = container.node() ? container.node().getBoundingClientRect().width : false,
-        tooltipContainer,
-        dataset;
+        containerWidth = container.node() ? container.node().getBoundingClientRect().width : false;
 
     if (containerWidth) {
 
@@ -318,20 +315,48 @@ function createHorizontalgroupedRowChart(optionalColorSchema) {
                 bottom: 20
             })
             .xTicks(10);
-            // .nameLabel('date')
-            // .valueLabel('views')
-            // .groupLabel('stack')
-            // .on('customMouseOver', function() {
-            //     chartTooltip.show();
-            // })
-            // .on('customMouseMove', function(dataPoint, topicColorMap, x, y) {
-            //     chartTooltip.update(dataPoint, topicColorMap, x, y);
-            // })
-            // .on('customMouseOut', function() {
-            //     chartTooltip.hide();
-            // });
 
         groupedRow.colorSchema(['red', 'yellow', 'blue']);
+
+        container.datum(data).call(groupedRow);
+    }
+}
+
+function createHorizontalExportGroupedRowChart(optionalColorSchema) {
+    let groupedRow = groupedRowChart(),
+        container = d3Selection.select('.js-grouped-row-chart-export-container'),
+        containerWidth = container.node() ? container.node().getBoundingClientRect().width : false;
+
+    if (containerWidth) {
+
+        // StackedAreChart Setup and start
+        const isStacked = true;
+        const ratio = isStacked ? 100 / d3Array.max( data, getParentValue ) :
+            100/d3Array.max(data, getValue);
+        groupedRow
+            .tooltipThreshold(600)
+            .grid('vertical')
+            .height(3*10*30)
+            .width(1175)
+            .percentageAxisToMaxRatio(ratio)
+            .isHorizontal(true)
+            .isStacked(isStacked)
+            .isAnimated(true)
+            .isPrintMode(true)
+            .margin({
+                left: 250,
+                top: 40,
+                right: 60,
+                bottom: 20
+            })
+            .xTicks(10);
+
+        groupedRow.colorSchema(['red', 'yellow', 'blue']);
+
+        // unstripe them
+        data.forEach( o => {
+            o.striped = false;
+        });
 
         container.datum(data).call(groupedRow);
     }
@@ -341,14 +366,16 @@ if (d3Selection.select('.js-grouped-row-chart-tooltip-container').node()){
     // Chart creation
     creategroupedRowChartWithTooltip();
     createHorizontalgroupedRowChart();
+    createHorizontalExportGroupedRowChart();
 
     // For getting a responsive behavior on our chart,
     // we'll need to listen to the window resize event
     redrawCharts = () => {
         d3Selection.selectAll('.grouped-row').remove();
-
         creategroupedRowChartWithTooltip();
         createHorizontalgroupedRowChart();
+        createHorizontalExportGroupedRowChart();
+
     };
 
     // Redraw charts on window resize

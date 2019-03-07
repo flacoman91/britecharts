@@ -151,6 +151,36 @@ define(function (require) {
             isAnimated = false,
             isPrintMode = false,
 
+            // legend stuff
+            // tooltip
+            tooltip,
+            tooltipOffset = {
+                y: -55,
+                x: 0
+            },
+
+            circleYOffset = 10,
+            entryLineLimit = 5,
+            initialTooltipTextXPosition = -25,
+            tooltipTextLinePadding = 5,
+            tooltipRightWidth,
+            tooltipMaxTopicLength = 200,
+            tooltipTextContainer,
+            tooltipDivider,
+            tooltipBody,
+            tooltipTitle,
+            tooltipWidth = 250,
+            tooltipHeight = 48,
+            tooltipBorderRadius = 3,
+            ttTextX = 0,
+            ttTextY = 37,
+            textHeight,
+            bodyFillColor = '#FFFFFF',
+            borderStrokeColor = '#D2D6DF',
+            titleFillColor = '#6D717A',
+            textFillColor = '#282C35',
+            tooltipTextColor = '#000000',
+
             // events
             dispatcher = d3Dispatch.dispatch(
                 'customMouseOver',
@@ -167,7 +197,8 @@ define(function (require) {
          */
         function exports(_selection) {
             _selection.each(function (_data) {
-                chartWidth = width - margin.left - margin.right;
+                const printWidth = isPrintMode ? 250 : 0;
+                chartWidth = width - margin.left - margin.right - printWidth;
                 chartHeight = height - margin.top - margin.bottom;
                 data = cleanData(_data);
 
@@ -179,6 +210,7 @@ define(function (require) {
                 buildAxis();
                 drawGroupedRow();
                 drawAxis();
+                drawLegend();
                 addMouseEvents();
             });
         }
@@ -260,6 +292,12 @@ define(function (require) {
                 .append('g').classed('grid-lines-group', true);
             container
                 .append('g').classed('chart-group', true);
+
+            if(isPrintMode) {
+                container
+                    .append( 'g' ).classed( 'legend-group', true );
+            }
+
             container
                 .append('g').classed('y-axis-group axis', true);
             container
@@ -415,6 +453,133 @@ define(function (require) {
                     .text(yAxisLabel)
             }
         }
+
+
+        function drawLegend() {
+            if(!isPrintMode)
+                return;
+            const pos = Number.parseInt(chartWidth) + Number.parseInt(margin.right);
+
+            tooltipTextContainer = svg.selectAll('.legend-group')
+                .append('g')
+                .attr('transform', 'translate(' + pos + ", -30)")
+                .classed('tooltip-text', true);
+
+            tooltipBody = tooltipTextContainer
+                .append('g')
+                .classed('tooltip-body', true)
+                .style('transform', 'translateY(8px)')
+                .style('fill', textFillColor);
+
+            const keys = [ ...new Set( data.map( o => o.group ) ) ].reverse();
+            keys.forEach(updateTopicContent);
+        }
+
+        /**
+         * Draws the data entries inside the tooltip for a given topic
+         * @param  {Object} topic Topic to extract data from
+         * @return void
+         * @private
+         */
+        function updateTopicContent(topic){
+            let name = topic,
+                tooltipLeftText,
+                elementText;
+
+            tooltipLeftText = topic;
+
+            elementText = tooltipBody
+                .append('text')
+                .classed('tooltip-left-text', true)
+                .attr('dy', '1em')
+                .attr('x', ttTextX)
+                .attr('y', ttTextY)
+                .style('fill', tooltipTextColor)
+                .text(tooltipLeftText)
+                .call(textWrap, tooltipMaxTopicLength, initialTooltipTextXPosition);
+
+
+            // IE11 give us sometimes a height of 0 when hovering on top of the vertical marker
+            // This hack fixes it for some cases, but it doesn't work in multiline (they won't wrap)
+            // Let's remove this once we stop supporting IE11
+            textHeight = elementText.node().getBBox().height ? elementText.node().getBBox().height : textHeight;
+
+            tooltipHeight += textHeight + tooltipTextLinePadding;
+            // update the width if it exists because IE renders the elements
+            // too slow and cant figure out the width?
+            tooltipBody
+                .append('circle')
+                .classed('tooltip-circle', true)
+                .attr('cx', 23 - tooltipWidth / 4)
+                .attr('cy', (ttTextY + circleYOffset))
+                .attr('r', 5)
+                .style('fill', categoryColorMap[name])
+                .style('stroke-width', 1);
+
+            ttTextY += textHeight + 7;
+        }
+
+        /**
+         * Wraps a text given the text, width, x position and textFormatter function
+         * @param  {D3Selection} text  Selection with the text to wrap inside
+         * @param  {Number} width Desired max width for that line
+         * @param  {Number} xpos  Initial x position of the text
+         * REF: http://bl.ocks.org/mbostock/7555321
+         * More discussions on https://github.com/mbostock/d3/issues/1642
+         * @private
+         *
+         */
+        function textWrap(text, width, xpos = 0) {
+            text.each(function() {
+                var words,
+                    word,
+                    line,
+                    lineNumber,
+                    lineHeight,
+                    y,
+                    dy,
+                    tspan;
+
+                text = d3Selection.select(this);
+
+                words = text.text().split(/\s+/).reverse();
+                line = [];
+                lineNumber = 0;
+                lineHeight = 1.2;
+                y = text.attr('y');
+                dy = parseFloat(text.attr('dy'));
+                tspan = text
+                    .text(null)
+                    .append('tspan')
+                    .attr('x', xpos)
+                    .attr('y', y)
+                    .attr('dy', dy + 'em');
+
+                while ((word = words.pop())) {
+                    line.push(word);
+                    tspan.text(line.join(' '));
+
+                    // fixes for IE wrap text issue
+                    const textWidth = textHelper.getTextWidth(line.join(' '), 16, 'Karla, sans-serif');
+
+                    if (textWidth > width) {
+                        line.pop();
+                        tspan.text(line.join(' '));
+
+                        if (lineNumber < entryLineLimit - 1) {
+                            line = [word];
+                            tspan = text.append('tspan')
+                                .attr('x', xpos)
+                                .attr('y', y)
+                                .attr('dy', ++lineNumber * lineHeight + dy + 'em')
+                                .text(word);
+                        }
+                    }
+                }
+            });
+
+        }
+
 
         /**
          * Draws a vertical line to extend y-axis till the edges
