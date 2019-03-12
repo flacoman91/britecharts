@@ -906,42 +906,42 @@ function isIE(){
 
 // Show charts if container available
 if (d3Selection.select('.js-row-chart-tooltip-container').node()){
-    // createFocusExportRowChart();
-    // createExportRowChart();
-    // createRowChartWithTooltip();
+    createFocusExportRowChart();
+    createExportRowChart();
+    createRowChartWithTooltip();
 
-    // createRowChartDataLens('.js-mobile-lg-row-chart-lens-container', 600);
-    // createRowChartDataLens('.js-mobile-sm-row-chart-lens-container', 320);
-    // createRowChartDataLens('.js-row-chart-lens-container');
+    createRowChartDataLens('.js-mobile-lg-row-chart-lens-container', 600);
+    createRowChartDataLens('.js-mobile-sm-row-chart-lens-container', 320);
+    createRowChartDataLens('.js-row-chart-lens-container');
 
     createHorizontalRowChart('.js-horizontal-row-chart-container');
     createHorizontalRowChart('.js-mobile-lg-row-chart-container', 600);
     createHorizontalRowChart('.js-mobile-sm-row-chart-container', 320);
-    // createSimpleRowChart();
-    // createRow4ExpandedChart();
-    // createLastExpandedChart();
-    // createCollapsedChart();
-    // createMassiveChart();
+    createSimpleRowChart();
+    createRow4ExpandedChart();
+    createLastExpandedChart();
+    createCollapsedChart();
+    createMassiveChart();
 
     let redrawCharts = function() {
         d3Selection.selectAll( '.row-chart' ).remove();
-        // createFocusExportRowChart();
-        // createExportRowChart();
-        // createRowChartWithTooltip();
+        createFocusExportRowChart();
+        createExportRowChart();
+        createRowChartWithTooltip();
 
-        // createRowChartDataLens('.js-mobile-lg-row-chart-lens-container', 600);
-        // createRowChartDataLens('.js-mobile-sm-row-chart-lens-container', 320);
-        // createRowChartDataLens('.js-row-chart-lens-container');
+        createRowChartDataLens('.js-mobile-lg-row-chart-lens-container', 600);
+        createRowChartDataLens('.js-mobile-sm-row-chart-lens-container', 320);
+        createRowChartDataLens('.js-row-chart-lens-container');
 
         createHorizontalRowChart('.js-horizontal-row-chart-container');
         createHorizontalRowChart('.js-mobile-lg-row-chart-container', 600);
         createHorizontalRowChart('.js-mobile-sm-row-chart-container', 320);
 
-        // createSimpleRowChart();
-        // createRow4ExpandedChart();
-        // createLastExpandedChart();
-        // createCollapsedChart();
-        // createMassiveChart();
+        createSimpleRowChart();
+        createRow4ExpandedChart();
+        createLastExpandedChart();
+        createCollapsedChart();
+        createMassiveChart();
     };
 
     // Redraw charts on window resize
