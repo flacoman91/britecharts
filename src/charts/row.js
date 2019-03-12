@@ -1043,32 +1043,65 @@ define(function(require) {
             if(labelsTotalCount) {
                 const ltc = labelsTotalCount.toLocaleString();
                 const compCountTxt = labelsTotalText + ' ' + ltc;
-                let cw = textHelper.getTextWidth( compCountTxt, labelsSizeChild, 'sans-serif' );
+                let cw = textHelper.getTextWidth( compCountTxt, labelsSizeChild, 'Karla, sans-serif');
+                let part1Width = textHelper.getTextWidth( labelsTotalText, labelsSizeChild, 'Karla, sans-serif' );
+                let numWidth = textHelper.getTextWidth( ltc, labelsSizeChild, 'Karla, sans-serif' );
+
+                console.log(cw, part1Width, numWidth);
+
                 let printPadding = isPrintMode && isIE ? 10 : 0;
 
                 const ieTweak = isIE ? 5 :0;
-                const complaintTotalGroup = svg.select( '.title-group' ).append( 'text' )
-                    .text( null )
-                    .attr( 'x', chartWidth - cw - printPadding - 10 - ieTweak - 5)
-                    .attr( 'y', titleMarginTop );
 
-                complaintTotalGroup.append('tspan')
-                    .text(labelsTotalText)
-                    .attr( 'font-size', labelsSizeChild );
+                if ( width > 350 ) {
+                    const complaintTotalGroup = svg.select( '.title-group' ).append( 'text' )
+                        .text( null )
+                        .attr( 'x', chartWidth - cw - printPadding - 10 - ieTweak - 5 )
+                        .attr( 'y', titleMarginTop );
 
-                complaintTotalGroup.append('tspan')
-                    .text( ltc )
-                    .classed('count', true)
-                    .attr('dx', 5)
-                    .attr( 'font-size', labelsSizeChild )
-                    .attr( 'font-weight', 600 );
+                    complaintTotalGroup.append( 'tspan' )
+                        .text( labelsTotalText )
+                        .attr( 'font-size', labelsSizeChild );
 
-                const titlexPos = width > 600 ? chartWidth - complaintTotalGroup.node().getBoundingClientRect().width - 10 - printPadding :
-                    chartWidth - complaintTotalGroup.node().getBoundingClientRect().width - 10;
+                    complaintTotalGroup.append( 'tspan' )
+                        .text( ltc )
+                        .classed( 'count', true )
+                        .attr( 'dx', 5 )
+                        .attr( 'font-size', labelsSizeChild )
+                        .attr( 'font-weight', 600 );
 
-                console.log('title width is' + complaintTotalGroup.node().getBoundingClientRect().width );
-                complaintTotalGroup.attr('x', titlexPos)
+                    const titlexPos = width > 600 ? chartWidth - complaintTotalGroup.node().getBoundingClientRect().width - 10 - printPadding :
+                        chartWidth - complaintTotalGroup.node().getBoundingClientRect().width - 10;
 
+                    console.log( 'title width is' + complaintTotalGroup.node().getBoundingClientRect().width );
+                    complaintTotalGroup.attr( 'x', titlexPos )
+                } else {
+                    const complaintTotalGroup = svg.select( '.title-group' ).append( 'text' )
+                        .text( null )
+                        .attr( 'x', chartWidth - cw - printPadding - 10 - ieTweak - 5 )
+                        .attr( 'y', titleMarginTop );
+
+                    complaintTotalGroup.append( 'tspan' )
+                        .text( labelsTotalText )
+                        .attr( 'font-size', labelsSizeChild )
+                        .attr( 'font-family', 'Karla, sans-serif' )
+                        .attr( 'x', chartWidth - part1Width * 1.35 );
+                    console.log('TL===>' +complaintTotalGroup.select('tspan').node().getComputedTextLength());
+
+                    complaintTotalGroup.append( 'tspan' )
+                        .text( ltc )
+                        .classed( 'count', true )
+                        .attr( 'x', chartWidth - numWidth * 2 )
+                        .attr( 'dy', 12 )
+                        .attr( 'font-size', labelsSizeChild )
+                        .attr( 'font-weight', 600 );
+
+                    const titlexPos = width > 600 ? chartWidth - complaintTotalGroup.node().getBoundingClientRect().width - 10 - printPadding :
+                        chartWidth - complaintTotalGroup.node().getBoundingClientRect().width - 10;
+
+                    console.log( 'title width is' + complaintTotalGroup.node().getBoundingClientRect().width );
+                    complaintTotalGroup.attr( 'x', titlexPos )
+                }
             }
 
             if(labelsInterval && width > 600) {

@@ -188,10 +188,12 @@ function createRowChartDataLens(containerId, width) {
         });
 
         // let out total count be 10000
-        const height = calculateHeight(dataTarget);
+        const isDesktop = containerWidth > 600;
+        let height = calculateHeight(dataTarget);
+        height = isDesktop ? height : height * 1.5;
         const margin = {
-            left: containerWidth > 600 ? 250 : width / 2.5,
-            right: containerWidth > 600 ? 100 : 20,
+            left: isDesktop ? 250 : width / 2.5,
+            right: isDesktop ? 100 : 20,
             top: 15,
             bottom: 10
         };
@@ -305,10 +307,16 @@ function createHorizontalRowChart(containerId, width) {
         dataset = aRowDataSet().withColors().build();
 
         const colorScheme = dataset.map((o)=>{ return '#20aa3f'; });
-        const height = calculateHeight(dataset);
+        const isDesktop = containerWidth > 600;
+        let height = calculateHeight(dataset);
+        let axisWrapLimit = 1;
+        if(!isDesktop) {
+            height = height * 1.5;
+            axisWrapLimit = 2;
+        }
         const margin = {
-            left: containerWidth > 600 ? 200 : containerWidth / 2.5,
-            right: containerWidth > 600 ? 50 : 20,
+            left: isDesktop ? 200 : containerWidth / 2.5,
+            right: isDesktop? 50 : 20,
             top: 14,
             bottom: 5
         };
@@ -331,6 +339,7 @@ function createHorizontalRowChart(containerId, width) {
             .height(height)
             .xTicks( 0 )
             .yTicks( 0 )
+            .yAxisLineWrapLimit(axisWrapLimit)
             .percentageAxisToMaxRatio(1);
 
         rowContainer.datum(dataset).call(rowChart);
@@ -640,47 +649,6 @@ function calculateHeight(data){
     return height;
 }
 
-// Show charts if container available
-if (d3Selection.select('.js-row-chart-tooltip-container').node()){
-    // createFocusExportRowChart();
-    // createExportRowChart();
-     //createRowChartWithTooltip();
-    createRowChartDataLens('.js-mobile-lg-row-chart-lens-container', 600);
-    createRowChartDataLens('.js-mobile-sm-row-chart-lens-container', 320);
-    createRowChartDataLens('.js-row-chart-lens-container');
-    createHorizontalRowChart('.js-horizontal-row-chart-container');
-    createHorizontalRowChart('.js-mobile-lg-row-chart-container', 600);
-    createHorizontalRowChart('.js-mobile-sm-row-chart-container', 320);
-    // createSimpleRowChart();
-    // createRow4ExpandedChart();
-    // createLastExpandedChart();
-    // createCollapsedChart();
-    // createMassiveChart();
-
-    let redrawCharts = function() {
-        d3Selection.selectAll( '.row-chart' ).remove();
-        // createFocusExportRowChart();
-        // createExportRowChart();
-        // createRowChartWithTooltip();
-        createRowChartDataLens('.js-mobile-lg-row-chart-lens-container', 600);
-        createRowChartDataLens('.js-mobile-sm-row-chart-lens-container', 320);
-        createRowChartDataLens('.js-row-chart-lens-container');
-
-        createHorizontalRowChart('.js-horizontal-row-chart-container');
-        createHorizontalRowChart('.js-mobile-lg-row-chart-container', 600);
-        createHorizontalRowChart('.js-mobile-sm-row-chart-container', 320);
-
-        // createSimpleRowChart();
-        // createRow4ExpandedChart();
-        // createLastExpandedChart();
-        // createCollapsedChart();
-        // createMassiveChart();
-    };
-
-    // Redraw charts on window resize
-    PubSub.subscribe('resize', redrawCharts);
-}
-
 
 
 /**
@@ -934,4 +902,48 @@ function processFilters(filters){
 function isIE(){
     const ua = window.navigator.userAgent;
     return ua.indexOf( 'Edge' ) > -1 || ua.indexOf( 'MSIE' ) > -1;
+}
+
+// Show charts if container available
+if (d3Selection.select('.js-row-chart-tooltip-container').node()){
+    // createFocusExportRowChart();
+    // createExportRowChart();
+    // createRowChartWithTooltip();
+
+    // createRowChartDataLens('.js-mobile-lg-row-chart-lens-container', 600);
+    // createRowChartDataLens('.js-mobile-sm-row-chart-lens-container', 320);
+    // createRowChartDataLens('.js-row-chart-lens-container');
+
+    createHorizontalRowChart('.js-horizontal-row-chart-container');
+    createHorizontalRowChart('.js-mobile-lg-row-chart-container', 600);
+    createHorizontalRowChart('.js-mobile-sm-row-chart-container', 320);
+    // createSimpleRowChart();
+    // createRow4ExpandedChart();
+    // createLastExpandedChart();
+    // createCollapsedChart();
+    // createMassiveChart();
+
+    let redrawCharts = function() {
+        d3Selection.selectAll( '.row-chart' ).remove();
+        // createFocusExportRowChart();
+        // createExportRowChart();
+        // createRowChartWithTooltip();
+
+        // createRowChartDataLens('.js-mobile-lg-row-chart-lens-container', 600);
+        // createRowChartDataLens('.js-mobile-sm-row-chart-lens-container', 320);
+        // createRowChartDataLens('.js-row-chart-lens-container');
+
+        createHorizontalRowChart('.js-horizontal-row-chart-container');
+        createHorizontalRowChart('.js-mobile-lg-row-chart-container', 600);
+        createHorizontalRowChart('.js-mobile-sm-row-chart-container', 320);
+
+        // createSimpleRowChart();
+        // createRow4ExpandedChart();
+        // createLastExpandedChart();
+        // createCollapsedChart();
+        // createMassiveChart();
+    };
+
+    // Redraw charts on window resize
+    PubSub.subscribe('resize', redrawCharts);
 }
