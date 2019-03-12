@@ -167,7 +167,8 @@ define(function(require) {
 
                 // don't include this label on child elements (hasparent)
                 // elements
-                if ( pctOfSet && !parent ) {
+                if ( pctOfSet && !parent && width > 600) {
+                    console.log(width);
                     pctLabel = '  | ' + pctOfSet + '%';
                 }
 
@@ -218,7 +219,9 @@ define(function(require) {
          */
         function exports(_selection) {
             _selection.each(function(_data) {
-                chartWidth = width - margin.left - margin.right - (yAxisPaddingBetweenChart * 1.2) - 50;
+                chartWidth = width > 600 ? width - margin.left - margin.right - (yAxisPaddingBetweenChart * 1.2) - 100 :
+                    width - margin.left - margin.right;
+
                 chartHeight = height - margin.top - margin.bottom;
                 ({data, dataZeroed} = sortData(cleanData(_data)));
                 buildScales();
@@ -580,7 +583,7 @@ define(function(require) {
                     .attr('class', (d) => {
                         return 'visibility visibility-' + getIndex(d);
                     })
-                    .attr('x', -(margin.left-5))
+                    .attr('x', -(margin.left) + 30)
                     .attr('y', -textHgt)
                     .attr('width', '300')
                     .attr('height', '300')
@@ -738,7 +741,7 @@ define(function(require) {
                 .attr( 'y', chartHeight )
                 .attr( 'x', 0 )
                 .merge( rows )
-                .attr( 'x',  -margin.left - 30)
+                .attr( 'x',  -margin.left)
                 .attr( 'y', function (d, i) {
                     return yScale(d.name) - a * d.width/2;	//center the bar on the tick
                 })
@@ -853,7 +856,9 @@ define(function(require) {
                     .on('mouseout', rowHoverOut );
             }
 
-            if(enableYAxisRight && enableLabels) {
+            console.log(width);
+
+            if(enableYAxisRight && enableLabels && width > 600) {
                 const gunit  = bargroups
                     .append( 'g' )
                     .attr( 'transform', `translate(${chartWidth + 10}, 0)` )
@@ -1036,7 +1041,8 @@ define(function(require) {
             }
 
             if(labelsTotalCount) {
-                const compCountTxt = labelsTotalText + ' ' + labelsTotalCount;
+                const ltc = labelsTotalCount.toLocaleString();
+                const compCountTxt = labelsTotalText + ' ' + ltc;
                 let cw = textHelper.getTextWidth( compCountTxt, labelsSizeChild, 'sans-serif' );
                 let printPadding = isPrintMode && isIE ? 10 : 0;
 
@@ -1051,17 +1057,21 @@ define(function(require) {
                     .attr( 'font-size', labelsSizeChild );
 
                 complaintTotalGroup.append('tspan')
-                    .text( labelsTotalCount )
+                    .text( ltc )
                     .classed('count', true)
                     .attr('dx', 5)
                     .attr( 'font-size', labelsSizeChild )
                     .attr( 'font-weight', 600 );
 
-                complaintTotalGroup.attr('x', chartWidth - complaintTotalGroup.node().getBoundingClientRect().width - 10 - printPadding)
+                const titlexPos = width > 600 ? chartWidth - complaintTotalGroup.node().getBoundingClientRect().width - 10 - printPadding :
+                    chartWidth - complaintTotalGroup.node().getBoundingClientRect().width - 10;
+
+                console.log('title width is' + complaintTotalGroup.node().getBoundingClientRect().width );
+                complaintTotalGroup.attr('x', titlexPos)
 
             }
 
-            if(labelsInterval) {
+            if(labelsInterval && width > 600) {
                 svg.select( '.title-group' )
                     .append( 'text' )
                     .text( `Change in past ${labelsInterval}` )

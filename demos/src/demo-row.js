@@ -156,10 +156,10 @@ function createExportRowChart() {
     }
 }
 
-function createRowChartDataLens() {
+function createRowChartDataLens(containerId, width) {
     let rowChart = row(),
-        rowContainer = d3Selection.select('.js-row-chart-lens-container'),
-        containerWidth = rowContainer.node() ? rowContainer.node().getBoundingClientRect().width : false,
+        rowContainer = d3Selection.select( containerId ),
+        containerWidth = width ? width : rowContainer.node().getBoundingClientRect().width,
         dataset;
 
     if (containerWidth) {
@@ -189,14 +189,16 @@ function createRowChartDataLens() {
 
         // let out total count be 10000
         const height = calculateHeight(dataTarget);
+        const margin = {
+            left: containerWidth > 600 ? 250 : width / 2.5,
+            right: containerWidth > 600 ? 100 : 20,
+            top: 15,
+            bottom: 10
+        };
+
         rowChart
             .isAnimated(true)
-            .margin({
-                left:250,
-                right: 100,
-                top: 10,
-                bottom: 10
-            })
+            .margin(margin)
             .backgroundColor('#f7f8f9')
             .enableYAxisRight(true)
             .enableLabels(true)
@@ -208,11 +210,11 @@ function createRowChartDataLens() {
             //.labelsSuffix('complaints')
             .outerPadding(.2)
             .colorSchema(colorScheme)
-            .width(1020)
+            .width(containerWidth)
             .height(height)
             .xTicks( 0 )
             .yTicks( 0 )
-            .percentageAxisToMaxRatio(10000/800);
+            .percentageAxisToMaxRatio(75000/800);
 
 
         rowContainer.datum(dataTarget).call(rowChart);
@@ -274,71 +276,10 @@ function createRowChartWithTooltip() {
     }
 }
 
-function appendExportDetails(chart, container, scope) {
-    const chartName = scope.chartName,
-        dateRange = scope.dateRange,
-        elems = [],
-        filters = scope.filters,
-        detailWidth =  scope.chartWidth || 1100,
-        padBottom = 100,
-        padding = 10,
-        paddingTop = 30,
-        detailContainer = container.select( 'svg' )
-            .append( 'g' )
-            .classed( 'export-details', true )
-            .attr( 'transform', `translate(${ padding }, ${ paddingTop })` );
-    const contentWidth = detailWidth - 50;
-
-    // needs to be added first
-    // on the bottom adding height of the details.
-    detailContainer.append( 'rect' )
-        .classed( 'detail-wrapper', true )
-        .attr('fill','grey')
-        .attr( 'width', detailWidth );
-
-    const topPad = isIE() ? 0 : paddingTop;
-    const dr = appendDateRange( detailContainer, dateRange, contentWidth, topPad );
-    elems.push( dr );
-
-    const d = appendExportDate( detailContainer, contentWidth, sumHeight( elems ) );
-    elems.push( d );
-
-    const u = appendURL( detailContainer, contentWidth, sumHeight( elems ) );
-    elems.push( u );
-
-    const f = appendFilterDetails( detailContainer, filters, contentWidth, sumHeight( elems ) );
-    elems.push( f );
-
-    let newHeight = sumHeight( elems );
-    const detWrapper = detailContainer.select( 'rect.detail-wrapper' )
-        .attr( 'height', newHeight );
-
-    appendChartTitle( container, scope, getHeight( detWrapper ) );
-
-    // shift main chart down below details container
-    const detailHeight = getHeight( detWrapper ) + padBottom,
-        chartHeight = getHeight( container.select( '.container-group' ) ),
-        oldTransform = container.select( '.container-group' )
-            .attr( 'transform' );
-
-    newHeight = detailHeight + chartHeight + padBottom;
-    container.select( '.container-group' )
-        .attr( 'transform', `${ oldTransform } translate(0, ${ detailHeight })` );
-    // update the height for export
-    container.select( 'rect.export-wrapper' ).attr( 'height', newHeight );
-    container.select( 'svg' ).attr( 'height', newHeight );
-    chart.height( newHeight );
-    chart.exportChart( `${ chartName }.png` );
-
-    // clean up remnants
-    // comment this out for debugging to see the chart in the dom
-    // container.select( 'svg' ).remove();
-
-}
-function createHorizontalRowChart() {
+function createHorizontalRowChart(containerId, width) {
     let rowChart = row(),
-        rowContainer = d3Selection.select('.js-horizontal-row-chart-container'),
-        containerWidth = rowContainer.node() ? rowContainer.node().getBoundingClientRect().width : false,
+        rowContainer = d3Selection.select(containerId),
+        containerWidth = width ? width : rowContainer.node().getBoundingClientRect().width,
         containerHeight = rowContainer.node() ? rowContainer.node().getBoundingClientRect().height : false,
         dataset;
 
@@ -365,14 +306,16 @@ function createHorizontalRowChart() {
 
         const colorScheme = dataset.map((o)=>{ return '#20aa3f'; });
         const height = calculateHeight(dataset);
+        const margin = {
+            left: containerWidth > 600 ? 200 : containerWidth / 2.5,
+            right: containerWidth > 600 ? 50 : 20,
+            top: 14,
+            bottom: 5
+        };
+
         rowChart
             .isAnimated(true)
-            .margin({
-                left: 200,
-                right: 50,
-                top: 5,
-                bottom: 5
-            })
+            .margin(margin)
             .backgroundColor('#f7f8f9')
             .enableYAxisRight(true)
             .enableLabels(true)
@@ -381,13 +324,14 @@ function createHorizontalRowChart() {
             .labelsSizeChild(12)
             .downArrowColor( '#257675' )
             //.labelsSuffix('complaints')
+            .labelsTotalCount(7000)
             .colorSchema(colorScheme)
             .outerPadding(.1)
             .width(containerWidth)
             .height(height)
             .xTicks( 0 )
             .yTicks( 0 )
-            .percentageAxisToMaxRatio(calculateMaxRatio(dataset));
+            .percentageAxisToMaxRatio(1);
 
         rowContainer.datum(dataset).call(rowChart);
 
@@ -599,6 +543,67 @@ function createMassiveChart() {
     }
 }
 
+function appendExportDetails(chart, container, scope) {
+    const chartName = scope.chartName,
+        dateRange = scope.dateRange,
+        elems = [],
+        filters = scope.filters,
+        detailWidth =  scope.chartWidth || 1100,
+        padBottom = 100,
+        padding = 10,
+        paddingTop = 30,
+        detailContainer = container.select( 'svg' )
+            .append( 'g' )
+            .classed( 'export-details', true )
+            .attr( 'transform', `translate(${ padding }, ${ paddingTop })` );
+    const contentWidth = detailWidth - 50;
+
+    // needs to be added first
+    // on the bottom adding height of the details.
+    detailContainer.append( 'rect' )
+        .classed( 'detail-wrapper', true )
+        .attr('fill','grey')
+        .attr( 'width', detailWidth );
+
+    const topPad = isIE() ? 0 : paddingTop;
+    const dr = appendDateRange( detailContainer, dateRange, contentWidth, topPad );
+    elems.push( dr );
+
+    const d = appendExportDate( detailContainer, contentWidth, sumHeight( elems ) );
+    elems.push( d );
+
+    const u = appendURL( detailContainer, contentWidth, sumHeight( elems ) );
+    elems.push( u );
+
+    const f = appendFilterDetails( detailContainer, filters, contentWidth, sumHeight( elems ) );
+    elems.push( f );
+
+    let newHeight = sumHeight( elems );
+    const detWrapper = detailContainer.select( 'rect.detail-wrapper' )
+        .attr( 'height', newHeight );
+
+    appendChartTitle( container, scope, getHeight( detWrapper ) );
+
+    // shift main chart down below details container
+    const detailHeight = getHeight( detWrapper ) + padBottom,
+        chartHeight = getHeight( container.select( '.container-group' ) ),
+        oldTransform = container.select( '.container-group' )
+            .attr( 'transform' );
+
+    newHeight = detailHeight + chartHeight + padBottom;
+    container.select( '.container-group' )
+        .attr( 'transform', `${ oldTransform } translate(0, ${ detailHeight })` );
+    // update the height for export
+    container.select( 'rect.export-wrapper' ).attr( 'height', newHeight );
+    container.select( 'svg' ).attr( 'height', newHeight );
+    chart.height( newHeight );
+    chart.exportChart( `${ chartName }.png` );
+
+    // clean up remnants
+    // comment this out for debugging to see the chart in the dom
+    // container.select( 'svg' ).remove();
+
+}
 
 function calculateMaxRatio(data){
     return 100 / d3Array.max( data, o => o.pctOfSet )
@@ -637,29 +642,39 @@ function calculateHeight(data){
 
 // Show charts if container available
 if (d3Selection.select('.js-row-chart-tooltip-container').node()){
-    createFocusExportRowChart();
-    createExportRowChart();
-    createRowChartWithTooltip();
-    createRowChartDataLens();
-    createHorizontalRowChart();
-    createSimpleRowChart();
-    createRow4ExpandedChart();
-    createLastExpandedChart();
-    createCollapsedChart();
-    createMassiveChart();
+    // createFocusExportRowChart();
+    // createExportRowChart();
+     //createRowChartWithTooltip();
+    createRowChartDataLens('.js-mobile-lg-row-chart-lens-container', 600);
+    createRowChartDataLens('.js-mobile-sm-row-chart-lens-container', 320);
+    createRowChartDataLens('.js-row-chart-lens-container');
+    createHorizontalRowChart('.js-horizontal-row-chart-container');
+    createHorizontalRowChart('.js-mobile-lg-row-chart-container', 600);
+    createHorizontalRowChart('.js-mobile-sm-row-chart-container', 320);
+    // createSimpleRowChart();
+    // createRow4ExpandedChart();
+    // createLastExpandedChart();
+    // createCollapsedChart();
+    // createMassiveChart();
 
     let redrawCharts = function() {
         d3Selection.selectAll( '.row-chart' ).remove();
-        createFocusExportRowChart();
-        createExportRowChart();
-        createRowChartWithTooltip();
-        createRowChartDataLens();
-        createHorizontalRowChart();
-        createSimpleRowChart();
-        createRow4ExpandedChart();
-        createLastExpandedChart();
-        createCollapsedChart();
-        createMassiveChart();
+        // createFocusExportRowChart();
+        // createExportRowChart();
+        // createRowChartWithTooltip();
+        createRowChartDataLens('.js-mobile-lg-row-chart-lens-container', 600);
+        createRowChartDataLens('.js-mobile-sm-row-chart-lens-container', 320);
+        createRowChartDataLens('.js-row-chart-lens-container');
+
+        createHorizontalRowChart('.js-horizontal-row-chart-container');
+        createHorizontalRowChart('.js-mobile-lg-row-chart-container', 600);
+        createHorizontalRowChart('.js-mobile-sm-row-chart-container', 320);
+
+        // createSimpleRowChart();
+        // createRow4ExpandedChart();
+        // createLastExpandedChart();
+        // createCollapsedChart();
+        // createMassiveChart();
     };
 
     // Redraw charts on window resize
