@@ -288,10 +288,10 @@ function creategroupedRowChartWithTooltip(optionalColorSchema) {
     }
 }
 
-function createHorizontalgroupedRowChart(optionalColorSchema) {
+function createHorizontalgroupedRowChart(containerId, width) {
     let groupedRow = groupedRowChart(),
-        container = d3Selection.select('.js-grouped-row-chart-fixed-container'),
-        containerWidth = container.node() ? container.node().getBoundingClientRect().width : false;
+        container = d3Selection.select(containerId),
+        containerWidth = width ? width : container.node().getBoundingClientRect().width;
 
     if (containerWidth) {
 
@@ -299,6 +299,14 @@ function createHorizontalgroupedRowChart(optionalColorSchema) {
         const isStacked = true;
         const ratio = isStacked ? 100 / d3Array.max( data, getParentValue ) :
             100/d3Array.max(data, getValue);
+        const isDesktop = containerWidth > 600;
+        const margin = {
+            left: isDesktop ? 250 : containerWidth / 2.5,
+            top: 40,
+            right: isDesktop ? 30 : 0,
+            bottom: 20
+        };
+
         groupedRow
             .tooltipThreshold(600)
             .grid('vertical')
@@ -308,12 +316,7 @@ function createHorizontalgroupedRowChart(optionalColorSchema) {
             .isHorizontal(true)
             .isStacked(isStacked)
             .isAnimated(true)
-            .margin({
-                left: 250,
-                top: 40,
-                right: 30,
-                bottom: 20
-            })
+            .margin(margin)
             .xTicks(10);
 
         groupedRow.colorSchema(['red', 'yellow', 'blue']);
@@ -365,7 +368,9 @@ function createHorizontalExportGroupedRowChart(optionalColorSchema) {
 if (d3Selection.select('.js-grouped-row-chart-tooltip-container').node()){
     // Chart creation
     creategroupedRowChartWithTooltip();
-    createHorizontalgroupedRowChart();
+    createHorizontalgroupedRowChart('.js-grouped-row-chart-600-container', 600);
+    createHorizontalgroupedRowChart('.js-grouped-row-chart-320-container', 320);
+    createHorizontalgroupedRowChart('.js-grouped-row-chart-fixed-container');
     createHorizontalExportGroupedRowChart();
 
     // For getting a responsive behavior on our chart,
@@ -373,7 +378,9 @@ if (d3Selection.select('.js-grouped-row-chart-tooltip-container').node()){
     redrawCharts = () => {
         d3Selection.selectAll('.grouped-row').remove();
         creategroupedRowChartWithTooltip();
-        createHorizontalgroupedRowChart();
+        createHorizontalgroupedRowChart('.js-grouped-row-chart-600-container', 600);
+        createHorizontalgroupedRowChart('.js-grouped-row-chart-320-container', 320);
+        createHorizontalgroupedRowChart('.js-grouped-row-chart-fixed-container');
         createHorizontalExportGroupedRowChart();
 
     };
