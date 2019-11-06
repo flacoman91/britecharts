@@ -133,6 +133,7 @@ define(function(require) {
             labelsTotalCount = '',
             labelsInterval = '',
             valueLabel = 'value',
+            wrapLabels = true,
             nameLabel = 'name',
             pctChangeLabel = 'pctChange',
             //pctOfSet = '',
@@ -569,8 +570,11 @@ define(function(require) {
          * @private
          */
         function wrapTextWithEllipses(text, containerWidth) {
-            const lineHeight = yAxisLineWrapLimit > 1 ? .8 : 1.2;
-            textHelper.wrapTextWithEllipses(text, containerWidth, 0, yAxisLineWrapLimit, lineHeight);
+            if(wrapLabels) {
+                const lineHeight = yAxisLineWrapLimit > 1 ? .8 : 1.2;
+                textHelper.wrapTextWithEllipses(text, containerWidth, 0,
+                    yAxisLineWrapLimit, lineHeight);
+            }
         }
 
         // eyeball
@@ -1907,6 +1911,24 @@ define(function(require) {
                 return yTicks;
             }
             yTicks = _x;
+
+            return this;
+        };
+
+        /**
+         * Gets or Sets whether we need to wrap labels. In some instances we want to manually do this after chart is rendered
+         * there is an issue in React where we cannot find the width of the bounding box until the chart is
+         * finished added to the DOM
+         * (Default is true)
+         * @param  {boolean} _x          Whether to wrap labels or not
+         * @return {boolean | module}    Current wrapLabels or Chart module to chain calls
+         * @public
+         */
+        exports.wrapLabels = function(_x) {
+            if (!arguments.length) {
+                return yTicks;
+            }
+            wrapLabels = _x;
 
             return this;
         };

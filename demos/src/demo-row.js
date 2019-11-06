@@ -263,6 +263,7 @@ function createRowChartWithTooltip() {
             .height(height)
             .xTicks( 0 )
             .yTicks( 0 )
+            .wrapLabels(false)
             .percentageAxisToMaxRatio(calculateMaxRatio(dataset))
             .on('customMouseOver', tooltip.show)
             .on('customMouseMove', tooltip.update)
