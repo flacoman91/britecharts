@@ -7,20 +7,20 @@
 @import "helpers/loadingStates.scss";
 
 // Common Elements
-@import "common/_grid.scss";
-@import "common/_axes.scss";
-@import "common/_tooltip.scss";
-@import "common/_legend.scss";
+@import "common.scss";
 
 // Charts
 @import "charts/bar.scss";
 @import "charts/donut.scss";
 @import "charts/line.scss";
+@import "charts/row.scss";
 @import "charts/scatter-plot.scss";
 @import "charts/sparkline.scss";
 @import "charts/stacked-area.scss";
 @import "charts/stacked-bar.scss";
 @import "charts/grouped-bar.scss";
+@import "charts/grouped-row.scss";
 @import "charts/step.scss";
 @import "charts/brush.scss";
 @import "charts/bullet.scss";
+@import "charts/cfpb-barcharts.scss";

@@ -303,7 +303,7 @@ define(['jquery', 'd3', 'tooltip'], function($, d3, tooltip) {
             describe('integer values', function() {
 
                 it('should format big numbers', () =>  {
-                    var expected = '10k',
+                    var expected = '10,000',
                         actual;
 
                     tooltipChart.update({

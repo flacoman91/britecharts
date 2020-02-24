@@ -1,0 +1,54 @@
+{
+    "data": [
+        {
+            "hasChildren": false,
+            "isParent": true,
+            "name": "Radiating",
+            "value": 800,
+            "parentCount": 2000,
+            "pctChange": -20,
+            "pctOfSet": 5,
+            "width": ".5"
+        },
+        {
+            "hasChildren": false,
+            "isParent": true,
+            "name": "Radiating Kid",
+            "value": 600,
+            "parentCount": 2000,
+            "pctChange": 50,
+            "pctOfSet": 55,
+            "width": ".5"
+        },
+        {
+            "hasChildren": false,
+            "name": "Opalescent",
+            "isParent": true,
+            "value": 400,
+            "parentCount": 2000,
+            "pctChange": 11,
+            "pctOfSet": 100,
+            "width": ".5"
+        },
+        {
+            "hasChildren": false,
+            "name": "Shining",
+            "isParent": true,
+            "value": 300,
+            "parentCount": 2000,
+            "pctChange": 1,
+            "pctOfSet": 12,
+            "width": ".5"
+        },
+        {
+            "hasChildren": false,
+            "isParent": true,
+            "name": "Brillian Brillian",
+            "value": 300,
+            "parentCount": 2000,
+            "pctChange": "---",
+            "pctOfSet": 70,
+            "width": ".5"
+        }
+    ]
+}

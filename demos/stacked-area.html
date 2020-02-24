@@ -1,30 +1,30 @@
 
     <div class="container" id="stacked-area">
         <div class="row">
-            <div class="col-md-8">
+            <div>
                 <h2 class="tutorial__heading">Stacked Area Chart with Tooltip</h2>
                 <div class="js-stacked-area-chart-tooltip-container card--chart"></div>
             </div>
             <div class="col-md-4 sidebar">
                 <h3>The code</h3>
                 <pre><code class="language-javascript">
-stackedArea
-    .isAnimated(true)
-    .tooltipThreshold(600)
-    .width(containerWidth)
-    .grid('horizontal')
-    .on('customMouseOver', chartTooltip.show)
-    .on('customMouseMove', chartTooltip.update)
-    .on('customMouseOut', chartTooltip.hide);
+                    stackedArea
+                        .isAnimated(true)
+                        .tooltipThreshold(600)
+                        .width(containerWidth)
+                        .grid('horizontal')
+                        .on('customMouseOver', chartTooltip.show)
+                        .on('customMouseMove', chartTooltip.update)
+                        .on('customMouseOut', chartTooltip.hide);
 
-container.datum(dataset.data).call(stackedArea);
+                    container.datum(dataset.data).call(stackedArea);
 
-chartTooltip
-    .topicLabel('values')
-    .title('Testing tooltip');
+                    chartTooltip
+                        .topicLabel('values')
+                        .title('Testing tooltip');
 
-tooltipContainer = d3.select('.metadata-group .vertical-marker-container');
-tooltipContainer.datum([]).call(chartTooltip);
+                    tooltipContainer = d3.select('.metadata-group .vertical-marker-container');
+                    tooltipContainer.datum([]).call(chartTooltip);
                 </code></pre>
                 <h4>Colors</h4>
                 <label class="control-label">You can also check other color schemas:</label>
@@ -38,43 +38,30 @@ tooltipContainer.datum([]).call(chartTooltip);
             </div>
         </div>
     </div>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <h2 class="tutorial__heading">EXPORT Stacked Area Chart</h2>
+                <div class="js-stacked-area-chart-export-container card--chart"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row">
+            <div>
+                <h2 class="tutorial__heading">Chart Jumping Values</h2>
+                <div class="js-stacked-area-chart-jumping-container card--chart"></div>
+            </div>
+        </div>
+    </div>
+
     <div class="container">
         <div class="row">
             <div class="col-md-8">
                 <h2 class="tutorial__heading">Stacked Area Chart with fixed Aspect Ratio</h2>
                 <div class="js-stacked-area-chart-fixed-container card--chart"></div>
-            </div>
-            <div class="col-md-4 sidebar">
-                <h3>The code</h3>
-                <pre><code class="language-javascript">
-stackedArea
-    .tooltipThreshold(600)
-    .aspectRatio(0.5)
-    .grid('full')
-    .xAxisFormat('custom')
-    .xAxisCustomFormat('%Y/%m/%d')
-    .xTicks(2)
-    .width(containerWidth)
-    .dateLabel('date')
-    .valueLabel('views')
-    .on('customMouseOver', chartTooltip.show)
-    .on('customMouseMove', chartTooltip.update)
-    .on('customMouseOut', chartTooltip.hide);
-
-container.datum(dataset.data).call(stackedArea);
-
-// Tooltip Setup and start
-chartTooltip
-    .topicLabel('values')
-    .title('Tooltip Title');
-
-// Note that if the viewport width is less than the tooltipThreshold value,
-// this container won't exist, and the tooltip won't show up
-tooltipContainer = d3Selection.select('.js-stacked-area-chart-fixed-container .metadata-group .vertical-marker-container');
-tooltipContainer.datum([]).call(chartTooltip);
-                </code></pre>
-                <h4>Demo Code</h4>
-                <p>Read the whole code of this demo <a href="https://github.com/eventbrite/britecharts/blob/master/demos/src/demo-stacked-area.js">in github</a></p>
             </div>
         </div>
     </div>
@@ -83,38 +70,6 @@ tooltipContainer.datum([]).call(chartTooltip);
             <div class="col-md-8">
                 <h2 class="tutorial__heading">Stacked Area Chart with custom stack order</h2>
                 <div class="js-stacked-area-chart-tooltip-bis-container card--chart"></div>
-            </div>
-            <div class="col-md-4 sidebar">
-                <h3>The code</h3>
-                <pre><code class="language-javascript">
-stackedArea
-    .tooltipThreshold(600)
-    .aspectRatio(0.6)
-    .grid('full')
-    .xAxisFormat('custom')
-    .xAxisCustomFormat('%Y/%m/%d')
-    .xTicks(2)
-    .width(containerWidth)
-    .dateLabel('date')
-    .valueLabel('views')
-    .on('customMouseOver', chartTooltip.show)
-    .on('customMouseMove', chartTooltip.update)
-    .on('customMouseOut', chartTooltip.hide);
-
-container.datum(dataset.data).call(stackedArea);
-
-// Tooltip Setup and start
-chartTooltip
-    .topicLabel('values')
-    .title('Tooltip Title');
-
-// Note that if the viewport width is less than the tooltipThreshold value,
-// this container won't exist, and the tooltip won't show up
-tooltipContainer = d3Selection.select('.js-stacked-area-chart-fixed-container .metadata-group .vertical-marker-container');
-tooltipContainer.datum([]).call(chartTooltip);
-                </code></pre>
-                <h4>Demo Code</h4>
-                <p>Read the whole code of this demo <a href="https://github.com/eventbrite/britecharts/blob/master/demos/src/demo-stacked-area.js">in github</a></p>
             </div>
         </div>
     </div>

@@ -12,6 +12,7 @@ define(function(require){
     const d3Selection = require('d3-selection');
     const d3Transition = require('d3-transition');
     const d3TimeFormat = require('d3-time-format');
+    const textHelper = require('./helpers/text');
 
     const {exportChart} = require('./helpers/export');
     const colorHelper = require('./helpers/color');
@@ -150,6 +151,7 @@ define(function(require){
             topicColorMap,
             linearGradient,
             lineGradientId = uniqueId('one-line-gradient'),
+            areaOpacity = 0.24,
 
             highlightFilter = null,
             highlightFilterId = null,
@@ -165,9 +167,10 @@ define(function(require){
             xTicks = null,
             xAxisCustomFormat = null,
             locale,
-
             shouldShowAllDataPoints = false,
             isAnimated = false,
+            isPrintMode = false,
+            initializeVerticalMarker = false,
             ease = d3Ease.easeQuadInOut,
             animationDuration = 1500,
             maskingRectangle,
@@ -176,7 +179,7 @@ define(function(require){
 
             dataByTopic,
             dataByDate,
-
+            dataRange,
             dateLabel = 'date',
             valueLabel = 'value',
             topicLabel = 'topic',
@@ -200,10 +203,41 @@ define(function(require){
             verticalGridLines,
             horizontalGridLines,
             grid = null,
+            enableSingleLineGradient = false,
+            isUsingFakeData = false,
 
             baseLine,
+            areaCurve = 'monotoneX',
+            area,
+            layers,
+            layersInitial,
+            areaOutline,
+            series,
 
             pathYCache = {},
+
+            // legend stuff
+            circleYOffset = 8,
+            entryLineLimit = 5,
+            initialTooltipTextXPosition = -25,
+            tooltipTextLinePadding = 5,
+            tooltipRightWidth,
+            tooltipMaxTopicLength = 200,
+            tooltipTextContainer,
+            tooltipDivider,
+            tooltipBody,
+            tooltipTitle,
+            tooltipWidth = 300,
+            tooltipHeight = 48,
+            tooltipBorderRadius = 3,
+            ttTextX = -15,
+            ttTextY = 37,
+            textHeight,
+            bodyFillColor = '#FFFFFF',
+            borderStrokeColor = '#D2D6DF',
+            titleFillColor = '#6D717A',
+            textFillColor = '#282C35',
+            tooltipTextColor = '#000000',
 
             // extractors
             getDate = ({date}) => date,
@@ -231,10 +265,11 @@ define(function(require){
             _selection.each(function(_data) {
                 ({
                     dataByTopic,
-                    dataByDate
+                    dataByDate,
+                    dataRange
                 } = cleanData(_data));
-
-                chartWidth = width - margin.left - margin.right;
+                const printWidth = isPrintMode ? tooltipWidth : 0;
+                chartWidth = width - margin.left - margin.right - printWidth;
                 chartHeight = height - margin.top - margin.bottom;
 
                 buildScales();
@@ -242,7 +277,10 @@ define(function(require){
                 buildAxis();
                 drawAxis();
                 buildGradient();
+                drawStackedAreas();
                 drawLines();
+                drawLegend();
+
                 createMaskingClip();
 
                 if (shouldShowTooltip()) {
@@ -256,6 +294,10 @@ define(function(require){
                 }
 
                 addTouchEvents();
+
+                if(initializeVerticalMarker){
+                    initVerticalMarker();
+                }
             });
         }
 
@@ -405,6 +447,12 @@ define(function(require){
               .append('g').classed('grid-lines-group', true);
             container
               .append('g').classed('chart-group', true);
+
+            if(isPrintMode) {
+                container
+                    .append( 'g' ).classed( 'legend-group', true );
+            }
+
             container
               .append('g').classed('metadata-group', true);
         }
@@ -493,7 +541,7 @@ define(function(require){
          * @param  {obj} dataByTopic    Raw data grouped by topic
          * @return {obj}                Parsed data with dataByTopic and dataByDate
          */
-        function cleanData({dataByTopic, dataByDate}) {
+        function cleanData({dataByTopic, dataByDate, dataRange}) {
             if (!dataByTopic) {
                 throw new Error('Data needs to have a dataByTopic property');
             }
@@ -529,6 +577,13 @@ define(function(require){
                 return d;
             });
 
+            if(dataRange) {
+                dataRange = dataRange.map( ( d ) => {
+                    d.date = new Date( d.date );
+                    return d;
+                } );
+            }
+
             const normalizedDataByTopic = dataByTopic.reduce((accum, topic) => {
                 let {dates, ...restProps} = topic;
 
@@ -544,7 +599,8 @@ define(function(require){
 
             return {
                 dataByTopic: normalizedDataByTopic,
-                dataByDate
+                dataByDate,
+                dataRange
             };
         }
 
@@ -661,12 +717,173 @@ define(function(require){
                 .attr('id', ({topic}) => topic)
                 .attr('d', ({dates}) => topicLine(dates))
                 .style('stroke', (d) => (
-                    dataByTopic.length === 1 ? `url(#${lineGradientId})` : getLineColor(d)
-                ));
+                    dataByTopic.length === 1 && enableSingleLineGradient
+                        ? `url(#${lineGradientId})` : getLineColor(d)
+                ))
+                .style('opacity', (d)=>{
+                    return d.show ? 1 : 0;
+                })
+                .style('stroke-dasharray', (d)=>{
+                    return d.dashed ? [.5, 4] : false;
+                });
 
             lines
                 .exit()
                 .remove();
+        }
+
+        /**
+         * Draws the different areas into the chart-group element
+         * @private
+         */
+        function drawStackedAreas() {
+            // define the area
+            if(!dataRange)
+                return;
+            const area = d3Shape.area()
+                .curve(curveMap[lineCurve])
+                .x(({date}) => xScale(date))
+                .y0(({min}) => yScale(min))
+                .y1(({max}) => yScale(max));
+
+             // add the area
+            const areaGroup = svg.select('.chart-group').append('g')
+                .attr('class', 'area');
+            areaGroup.append("path")
+                .data([dataRange])
+                .attr("class", "area")
+                .attr("d", area);
+        }
+
+        function drawLegend() {
+            if(!isPrintMode)
+                return;
+            const pos = Number.parseInt(chartWidth) + Number.parseInt(margin.right);
+
+            tooltipTextContainer = svg.selectAll('.legend-group')
+                .append('g')
+                .attr('transform', 'translate(' + pos + ", 0)")
+                .classed('tooltip-text', true);
+
+            tooltipTitle = tooltipTextContainer
+                .append('text')
+                .classed('tooltip-title', true)
+                .attr('x', ttTextX - 28)
+                .attr('dy', '.35em')
+                .attr('y', 16)
+                .style('fill', textFillColor)
+                .style('font-size', '12px');
+
+            tooltipDivider = tooltipTextContainer
+                .append('line')
+                .classed('tooltip-divider', true)
+                .attr('x1', ttTextX - 28 )
+                .attr('x2', 225)
+                .attr('y1', 31)
+                .attr('y2', 31)
+                .style('stroke', borderStrokeColor);
+
+            tooltipBody = tooltipTextContainer
+                .append('g')
+                .classed('tooltip-body', true)
+                .style('transform', 'translateY(8px)')
+                .style('fill', textFillColor);
+
+            const visibleTopics = dataByTopic.filter(o=>o.show);
+            for(let i=0; i< visibleTopics.length; i++){
+                visibleTopics[i].sum = visibleTopics[i].dates.reduce((a, b)=>a + b.value, 0);
+            }
+
+            visibleTopics.map(o=>{
+                if(o.sum % 1 !== 0){
+                    o.sum = parseFloat(o.sum).toFixed(2);
+                }
+            });
+            const min = visibleTopics[0].dates[0];
+            const last = visibleTopics[0].dates.length - 1;
+            const max = visibleTopics[0].dates[last];
+            updateTitle(min, max);
+            visibleTopics.forEach(updateTopicContent);
+        }
+        /**
+         * Figures out which date format to use when showing the date of the current data entry
+         * @param {Date} date   Date object to format
+         * @return {Function}   The proper date formatting function
+         * @private
+         */
+        function formatDate(date) {
+            const d = new Date(date);
+            return d.toLocaleDateString();
+        }
+
+        /**
+         * Updates value of tooltipTitle with the data meaning and the date
+         * @param  {Object} dataPoint Point of data to use as source
+         * @return void
+         * @private
+         */
+        function updateTitle(min, max) {
+            const title = formatDate(min.date) + ' - ' + formatDate(max.date);
+            tooltipTitle.text(title);
+        }
+
+        /**
+         * Draws the data entries inside the tooltip for a given topic
+         * @param  {Object} topic Topic to extract data from
+         * @return void
+         * @private
+         */
+        function updateTopicContent(topic){
+            let name = topic.topicName,
+                tooltipRight,
+                tooltipLeftText,
+                tooltipRightText,
+                elementText;
+
+            tooltipLeftText = name;
+            tooltipRightText = topic.sum.toLocaleString();
+
+            elementText = tooltipBody
+                .append('text')
+                .classed('tooltip-left-text', true)
+                .attr('dy', '1em')
+                .attr('x', ttTextX)
+                .attr('y', ttTextY)
+                .style('fill', tooltipTextColor)
+                .style('font-size', '12px')
+                .text(tooltipLeftText)
+                .call(textWrap, tooltipMaxTopicLength, 12, initialTooltipTextXPosition);
+
+            tooltipRight = tooltipBody
+                .append('text')
+                .classed('tooltip-right-text', true)
+                .attr('dy', '1em')
+                .attr('x', ttTextX)
+                .attr('y', ttTextY)
+                .style('fill', tooltipTextColor)
+                .style('font-size', '12px')
+                .text(tooltipRightText);
+
+            // IE11 give us sometimes a height of 0 when hovering on top of the vertical marker
+            // This hack fixes it for some cases, but it doesn't work in multiline (they won't wrap)
+            // Let's remove this once we stop supporting IE11
+            textHeight = elementText.node().getBBox().height ? elementText.node().getBBox().height : textHeight;
+
+            tooltipHeight += textHeight + tooltipTextLinePadding;
+            // update the width if it exists because IE renders the elements
+            // too slow and cant figure out the width?
+            tooltipRightWidth = tooltipRight.node().getBBox().width ? tooltipRight.node().getBBox().width : tooltipRightWidth;
+            tooltipRight.attr( 'x', tooltipWidth - tooltipRightWidth - tooltipWidth / 4 );
+            tooltipBody
+                .append('circle')
+                .classed('tooltip-circle', true)
+                .attr('cx', ttTextX - 20)
+                .attr('cy', (ttTextY + circleYOffset))
+                .attr('r', 5)
+                .style('fill', topicColorMap[topic.topic])
+                .style('stroke-width', 1);
+
+            ttTextY += textHeight + 7;
         }
 
         /**
@@ -843,6 +1060,69 @@ define(function(require){
         }
 
         /**
+         * Wraps a text given the text, width, x position and textFormatter function
+         * @param  {D3Selection} text  Selection with the text to wrap inside
+         * @param  {Number} width Desired max width for that line
+         * @param  {Number} fontSize size of font for that line
+         * @param  {Number} xpos  Initial x position of the text
+         * REF: http://bl.ocks.org/mbostock/7555321
+         * More discussions on https://github.com/mbostock/d3/issues/1642
+         * @private
+         *
+         */
+        function textWrap(text, width, fontSize, xpos = 0) {
+            text.each(function() {
+                var words,
+                    word,
+                    line,
+                    lineNumber,
+                    lineHeight,
+                    y,
+                    dy,
+                    tspan;
+
+                text = d3Selection.select(this);
+
+                words = text.text().split(/\s+/).reverse();
+                line = [];
+                lineNumber = 0;
+                lineHeight = 1.2;
+                y = text.attr('y');
+                dy = parseFloat(text.attr('dy'));
+                tspan = text
+                    .text(null)
+                    .append('tspan')
+                    .attr('x', xpos)
+                    .attr('y', y)
+                    .attr('dy', dy + 'em');
+
+                while ((word = words.pop())) {
+                    line.push(word);
+                    tspan.text(line.join(' '));
+
+                    // fixes for IE wrap text issue
+                    const textWidth = textHelper.getTextWidth(line.join(' '), fontSize, 'Karla, sans-serif');
+
+                    if (textWidth > width) {
+                        line.pop();
+                        tspan.text(line.join(' '));
+
+                        if (lineNumber < entryLineLimit - 1) {
+                            line = [word];
+                            tspan = text.append('tspan')
+                                .attr('x', xpos)
+                                .attr('y', y)
+                                .attr('dy', ++lineNumber * lineHeight + dy + 'em')
+                                .text(word);
+                        }
+                    }
+                }
+            });
+
+        }
+
+
+        /**
          * MouseMove handler, calculates the nearest dataPoint to the cursor
          * and updates metadata related to it
          * @private
@@ -865,6 +1145,24 @@ define(function(require){
         }
 
         /**
+         * initializes and draws the vertical marker on chart draw.
+         * It also resets the container of the vertical marker
+         * @private
+         */
+        function initVerticalMarker(){
+            let dataPoint = getNearestDataPoint(chartWidth),
+                dataPointXPosition;
+
+            if (dataPoint) {
+                dataPointXPosition = xScale(new Date( dataPoint.date ));
+                // Move verticalMarker to that datapoint
+                moveVerticalMarker(dataPointXPosition);
+                // Add data points highlighting
+                highlightDataPoints(dataPoint);
+            }
+        }
+
+        /**
          * MouseOut handler, hides overlay and removes active class on verticalMarkerLine
          * It also resets the container of the vertical marker
          * @private
@@ -872,8 +1170,6 @@ define(function(require){
         function handleMouseOut(e, d){
             overlay.style('display', 'none');
             verticalMarkerLine.classed('bc-is-active', false);
-            verticalMarkerContainer.attr('transform', 'translate(9999, 0)');
-
             dispatcher.call('customMouseOut', e, d, d3Selection.mouse(e));
         }
 
@@ -921,6 +1217,16 @@ define(function(require){
                 return acc;
             }, {});
 
+            const dashedPoints = dataByTopic.filter( o => {
+                    return o.dashed;
+                } )
+                .map(o=>{ return o.topicName; });
+
+            const hiddenPoints = dataByTopic.filter( o => {
+                    return !o.show;
+                } )
+                .map(o=>{ return o.topicName; });
+
             // Group corresponding path node with its topic, and
             // sorting the topics based on the order of the colors,
             // so that the order always stays constant
@@ -933,7 +1239,6 @@ define(function(require){
                                         .sort((a, b) => topicColorMap[a.topic.name] < topicColorMap[b.topic.name])
 
             dataPoint.topics = topicsWithNode.map(({topic}) => topic);
-
             dataPoint.topics.forEach((d, index) => {
                 let marker = verticalMarkerContainer
                               .append('g')
@@ -946,6 +1251,12 @@ define(function(require){
                                     .style('stroke-width', () => (
                                         shouldShowAllDataPoints ? highlightCircleStrokeAll : highlightCircleStroke
                                     ))
+                                    .style( 'fill', () => {
+                                        return topicColorMap[ d.name ];
+                                    })
+                                    .style( 'opacity', () => {
+                                        return hiddenPoints.includes(d.topicName) ? 0 : 1;
+                                    })
                                     .style('stroke', topicColorMap[d.name])
                                     .style('cursor', 'pointer')
                                     .on('click', function () {
@@ -1050,6 +1361,21 @@ define(function(require){
                 return aspectRatio;
             }
             aspectRatio = _x;
+
+            return this;
+        };
+
+        /**
+         * Gets or Sets whether single line gradient is enabled
+         * @param  {Boolean} _x Desired aspect ratio for the graph
+         * @return { (Boolean | Module) } Current aspect ratio or Line Chart module to chain calls
+         * @public
+         */
+        exports.enableSingleLineGradient = function(_x) {
+            if (!arguments.length) {
+                return enableSingleLineGradient;
+            }
+            enableSingleLineGradient = _x;
 
             return this;
         };
@@ -1201,6 +1527,25 @@ define(function(require){
         };
 
         /**
+         * Gets or Sets the initializeVerticalMarker property of the chart,
+         * making vertical marker appear when chart renders.
+         * By default this is 'false'
+         *
+         * @param  {Boolean} _x Desired animation flag
+         * @return {Boolean | module} Current isAnimated flag or Chart module
+         * @public
+         */
+        exports.initializeVerticalMarker = function(_x) {
+            if (!arguments.length) {
+                return initializeVerticalMarker;
+            }
+            initializeVerticalMarker = _x;
+
+            return this;
+        };
+
+
+        /**
          * Gets or Sets the isAnimated property of the chart, making it to animate when render.
          * By default this is 'false'
          *
@@ -1216,6 +1561,22 @@ define(function(require){
 
             return this;
         };
+
+        /**
+         * Gets or Sets whether the chart should show the expand toggles/eyeball
+         * @param  {boolean} _x Should we show the expand toggles?
+         * @return {boolean | module} do we expand toggles
+         * @public
+         */
+        exports.isPrintMode = function(_x) {
+            if (!arguments.length) {
+                return isPrintMode;
+            }
+            isPrintMode = _x;
+
+            return this;
+        };
+
 
         /**
          * Gets or Sets the loading state of the chart

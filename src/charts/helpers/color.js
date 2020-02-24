@@ -129,7 +129,7 @@ define(function() {
         ];
 
     const aloeGreen = [
-            '#7bdcc0'
+            '#20aa3f'
         ];
 
     return {

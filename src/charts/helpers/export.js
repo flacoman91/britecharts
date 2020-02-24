@@ -1,6 +1,6 @@
 define(function(require) {
     'use strict';
-
+    const canvg = require('canvg-browser');
     const {colorSchemas} = require('./color');
     const constants = require('./constants');
     const serializeWithStyles = require('./style');
@@ -24,13 +24,14 @@ define(function(require) {
     const config = {
         styleClass : 'britechartStyle',
         defaultFilename: 'britechart.png',
-        chartBackground: 'white',
+        chartBackground: '#ffffff',
         imageSourceBase: 'data:image/svg+xml;base64,',
-        titleFontSize: '15px',
-        titleFontFamily: '\'Benton Sans\', sans-serif',
-        titleTopOffset: 15,
+        titleFontSize: '36px',
+        titleFontFamily: '\'Avenir Next\', sans-serif',
+        titleTopOffset: 25,
+        titleLeftOffset: 10,
         get styleBackgroundString () {
-            return `<style>svg{background:${this.chartBackground};}</style>`;
+            return `<style>svg{background:${this.chartBackground};padding: 20px;}</style>`;
         }
     };
 
@@ -41,13 +42,25 @@ define(function(require) {
      * @param  {string} title       Title for the image
      */
     function exportChart(d3svg, filename, title) {
-        let img = createImage(convertSvgToHtml.call(this, d3svg, title));
+        let svgHtml = convertSvgToHtml.call(this, d3svg, title);
+        let canvas = createCanvas(this.width(), this.height());
 
-        img.onload = handleImageLoad.bind(
+        if(navigator.msSaveOrOpenBlob){
+            let options = {
+                log: false,
+                ignoreMouse: true
+            };
+
+            canvg(canvas, svgHtml, options);
+            return(navigator.msSaveOrOpenBlob && navigator.msSaveOrOpenBlob(canvas.msToBlob(), filename));
+        } else {
+            let img = createImage( svgHtml );
+            img.onload = handleImageLoad.bind(
                 img,
-                createCanvas(this.width(), this.height()),
+                canvas,
                 filename
             );
+        }
     }
 
     /**
@@ -116,7 +129,6 @@ define(function(require) {
      */
     function drawImageOnCanvas(image, canvas) {
         canvas.getContext('2d').drawImage(image, 0, 0);
-
         return canvas;
     }
 
@@ -148,7 +160,6 @@ define(function(require) {
         if (navigator.userAgent.search('FireFox') > -1) {
             return html.replace(/url.*&quot;\)/, 'url(&quot;linearGradient[id*="-gradient-"]&quot;);');
         }
-
         return html;
     }
 
@@ -177,7 +188,7 @@ define(function(require) {
         }
         let {grey} = colorSchemas;
 
-        html =  html.replace(/<g/,`<text x="${this.margin().left}" y="${config.titleTopOffset}" font-family="${config.titleFontFamily}" font-size="${config.titleFontSize}" fill="${grey[6]}"> ${title} </text><g `);
+        html =  html.replace(/<g/,`<text x="${config.titleLeftOffset}" y="${config.titleTopOffset}" font-family="${config.titleFontFamily}" font-size="${config.titleFontSize}" fill="${grey[6]}"> ${title} </text><g `);
 
         return html;
     }

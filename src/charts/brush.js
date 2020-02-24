@@ -149,6 +149,9 @@ define(function(require) {
          */
         function buildAxis(){
             let minor, major;
+            if(!data || !data.length){
+                return;
+            }
 
             if (xAxisFormat === 'custom' && typeof xAxisCustomFormat === 'string') {
                 minor = {
@@ -538,14 +541,14 @@ define(function(require) {
          * @type {module:Brush~DateExtent}
          * @see {@link https://github.com/d3/d3-brush#brush_on|d3-brush:on(brush)}
          */
-        
+
         /**
          * Event indicating the end of a brush gesture
          * @event customBrushEnd
          * @type {module:Brush~DateExtent}
          * @see {@link https://github.com/d3/d3-brush#brush_on|d3-brush:on(end)}
          */
-        
+
         /**
          * @callback eventCallback
          * @param {module:Brush~DateExtent} dateExtent Date range

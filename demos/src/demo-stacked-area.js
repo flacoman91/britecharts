@@ -28,11 +28,19 @@ function createStackedAreaChartWithTooltip(optionalColorSchema) {
     if (containerWidth) {
         dataset = aTestDataSet().with6Sources().build();
 
+        let margin = {
+                top: 70,
+                right: 30,
+                bottom: 60,
+                left: 70
+            };
         // StackedAreChart Setup and start
         stackedArea
             .isAnimated(true)
+            .margin(margin)
             .tooltipThreshold(600)
-            .width(containerWidth)
+            .height(564)
+            .width(1175)
             .dateLabel('dateUTC')
             .valueLabel('views')
             .grid('horizontal')
@@ -45,10 +53,11 @@ function createStackedAreaChartWithTooltip(optionalColorSchema) {
                 chartTooltip.update(dataPoint, topicColorMap, dataPointXPosition);
             })
             .on('customMouseOut', chartTooltip.hide);
+        stackedArea.colorSchema(['red', 'blue', 'green', 'yellow', 'purple', 'pink', 'black', 'grey', 'orange']);
 
-        if (optionalColorSchema) {
-            stackedArea.colorSchema(optionalColorSchema);
-        }
+        // if (optionalColorSchema) {
+        //     stackedArea.colorSchema(optionalColorSchema);
+        // }
 
         container.datum(dataset.data).call(stackedArea);
 
@@ -60,6 +69,120 @@ function createStackedAreaChartWithTooltip(optionalColorSchema) {
         // Note that if the viewport width is less than the tooltipThreshold value,
         // this container won't exist, and the tooltip won't show up
         tooltipContainer = d3Selection.select('.js-stacked-area-chart-tooltip-container .metadata-group .vertical-marker-container');
+        tooltipContainer.datum([]).call(chartTooltip);
+
+        d3Selection.select('#button').on('click', function() {
+            stackedArea.exportChart('stacked-area.png', 'Britecharts Stacked Area');
+        });
+    }
+}
+
+function createStackedAreaChartExport(optionalColorSchema) {
+    let stackedArea = stackedAreaChart(),
+        container = d3Selection.select('.js-stacked-area-chart-export-container'),
+        containerWidth = container.node() ? container.node().getBoundingClientRect().width : false,
+        dataset;
+
+    if (containerWidth) {
+        dataset = aTestDataSet().with6Sources().build();
+
+
+        // StackedAreChart Setup and start
+        stackedArea
+            .isAnimated(true)
+            .isPrintMode(true)
+            .margin( {
+                top: 60,
+                bottom: 50,
+                left: 50,
+                right: 60
+            } )
+            .tooltipThreshold(600)
+            .height(564)
+            .width(1175)
+            .dateLabel('dateUTC')
+            .valueLabel('views')
+            .grid('horizontal');
+
+        stackedArea.colorSchema(['red', 'blue', 'green', 'yellow', 'purple', 'pink', 'black', 'grey', 'orange']);
+
+        // if (optionalColorSchema) {
+        //     stackedArea.colorSchema(optionalColorSchema);
+        // }
+
+        container.datum(dataset.data).call(stackedArea);
+    }
+}
+
+function createStackedAreaJumping() {
+    let stackedArea = stackedAreaChart(),
+        chartTooltip = tooltip(),
+        container = d3Selection.select('.js-stacked-area-chart-jumping-container'),
+        containerWidth = container.node() ? container.node().getBoundingClientRect().width : false,
+        tooltipContainer,
+        dataset;
+
+    if (containerWidth) {
+        dataset = aTestDataSet().withMassiveSources().build();
+
+        let margin = {
+            top: 70,
+            right: 30,
+            bottom: 60,
+            left: 70
+        };
+        // StackedAreChart Setup and start
+
+        const rowNames = uniq(dataset.data.map(o=>{ return o.name; }));
+        const names = rowNames.slice().reverse();
+        stackedArea
+            .isAnimated(true)
+            .areaCurve('linear')
+            .topicsOrder(rowNames)
+            .margin(margin)
+            .tooltipThreshold(600)
+            .height(564)
+            .width(1175)
+            .dateLabel('date')
+            .valueLabel('value')
+            .grid('horizontal')
+            .on('customDataEntryClick', function(d, mousePosition) {
+                // eslint-disable-next-line no-console
+                console.log('Data entry marker clicked', d, mousePosition);
+            })
+            .on('customMouseOver', chartTooltip.show)
+            .on('customMouseMove', function(dataPoint, topicColorMap, dataPointXPosition) {
+                chartTooltip.update(dataPoint, topicColorMap, dataPointXPosition);
+            })
+            .on('customMouseOut', chartTooltip.hide);
+        stackedArea.colorSchema([
+            'red',
+            'blue',
+            'brown',
+            'green',
+            'yellow',
+            'purple',
+            'pink',
+            'black',
+            'grey',
+            'orange',
+            'teal'
+        ]);
+
+        // if (optionalColorSchema) {
+        //     stackedArea.colorSchema(optionalColorSchema);
+        // }
+
+        container.datum(dataset.data).call(stackedArea);
+
+        chartTooltip
+            .topicsOrder(names)
+            .topicLabel('values')
+            .title('Testing tooltip');
+
+        // Note that if the viewport width is less than the tooltipThreshold value,
+        // this container won't exist, and the tooltip won't show up
+        tooltipContainer = d3Selection.select('.js-stacked-area-chart-jumping-container .metadata-group .vertical-marker-container');
         tooltipContainer.datum([]).call(chartTooltip);
 
         d3Selection.select('#button').on('click', function() {
@@ -177,7 +300,9 @@ function createLoadingState() {
 
 if (d3Selection.select('.js-stacked-area-chart-tooltip-container').node()){
     // Chart creation
+    createStackedAreaChartExport();
     createStackedAreaChartWithTooltip();
+    createStackedAreaJumping();
     createStackedAreaChartWithFixedAspectRatio();
     createStackedAreaChartWithSyncedTooltip();
     createLoadingState();
@@ -186,7 +311,9 @@ if (d3Selection.select('.js-stacked-area-chart-tooltip-container').node()){
     // we'll need to listen to the window resize event
     redrawCharts = function(){
         d3Selection.selectAll('.stacked-area').remove();
+        createStackedAreaChartExport();
         createStackedAreaChartWithTooltip();
+        createStackedAreaJumping();
         createStackedAreaChartWithFixedAspectRatio();
         createStackedAreaChartWithSyncedTooltip();
         createLoadingState();

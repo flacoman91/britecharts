@@ -1,7 +1,15 @@
 
     <div class="container" id="line">
         <div class="row">
-            <div class="col-md-8">
+            <div class="col-md-12">
+                <article>
+                    <h2>Export Chart</h2>
+                    <div class="js-export-line-chart-container card--chart"></div>
+                </article>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
                 <article>
                     <h2>Line Chart with fixed Aspect Ratio</h2>
                     <div class="js-line-chart-container line-chart-container card--chart"></div>
@@ -38,7 +46,7 @@ container.datum(dataset).call(lineChart);
         </div>
 
         <div class="row">
-            <div class="col-md-8">
+            <div class="col-md-12">
                 <article>
                     <h2>Line Chart with a single data source</h2>
                     <div class="britechart js-single-line-chart-container card--chart"></div>
@@ -66,26 +74,12 @@ container.datum(dataset).call(lineChart);
         </div>
 
         <div class="row">
-            <div class="col-md-8">
+            <div class="col-md-12">
                 <article>
                     <h2>Line Chart with Fixed Height</h2>
                     <div class="js-fixed-line-chart-container card--chart"></div>
                     <p>In this case, we have set a <strong>fixed height</strong> on the chart, as we are currently doing on the Sales report:</p>
                 </article>
-            </div>
-            <div class="col-md-4 sidebar">
-                <h3>The code</h3>
-                <pre><code class="language-javascript">
-lineChart
-    .tooltipThreshold(600)
-    .height(300)
-    .width(containerWidth)
-    .grid('full');
-
-container.datum(dataset).call(lineChart);
-                </code></pre>
-                <h4>Demo Code</h4>
-                <p>Read the whole code of this demo <a href="https://github.com/eventbrite/britecharts/blob/master/demos/src/demo-line.js">in github</a></p>
             </div>
         </div>
         <div class="row">

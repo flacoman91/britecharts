@@ -1,0 +1,160 @@
+{
+    "data": [
+        {
+            "hasChildren": true,
+            "isNotFilter": false,
+            "isParent": true,
+            "pctChange": -0.38,
+            "pctOfSet": 20.67,
+            "name": "Incorrect information on your report",
+            "value": 15502,
+            "parent": false,
+            "visible": true,
+            "width": 0.5
+        },
+        {
+            "hasChildren": true,
+            "isNotFilter": false,
+            "isParent": true,
+            "pctChange": 0.53,
+            "pctOfSet": 10.43,
+            "name": "Improper use of your report",
+            "value": 7823,
+            "parent": false,
+            "visible": true,
+            "width": 0.5
+        },
+        {
+            "hasChildren": true,
+            "isNotFilter": false,
+            "isParent": true,
+            "pctChange": -6.48,
+            "pctOfSet": 10.35,
+            "name": "Problem with a credit reporting company's investigation into an existing problem",
+            "value": 7759,
+            "parent": false,
+            "visible": true,
+            "width": 0.5
+        },
+        {
+            "hasChildren": true,
+            "isNotFilter": false,
+            "isParent": true,
+            "pctChange": 22.73,
+            "pctOfSet": 8.44,
+            "name": "Attempts to collect debt not owed",
+            "value": 6329,
+            "parent": false,
+            "visible": true,
+            "width": 0.5
+        },
+        {
+            "hasChildren": true,
+            "isNotFilter": false,
+            "isParent": true,
+            "pctChange": 13.71,
+            "pctOfSet": 4,
+            "name": "Trouble during payment process",
+            "value": 3000,
+            "parent": false,
+            "visible": true,
+            "width": 0.5
+        },
+        {
+            "hasChildren": true,
+            "isNotFilter": false,
+            "isParent": true,
+            "pctChange": 13.67,
+            "pctOfSet": 3.78,
+            "name": "Written notification about debt",
+            "value": 2835,
+            "parent": false,
+            "visible": true,
+            "width": 0.5
+        },
+        {
+            "hasChildren": true,
+            "isNotFilter": false,
+            "isParent": true,
+            "pctChange": 13.7,
+            "pctOfSet": 3,
+            "name": "Dealing with your lender or servicer",
+            "value": 2253,
+            "parent": false,
+            "visible": true,
+            "width": 0.5
+        },
+        {
+            "hasChildren": true,
+            "isNotFilter": false,
+            "isParent": true,
+            "pctChange": 14.62,
+            "pctOfSet": 2.89,
+            "name": "Struggling to pay mortgage",
+            "value": 2171,
+            "parent": false,
+            "visible": true,
+            "width": 0.5
+        },
+        {
+            "hasChildren": false,
+            "isNotFilter": false,
+            "isParent": false,
+            "pctChange": 14.62,
+            "pctOfSet": 2.89,
+            "name": "Mortgage    ",
+            "value": 2171,
+            "parent": "Struggling to pay mortgage",
+            "visible": true,
+            "width": 0.4
+        },
+        {
+            "hasChildren": true,
+            "isNotFilter": false,
+            "isParent": true,
+            "pctChange": -0.33,
+            "pctOfSet": 2.86,
+            "name": "Managing an account",
+            "value": 2146,
+            "parent": false,
+            "visible": true,
+            "width": 0.5
+        },
+        {
+            "hasChildren": false,
+            "isNotFilter": false,
+            "isParent": false,
+            "pctChange": -0.33,
+            "pctOfSet": 2.86,
+            "name": "Checking or savings account   ",
+            "value": 2146,
+            "parent": "Managing an account",
+            "visible": true,
+            "width": 0.4
+        },
+        {
+            "hasChildren": true,
+            "isNotFilter": false,
+            "isParent": true,
+            "pctChange": -3.55,
+            "pctOfSet": 2.58,
+            "name": "Communication tactics",
+            "value": 1933,
+            "parent": false,
+            "visible": true,
+            "width": 0.5
+        },
+        {
+            "hasChildren": false,
+            "isNotFilter": false,
+            "isParent": false,
+            "pctChange": -3.55,
+            "pctOfSet": 2.58,
+            "name": "Debt collection  ",
+            "value": 1933,
+            "parent": "Communication tactics",
+            "visible": true,
+            "width": 0.4
+        }
+    ]
+}

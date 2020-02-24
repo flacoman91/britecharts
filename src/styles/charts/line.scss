@@ -3,7 +3,9 @@
 $line-width: 2;
 
 .line-chart {
-
+    .area {
+        fill: $grey-200;
+    }
     // Class for data point markers
     .data-point-mark {
         fill: $white;

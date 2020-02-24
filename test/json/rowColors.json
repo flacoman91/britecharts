@@ -1,0 +1,91 @@
+{
+    "data": [
+        {
+            "hasChildren": true,
+            "isParent": true,
+            "name": "Radiating",
+            "value": 2024,
+            "pctChange": -20,
+            "pctOfSet": 5,
+            "width": ".5"
+        },
+        {
+            "hasChildren": false,
+            "isParent": false,
+            "name": "Radiating Kid",
+            "value": 1024,
+            "parent": "Radiating",
+            "pctChange": 50,
+            "pctOfSet": 55,
+            "width": ".4"
+        },
+        {
+            "hasChildren": false,
+            "name": "Opalescent",
+            "isParent": true,
+            "value": 7000,
+            "pctChange": 11,
+            "pctOfSet": 100,
+            "width": ".5"
+        },
+        {
+            "hasChildren": true,
+            "name": "Shining",
+            "isParent": true,
+            "value": 213,
+            "pctChange": 1,
+            "pctOfSet": 12,
+            "width": ".5"
+        },
+        {
+            "hasChildren": false,
+            "isParent": false,
+            "name": "Brillian Brillian Brillian BrillianBrillian Brillian",
+            "value": 6001,
+            "parent": "Shining",
+            "pctChange": "---",
+            "pctOfSet": 70,
+            "width": ".4"
+        },
+        {
+            "hasChildren": false,
+            "isParent": false,
+            "name": "Vivid",
+            "value": 613,
+            "parent": "Shining",
+            "pctChange": -9,
+            "pctOfSet": 24,
+            "width": ".4"
+        },
+        {
+            "hasChildren": true,
+            "name": "Brilliant",
+            "isParent": true,
+            "value": 1900,
+            "pctChange": 1,
+            "pctOfSet": 8,
+            "width": ".5"
+        },
+        {
+            "hasChildren": false,
+            "isParent": false,
+            "name": "Increase",
+            "value": 1900,
+            "parent": "Brilliant",
+            "pctChange": 999999,
+            "pctOfSet": 8,
+            "width": ".4"
+        },
+        {
+            "hasChildren": false,
+            "isParent": false,
+            "name": "Decrease",
+            "value": 1900,
+            "parent": "Brilliant",
+            "pctChange": -999999,
+            "pctOfSet": 8,
+            "width": ".4"
+        }
+
+    ]
+}

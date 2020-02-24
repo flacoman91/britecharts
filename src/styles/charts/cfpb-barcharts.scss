@@ -1,0 +1,28 @@
+.js-horizontal-test-chart-container .test-chart {
+  .y-axis-group,
+  .x-axis-group {
+    path {
+      display: none;
+    }
+  }
+  .tick line {
+    display: none;
+    stroke: none;
+  }
+  .tick text {
+    font-weight: 600;
+  }
+  .vertical-grid-line,
+  .horizontal-grid-line {
+    display: none
+  }
+  .tooltip-group {
+    //text {
+    //  fill: #ffffff !important;
+    //}
+    //rect {
+    //  fill: #43484e !important;
+    //  stroke: #43484e !important;
+    //}
+  }
+}
