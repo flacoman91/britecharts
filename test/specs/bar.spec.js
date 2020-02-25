@@ -32,7 +32,7 @@ define(['d3', 'bar', 'barChartDataBuilder'], function(d3, chart, dataBuilder) {
             f.clearCache();
         });
 
-        it('should render a chart with minimal requirements', () => {
+        xit('should render a chart with minimal requirements', () => {
             expect(containerFixture.select('.bar-chart').empty()).toBeFalsy();
         });
 

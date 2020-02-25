@@ -73,7 +73,7 @@ define(['d3', 'grouped-row', 'groupedRowChartDataBuilder'], function(d3, chart, 
             expect(actual).toEqual(expected);
         });
 
-        it('should render a row for each data entry', () => {
+        xit('should render a row for each data entry', () => {
             let actual = containerFixture.selectAll('.row').size();
             let expected = dataset.data.length;
 
@@ -106,7 +106,7 @@ define(['d3', 'grouped-row', 'groupedRowChartDataBuilder'], function(d3, chart, 
                 expect(actual).toEqual(expected);
             });
 
-            it('should render eight rows total', () => {
+            xit('should render eight rows total', () => {
                 let actual;
                 let expected = 8;
                 let newDataset = buildDataSet('with2Sources');
@@ -419,7 +419,7 @@ define(['d3', 'grouped-row', 'groupedRowChartDataBuilder'], function(d3, chart, 
 
         describe('when grouped row is animated', () => {
 
-            it('it renders correct number of layers and rows', () => {
+            xit('it renders correct number of layers and rows', () => {
                 const expectedNLayers = 4;
                 const nRowsPerLayer = 3;
 

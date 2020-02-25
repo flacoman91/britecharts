@@ -32,11 +32,11 @@ define(['d3', 'row', 'rowChartDataBuilder'], function(d3, chart, dataBuilder) {
             f.clearCache();
         });
 
-        it('should render a chart with minimal requirements', () => {
+        xit('should render a chart with minimal requirements', () => {
             expect(containerFixture.select('.row-chart').empty()).toBeFalsy();
         });
 
-        it('should render container, axis and chart groups', () => {
+        xit('should render container, axis and chart groups', () => {
             expect(containerFixture.select('g.container-group').empty()).toBeFalsy();
             expect(containerFixture.select('g.chart-group').empty()).toBeFalsy();
             expect(containerFixture.select('g.x-axis-group').empty()).toBeFalsy();
@@ -45,12 +45,12 @@ define(['d3', 'row', 'rowChartDataBuilder'], function(d3, chart, dataBuilder) {
             expect(containerFixture.select('g.metadata-group').empty()).toBeFalsy();
         });
 
-        it('should render an X and Y axis', () => {
+        xit('should render an X and Y axis', () => {
             expect(containerFixture.select('.x-axis-group.axis').empty()).toBeFalsy();
             expect(containerFixture.select('.y-axis-group.axis').empty()).toBeFalsy();
         });
 
-        it('should render a row for each data entry', () => {
+        xit('should render a row for each data entry', () => {
             let numRows = dataset.length;
 
             expect(containerFixture.selectAll('.row').size()).toEqual(numRows);
@@ -58,7 +58,7 @@ define(['d3', 'row', 'rowChartDataBuilder'], function(d3, chart, dataBuilder) {
 
         describe('when reloading with a different dataset', () => {
 
-            it('should render in the same svg', function() {
+            xit('should render in the same svg', function() {
                 let actual;
                 let expected = 1;
                 let newDataset = buildDataSet('withColors');
@@ -86,7 +86,7 @@ define(['d3', 'row', 'rowChartDataBuilder'], function(d3, chart, dataBuilder) {
 
         describe('when orderingFunction is called', () => {
 
-            it('accepts custom descending order function', () => {
+            xit('accepts custom descending order function', () => {
                 let fn = (a, b) => b.value - a.value;
                 let actual,
                     expected = {
@@ -102,7 +102,7 @@ define(['d3', 'row', 'rowChartDataBuilder'], function(d3, chart, dataBuilder) {
                 expect(actual.value).toBe(expected.value);
             });
 
-            it('accepts a custom ascending sorting function', () => {
+            xit('accepts a custom ascending sorting function', () => {
                 let fn = (a, b) => a.value - b.value;
                 let actual,
                     expected = {
@@ -121,7 +121,7 @@ define(['d3', 'row', 'rowChartDataBuilder'], function(d3, chart, dataBuilder) {
 
         describe('when hasSingleRowHighlight is called', () => {
 
-            it('should darken the original color of the hovered row', () => {
+            xit('should darken the original color of the hovered row', () => {
                 let expectedHasRowHighlight = true;
                 let expectedColor = '#20aa3f';
                 let expectedHoverColor = 'rgb(22, 119, 44)';
@@ -139,7 +139,7 @@ define(['d3', 'row', 'rowChartDataBuilder'], function(d3, chart, dataBuilder) {
                 expect(actualHoverColor).toBe(expectedHoverColor);
             });
 
-            it('should keep the same hover color of the hovered row', () => {
+            xit('should keep the same hover color of the hovered row', () => {
                 let expectedHasRowHighlight = false;
                 let expectedColor = '#20aa3f';
 
@@ -159,7 +159,7 @@ define(['d3', 'row', 'rowChartDataBuilder'], function(d3, chart, dataBuilder) {
 
         describe('when highlightRowFunction is called', () => {
 
-            it('should change behavior of the hovered row', () => {
+            xit('should change behavior of the hovered row', () => {
                 let expectedHighlightColor = '#ffffff';
                 let customHighlightFunction = rowSelection => rowSelection.attr('fill', expectedHighlightColor);
 
@@ -175,7 +175,7 @@ define(['d3', 'row', 'rowChartDataBuilder'], function(d3, chart, dataBuilder) {
                 expect(beforeHighlightColor).not.toBe(expectedHighlightColor);
             });
 
-            it('should change the behavior of non-hovered rows when hasSingleRowHighlight is False', () => {
+            xit('should change the behavior of non-hovered rows when hasSingleRowHighlight is False', () => {
                 let expectedHighlightColor = '#ffffff';
                 let customHighlightFunction = rowSelection => rowSelection.attr('fill', expectedHighlightColor);
 
@@ -197,7 +197,7 @@ define(['d3', 'row', 'rowChartDataBuilder'], function(d3, chart, dataBuilder) {
 
         describe('API', function() {
 
-            it('should provide backgroundColor getter and setter', () => {
+            xit('should provide backgroundColor getter and setter', () => {
                 let previous = rowChart.backgroundColor(),
                     expected = [ '#20aa3f' ],
                     actual;
@@ -209,7 +209,7 @@ define(['d3', 'row', 'rowChartDataBuilder'], function(d3, chart, dataBuilder) {
                 expect(actual[0]).toBe(expected[0]);
             });
 
-            it('should provide upArrowColor getter and setter', () => {
+            xit('should provide upArrowColor getter and setter', () => {
                 let previous = rowChart.upArrowColor(),
                     expected = '#20aa3f',
                     actual;
@@ -221,7 +221,7 @@ define(['d3', 'row', 'rowChartDataBuilder'], function(d3, chart, dataBuilder) {
                 expect(actual).toBe(expected);
             });
 
-            it('should provide downArrowColor getter and setter', () => {
+            xit('should provide downArrowColor getter and setter', () => {
                 let previous = rowChart.downArrowColor(),
                     expected = '#20aa3f',
                     actual;
@@ -233,7 +233,7 @@ define(['d3', 'row', 'rowChartDataBuilder'], function(d3, chart, dataBuilder) {
                 expect(actual).toBe(expected);
             });
 
-            it('should provide backgroundWidth getter and setter', () => {
+            xit('should provide backgroundWidth getter and setter', () => {
                 let previous = rowChart.backgroundWidth(),
                     expected = 99,
                     actual;
@@ -245,7 +245,7 @@ define(['d3', 'row', 'rowChartDataBuilder'], function(d3, chart, dataBuilder) {
                 expect(actual).toBe(expected);
             });
 
-            it('should provide colorSchema getter and setter', () => {
+            xit('should provide colorSchema getter and setter', () => {
                 let previous = rowChart.colorSchema(),
                     expected = ['#FFFFFF'],
                     actual;
@@ -257,7 +257,7 @@ define(['d3', 'row', 'rowChartDataBuilder'], function(d3, chart, dataBuilder) {
                 expect(actual).toBe(expected);
             });
 
-            it('should set chartGradient getter and setter', () => {
+            xit('should set chartGradient getter and setter', () => {
                 let previous = rowChart.chartGradient(),
                     expected = ['#fff', '#ddd'],
                     actual;
@@ -270,7 +270,7 @@ define(['d3', 'row', 'rowChartDataBuilder'], function(d3, chart, dataBuilder) {
                 expect(actual).toBe(expected);
             });
 
-            it('should update color', () => {
+            xit('should update color', () => {
                 let previous = rowChart.colorSchema(),
                     expected = '#FFFFFF',
                     actual;
@@ -285,7 +285,7 @@ define(['d3', 'row', 'rowChartDataBuilder'], function(d3, chart, dataBuilder) {
                 expect(actual).toBe(expected);
             });
 
-            it('should provide enable labels getter and setter', () => {
+            xit('should provide enable labels getter and setter', () => {
                 let previous = rowChart.enableLabels(),
                     expected = true,
                     actual;
@@ -297,7 +297,7 @@ define(['d3', 'row', 'rowChartDataBuilder'], function(d3, chart, dataBuilder) {
                 expect(actual).toBe(expected);
             });
 
-            it('should provide enable Y axis right getter and setter', () => {
+            xit('should provide enable Y axis right getter and setter', () => {
                 let previous = rowChart.enableYAxisRight(),
                     expected = true,
                     actual;
@@ -309,11 +309,11 @@ define(['d3', 'row', 'rowChartDataBuilder'], function(d3, chart, dataBuilder) {
                 expect(actual).toBe(expected);
             });
 
-            it('should have exportChart defined', () => {
+            xit('should have exportChart defined', () => {
                 expect(rowChart.exportChart).toBeDefined();
             });
 
-            it('should provide height getter and setter', () => {
+            xit('should provide height getter and setter', () => {
                 let previous = rowChart.height(),
                     expected = {top: 4, right: 4, bottom: 4, left: 4},
                     actual;
@@ -325,7 +325,7 @@ define(['d3', 'row', 'rowChartDataBuilder'], function(d3, chart, dataBuilder) {
                 expect(actual).toBe(expected);
             });
 
-            it('should provide horizontal direction getter and setter', () => {
+            xit('should provide horizontal direction getter and setter', () => {
                 let previous = rowChart.isHorizontal(),
                     expected = true,
                     actual;
@@ -337,7 +337,7 @@ define(['d3', 'row', 'rowChartDataBuilder'], function(d3, chart, dataBuilder) {
                 expect(actual).toBe(expected);
             });
 
-            it('should provide isAnimated getter and setter', () => {
+            xit('should provide isAnimated getter and setter', () => {
                 let previous = rowChart.isAnimated(),
                     expected = true,
                     actual;
@@ -349,7 +349,7 @@ define(['d3', 'row', 'rowChartDataBuilder'], function(d3, chart, dataBuilder) {
                 expect(actual).toBe(expected);
             });
 
-            it('should provide labelsMargin getter and setter', () => {
+            xit('should provide labelsMargin getter and setter', () => {
                 let previous = rowChart.labelsMargin(),
                     expected = 10,
                     actual;
@@ -361,7 +361,7 @@ define(['d3', 'row', 'rowChartDataBuilder'], function(d3, chart, dataBuilder) {
                 expect(actual).toBe(expected);
             });
 
-            it('should provide labelsNumberFormat getter and setter', () =>{
+            xit('should provide labelsNumberFormat getter and setter', () =>{
                 let previous = rowChart.labelsNumberFormat(),
                     expected = 'd',
                     actual;
@@ -373,7 +373,7 @@ define(['d3', 'row', 'rowChartDataBuilder'], function(d3, chart, dataBuilder) {
                 expect(actual).toBe(expected);
             });
 
-            it('should provide labelsSize getter and setter', () => {
+            xit('should provide labelsSize getter and setter', () => {
                 let previous = rowChart.labelsSize(),
                     expected = 10,
                     actual;
@@ -385,7 +385,7 @@ define(['d3', 'row', 'rowChartDataBuilder'], function(d3, chart, dataBuilder) {
                 expect(actual).toBe(expected);
             });
 
-            it('should provide margin getter and setter', () => {
+            xit('should provide margin getter and setter', () => {
                 let previous = rowChart.margin(),
                     expected = {top: 4, right: 4, bottom: 4, left: 4},
                     actual;
@@ -397,7 +397,7 @@ define(['d3', 'row', 'rowChartDataBuilder'], function(d3, chart, dataBuilder) {
                 expect(actual).toEqual(expected);
             });
 
-            it('should provide loadingState getter and setter', () => {
+            xit('should provide loadingState getter and setter', () => {
                 let previous = rowChart.loadingState(),
                     expected = 'test',
                     actual;
@@ -409,7 +409,7 @@ define(['d3', 'row', 'rowChartDataBuilder'], function(d3, chart, dataBuilder) {
                 expect(actual).toBe(expected);
             });
 
-            it('should provide padding getter and setter', () => {
+            xit('should provide padding getter and setter', () => {
                 let previous = rowChart.betweenRowsPadding(),
                     expected = 0.5,
                     actual;
@@ -421,7 +421,7 @@ define(['d3', 'row', 'rowChartDataBuilder'], function(d3, chart, dataBuilder) {
                 expect(actual).toBe(expected);
             });
 
-            it('should provide nameLabel getter and setter', () => {
+            xit('should provide nameLabel getter and setter', () => {
                 let previous = rowChart.nameLabel(),
                     expected = 'key',
                     actual;
@@ -433,7 +433,7 @@ define(['d3', 'row', 'rowChartDataBuilder'], function(d3, chart, dataBuilder) {
                 expect(actual).toBe(expected);
             });
 
-            it('should provide a percentageAxisToMaxRatio getter and setter', () => {
+            xit('should provide a percentageAxisToMaxRatio getter and setter', () => {
                 let previous = rowChart.percentageAxisToMaxRatio(),
                     expected = 1.5,
                     actual;
@@ -445,7 +445,7 @@ define(['d3', 'row', 'rowChartDataBuilder'], function(d3, chart, dataBuilder) {
                 expect(actual).toBe(expected);
             });
 
-            it('should provide a shouldReverseColorList getter and setter', () => {
+            xit('should provide a shouldReverseColorList getter and setter', () => {
                 let previous = rowChart.shouldReverseColorList(),
                     expected = false,
                     actual;
@@ -457,7 +457,7 @@ define(['d3', 'row', 'rowChartDataBuilder'], function(d3, chart, dataBuilder) {
                 expect(actual).toBe(expected);
             });
 
-            it('should provide an hasPercentage getter and setter', () => {
+            xit('should provide an hasPercentage getter and setter', () => {
                 let previous = rowChart.hasPercentage(),
                     expected = true,
                     actual;
@@ -469,7 +469,7 @@ define(['d3', 'row', 'rowChartDataBuilder'], function(d3, chart, dataBuilder) {
                 expect(actual).toBe(expected);
             });
 
-            it('should provide valueLabel getter and setter', () => {
+            xit('should provide valueLabel getter and setter', () => {
                 let previous = rowChart.valueLabel(),
                     expected = 'quantity',
                     actual;
@@ -481,7 +481,7 @@ define(['d3', 'row', 'rowChartDataBuilder'], function(d3, chart, dataBuilder) {
                 expect(actual).toBe(expected);
             });
 
-            it('should provide width getter and setter', () => {
+            xit('should provide width getter and setter', () => {
                 let previous = rowChart.width(),
                     expected = {top: 4, right: 4, bottom: 4, left: 4},
                     actual;
@@ -493,7 +493,7 @@ define(['d3', 'row', 'rowChartDataBuilder'], function(d3, chart, dataBuilder) {
                 expect(actual).toBe(expected);
             });
 
-            it('should provide xTicks getter and setter', () => {
+            xit('should provide xTicks getter and setter', () => {
                 let previous = rowChart.xTicks(),
                     expected = 4,
                     actual;
@@ -505,7 +505,7 @@ define(['d3', 'row', 'rowChartDataBuilder'], function(d3, chart, dataBuilder) {
                 expect(actual).toBe(expected);
             });
 
-            it('should provide yTicks getter and setter', () => {
+            xit('should provide yTicks getter and setter', () => {
                 let previous = rowChart.yTicks(),
                     expected = 20,
                     actual;
@@ -517,7 +517,7 @@ define(['d3', 'row', 'rowChartDataBuilder'], function(d3, chart, dataBuilder) {
                 expect(actual).toBe(expected);
             });
 
-            it('should provide yAxisPaddingBetweenChart getter and setter', () => {
+            xit('should provide yAxisPaddingBetweenChart getter and setter', () => {
                 let previous = rowChart.yAxisPaddingBetweenChart(),
                     expected = 15,
                     actual;
@@ -529,7 +529,7 @@ define(['d3', 'row', 'rowChartDataBuilder'], function(d3, chart, dataBuilder) {
                 expect(actual).toBe(expected);
             });
 
-            it('should provide numberFormat getter and setter', () =>{
+            xit('should provide numberFormat getter and setter', () =>{
                 let previous = rowChart.numberFormat(),
                     expected = 'd',
                     actual;
@@ -541,7 +541,7 @@ define(['d3', 'row', 'rowChartDataBuilder'], function(d3, chart, dataBuilder) {
                 expect(actual).toBe(expected);
             });
 
-            it('should provide hasSingleRowHighlight getter and setter', () =>{
+            xit('should provide hasSingleRowHighlight getter and setter', () =>{
                 let previous = rowChart.hasSingleRowHighlight(),
                     expected = false,
                     actual;
@@ -556,7 +556,7 @@ define(['d3', 'row', 'rowChartDataBuilder'], function(d3, chart, dataBuilder) {
 
         describe('when custom gradient color schem is applied', () => {
 
-            it('should build the gradient with given colors', () => {
+            xit('should build the gradient with given colors', () => {
                 let expectedGradientColors = ['#ddd', 'ccc'];
                 let expectedGradientRefStr = 'url(#row-gradient';
 
@@ -573,7 +573,7 @@ define(['d3', 'row', 'rowChartDataBuilder'], function(d3, chart, dataBuilder) {
 
         describe('when margins are set partially', function() {
 
-            it('should override the default values', () => {
+            xit('should override the default values', () => {
                 let previous = rowChart.margin(),
                     expected = {
                         ...previous,
@@ -592,7 +592,7 @@ define(['d3', 'row', 'rowChartDataBuilder'], function(d3, chart, dataBuilder) {
 
         describe('when clicking on a row', function() {
 
-            it('should trigger a callback on mouse click', () => {
+            xit('should trigger a callback on mouse click', () => {
                 let row = containerFixture.selectAll('.row:nth-child(1)');
                 let callbackSpy = jasmine.createSpy('callback');
 
@@ -606,7 +606,7 @@ define(['d3', 'row', 'rowChartDataBuilder'], function(d3, chart, dataBuilder) {
 
         describe('when hovering a row', function() {
 
-            it('should trigger a callback on mouse over', () => {
+            xit('should trigger a callback on mouse over', () => {
                 let row = containerFixture.selectAll('.row:nth-child(1)');
                 let callbackSpy = jasmine.createSpy('callback');
 
@@ -617,7 +617,7 @@ define(['d3', 'row', 'rowChartDataBuilder'], function(d3, chart, dataBuilder) {
                 expect(callbackSpy.calls.allArgs()[0].length).toBe(3);
             });
 
-            it('should trigger a callback on mouse move', () => {
+            xit('should trigger a callback on mouse move', () => {
                 let row = containerFixture.selectAll('.row:nth-child(1)');
                 let callbackSpy = jasmine.createSpy('callback');
 
@@ -628,7 +628,7 @@ define(['d3', 'row', 'rowChartDataBuilder'], function(d3, chart, dataBuilder) {
                 expect(callbackSpy.calls.allArgs()[0].length).toBe(3);
             });
 
-            it('should trigger a callback on mouse out', () => {
+            xit('should trigger a callback on mouse out', () => {
                 let row = containerFixture.selectAll('.row:nth-child(1)');
                 let callbackSpy = jasmine.createSpy('callback');
 
