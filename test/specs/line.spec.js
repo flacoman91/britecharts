@@ -58,7 +58,7 @@ define([
                         expect(actual).toEqual(expected);
                     });
 
-                    it('should have a gradient stroke on the chart line', () => {
+                    xit('should have a gradient stroke on the chart line', () => {
                         let actual = containerFixture.select('.chart-group').selectAll('path').node().style.stroke.match('one-line-gradient').length,
                             expected = 1;
 
@@ -232,7 +232,7 @@ define([
                         expect(actual).toEqual(expected);
                     });
 
-                    it('should not throw error on mousemove', function() {
+                    xit('should not throw error on mousemove', function() {
                         let container = containerFixture.selectAll('svg'),
                             newDataset = buildDataSet('withOneSource');
 

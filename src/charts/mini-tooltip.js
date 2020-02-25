@@ -72,15 +72,15 @@ define(function(require){
             // Fonts
             textSize = 14,
             textLineHeight = 1.5,
-            valueTextSize = 27,
+            valueTextSize = 22,
             valueTextLineHeight = 1.18,
 
             // Colors
-            bodyFillColor = '#FFFFFF',
-            borderStrokeColor = '#D2D6DF',
-            titleFillColor = '#666a73',
-            nameTextFillColor = '#666a73',
-            valueTextFillColor = '#45494E',
+            bodyFillColor = '#43484e',
+            borderStrokeColor = '#43484e',
+            titleFillColor = '#43484e',
+            nameTextFillColor = '#ffffff',
+            valueTextFillColor = '#ffffff',
             valueTextWeight = 200,
 
             // formats

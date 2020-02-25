@@ -1,0 +1,69 @@
+{
+    "data": [
+        {
+            "hasChildren": false,
+            "isNotFilter": false,
+            "isParent": true,
+            "parentCount": 7759,
+            "pctChange": -7.21,
+            "pctOfSet": 66.76,
+            "name": "Their investigation did not fix an error on your report",
+            "value": 5180,
+            "parent": false,
+            "visible": true,
+            "width": 0.5
+        },
+        {
+            "hasChildren": false,
+            "isNotFilter": false,
+            "isParent": true,
+            "parentCount": 7759,
+            "pctChange": 21.11,
+            "pctOfSet": 9.23,
+            "name": "Difficulty submitting a dispute or getting information about a dispute over the phone",
+            "value": 716,
+            "parent": false,
+            "visible": true,
+            "width": 0.5
+        },
+        {
+            "hasChildren": false,
+            "isNotFilter": false,
+            "isParent": true,
+            "parentCount": 7759,
+            "pctChange": -15,
+            "pctOfSet": 8.93,
+            "name": "Investigation took more than 30 days",
+            "value": 693,
+            "parent": false,
+            "visible": true,
+            "width": 0.5
+        },
+        {
+            "hasChildren": false,
+            "isNotFilter": false,
+            "isParent": true,
+            "parentCount": 7759,
+            "pctChange": -35.87,
+            "pctOfSet": 7.67,
+            "name": "Was not notified of investigation status or results",
+            "value": 595,
+            "parent": false,
+            "visible": true,
+            "width": 0.5
+        },
+        {
+            "hasChildren": false,
+            "isNotFilter": false,
+            "isParent": true,
+            "parentCount": 7759,
+            "pctChange": 26.25,
+            "pctOfSet": 6.86,
+            "name": "Problem with personal statement of dispute",
+            "value": 532,
+            "parent": false,
+            "visible": true,
+            "width": 0.5
+        }
+    ]
+}

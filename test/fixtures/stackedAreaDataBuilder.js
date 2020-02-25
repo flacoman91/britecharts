@@ -7,7 +7,8 @@ define(function(require) {
         jsonSixSources = require('json-loader!../json/areaDataSixSources.json'),
         jsonSalesChannel = require('json-loader!../json/areaDataSalesChannel.json'),
         jsonReportService = require('json-loader!../json/areaDataReportService.json'),
-        jsonLargeService = require('json-loader!../json/areaDataLarge.json');
+        jsonLargeService = require('json-loader!../json/areaDataLarge.json'),
+        jsonMassiveWeekSource = require('json-loader!../json/areaMassiveWeekSources.json');
 
 
     function StackedAreaDataBuilder(config){
@@ -27,6 +28,13 @@ define(function(require) {
             return new this.Klass(attributes);
         };
 
+        this.withMassiveSources = function(){
+            var attributes = _.extend({}, this.config, jsonMassiveWeekSource);
+
+            return new this.Klass(attributes);
+        };
+
+
         this.withReportData = function(){
             var attributes = _.extend({}, this.config, jsonReportService);
 
@@ -41,7 +49,7 @@ define(function(require) {
 
         this.withLargeData = function() {
             var attributes = _.extend({}, this.config, jsonLargeService);
-            
+
             return new this.Klass(attributes);
         }
 

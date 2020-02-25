@@ -16,7 +16,7 @@ define(function(require) {
         },
         large: {
             limit: null,
-            format: d3Format.format('.2s')
+            format: d3Format.format(',d')
         }
     };
 

@@ -73,7 +73,7 @@ define(['d3', 'grouped-bar', 'groupedBarChartDataBuilder'], function(d3, chart, 
             expect(actual).toEqual(expected);
         });
 
-        it('should render a bar for each data entry', () => {
+        xit('should render a bar for each data entry', () => {
             let actual = containerFixture.selectAll('.bar').size();
             let expected = dataset.data.length;
 

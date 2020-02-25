@@ -9,13 +9,20 @@ define(function(require) {
         jsonAllZeroes = require('json-loader!../json/lineDataAllZeroes.json'),
         jsonMultiMonthValueRange = require('json-loader!../json/multiMonthLineData'),
         jsonHourDateRange = require('json-loader!../json/lineDataOneSetHourly.json'),
-        jsonSmallValueRange = require('json-loader!../json/lineDataSmallValueRange');
+        jsonSmallValueRange = require('json-loader!../json/lineDataSmallValueRange'),
+        jsonTruncated = require('json-loader!../json/lineDataFiveTopicsTruncated.json');
 
 
-    function LineDataBuilder(config) {
+        function LineDataBuilder(config) {
         this.Klass = LineDataBuilder;
 
         this.config = _.defaults({}, config);
+
+        this.withTruncatedTopics = function(){
+            var attributes = _.extend({}, this.config, jsonTruncated);
+
+            return new this.Klass(attributes);
+        };
 
         this.with5Topics = function(){
             var attributes = _.extend({}, this.config, jsonFiveTopics);
@@ -52,7 +59,7 @@ define(function(require) {
 
             return new this.Klass(attributes);
         };
-        
+
         this.withAllZeroes = function() {
             var attributes = _.extend({}, this.config, jsonAllZeroes);
 

@@ -111,6 +111,9 @@
 .bar-chart .percentage-label {
   fill: #666A73; }
 
+.line-chart .area {
+  fill: #EFF2F5; }
+
 .line-chart .data-point-mark {
   fill: #ffffff; }
 
@@ -129,6 +132,31 @@
 
 .line-chart .masking-rectangle {
   fill: #ffffff; }
+
+.row-chart .row {
+  shape-rendering: crispEdges; }
+
+.row-chart g.row-wrapper {
+  cursor: pointer; }
+  .row-chart g.row-wrapper:hover .bg-hover {
+    fill-opacity: 1; }
+
+.row-chart .y-axis-group .tick text {
+  font-size: 16px; }
+  .row-chart .y-axis-group .tick text.print-mode {
+    font-size: 18px; }
+
+.row-chart .axis path.domain {
+  display: none; }
+
+.row-chart .tick line {
+  display: none; }
+
+.row-chart .adjust-upwards {
+  transform: translate(0, -10px); }
+
+.row-chart .percentage-label {
+  fill: #666A73; }
 
 .scatter-plot .y-axis-group .tick line {
   display: none; }
@@ -200,6 +228,23 @@
 .grouped-bar .tick line {
   display: none; }
 
+.grouped-row .x-axis-group path {
+  display: none; }
+
+.grouped-row .y-axis-group .tick text {
+  font-size: 14px; }
+
+.grouped-row .y-axis-group .adjust-upwards {
+  transform: translate(0, -10px); }
+
+.grouped-row .tick line,
+.grouped-row .tick line {
+  display: none; }
+
+.grouped-row .chart-group .group-background {
+  fill: #e7e8e9;
+  fill-opacity: .4; }
+
 .step-chart .step {
   fill: #8FDAD8;
   stroke-width: 0;
@@ -235,3 +280,18 @@
 
 .bullet-chart .bullet-title {
   font-size: 16px; }
+
+.js-horizontal-test-chart-container .test-chart .y-axis-group path,
+.js-horizontal-test-chart-container .test-chart .x-axis-group path {
+  display: none; }
+
+.js-horizontal-test-chart-container .test-chart .tick line {
+  display: none;
+  stroke: none; }
+
+.js-horizontal-test-chart-container .test-chart .tick text {
+  font-weight: 600; }
+
+.js-horizontal-test-chart-container .test-chart .vertical-grid-line,
+.js-horizontal-test-chart-container .test-chart .horizontal-grid-line {
+  display: none; }

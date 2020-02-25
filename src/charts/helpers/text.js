@@ -71,7 +71,7 @@ define(function(require) {
     /**
      * Wraps a selection of text within the available width, also adds class .adjust-upwards
      * to configure a y offset for entries with multiple rows
-     * @param  {D3Sekectuib} text       d3 text element
+     * @param  {D3Selection} text       d3 text element
      * @param  {Number} width           Width of the container where the text needs to wrap on
      * @param  {Number} xpos            number passed to determine the x offset
      * @param  {Number} limit           number of lines before an ellipses is added and the rest of the text is cut off
@@ -80,14 +80,13 @@ define(function(require) {
      * More discussions on https://github.com/mbostock/d3/issues/1642
      * @return {void}
      */
-    const wrapTextWithEllipses = function(text, width, xpos=0, limit=2) {
+    const wrapTextWithEllipses = function(text, width, xpos=0, limit=2, lineHeight = 1.2) {
 
             text.each(function() {
                 var words,
                     word,
                     line,
                     lineNumber,
-                    lineHeight,
                     y,
                     dy,
                     tspan;
@@ -97,7 +96,6 @@ define(function(require) {
                 words = text.text().split(/\s+/).reverse();
                 line = [];
                 lineNumber = 0;
-                lineHeight = 1.2;
                 y = text.attr('y');
                 dy = parseFloat(text.attr('dy'));
                 tspan = text

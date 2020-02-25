@@ -3,11 +3,13 @@ import donut from './charts/donut.js';
 import legend from './charts/legend.js';
 import line from './charts/line.js';
 import loadingStates from './charts/helpers/load.js';
+import row from './charts/row.js';
 import tooltip from './charts/tooltip.js';
 import miniTooltip from './charts/mini-tooltip.js';
 import sparkline from './charts/sparkline.js';
 import stackedArea from './charts/stacked-area.js';
 import groupedBar from './charts/grouped-bar.js';
+import groupedRow from './charts/grouped-row.js';
 import stackedBar from './charts/stacked-bar.js';
 import step from './charts/step.js';
 import brush from './charts/brush.js';
@@ -19,11 +21,13 @@ export {
         legend,
         line,
         loadingStates,
+        row,
         tooltip,
         miniTooltip,
         sparkline,
         stackedArea,
         groupedBar,
+        groupedRow,
         stackedBar,
         step,
         brush,
