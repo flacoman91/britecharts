@@ -782,15 +782,28 @@ define(function(require){
                 .merge(lines)
                 .attr('id', ({topic}) => topic)
                 .attr('d', ({dates}) => topicLine(dates))
-                .style('stroke', (d) => (
-                    dataByTopic.length === 1 && enableSingleLineGradient
-                        ? `url(#${lineGradientId})` : getLineColor(d)
-                ))
+                // CFPB Custom, we don't ever want a single line gradient
+                .style('stroke', (d) => getLineColor(d))
+                // old default code
+                // .style('stroke', (d) => (
+                //     dataByTopic.length === 1 ? `url(#${lineGradientId})` : getLineColor(d)
+                // ))
                 .style('opacity', (d)=>{
-                    return d.show ? 1 : 0;
+                    // code to make sure this is compatible with britecharts, vs
+                    // cfpb customizations
+                    if(d.hasOwnProperty('show')) {
+                        return d.show ? 1 : 0;
+                    }
+                    // show by default
+                    return 1;
                 })
                 .style('stroke-dasharray', (d)=>{
-                    return d.dashed ? [.5, 4] : false;
+                    // cfpb custom
+                    if(d.hasOwnProperty('show')) {
+                        return d.dashed ? [.5, 4] : false;
+                    }
+                    // line not dashed by default
+                    return false;
                 });
 
             lines
@@ -855,7 +868,15 @@ define(function(require){
                 .style('transform', 'translateY(8px)')
                 .style('fill', textFillColor);
 
-            const visibleTopics = dataByTopic.filter(o=>o.show);
+            let visibleTopics;
+
+            // CFPB backwards compatibility with default britecharts data
+            if(dataByTopic[0].hasOwnProperty('show')) {
+                visibleTopics = dataByTopic.filter(o => o.show);
+            } else {
+                visibleTopics = dataByTopic;
+            }
+
             for(let i=0; i< visibleTopics.length; i++){
                 visibleTopics[i].sum = visibleTopics[i].dates.reduce((a, b)=>a + b.value, 0);
             }
@@ -1240,6 +1261,10 @@ define(function(require){
         function handleMouseOut(e, d){
             overlay.style('display', 'none');
             verticalMarkerLine.classed('bc-is-active', false);
+            // cfpb change
+            // remove this since it's making the page superwide in ie
+            //verticalMarkerContainer.attr('transform', 'translate(9999, 0)');
+
             dispatcher.call('customMouseOut', e, d, d3Selection.mouse(e));
         }
 
@@ -1287,11 +1312,6 @@ define(function(require){
                 return acc;
             }, {});
 
-            const dashedPoints = dataByTopic.filter( o => {
-                    return o.dashed;
-                } )
-                .map(o=>{ return o.topicName; });
-
             const hiddenPoints = dataByTopic.filter( o => {
                     return !o.show;
                 } )
@@ -1321,9 +1341,6 @@ define(function(require){
                                     .style('stroke-width', () => (
                                         shouldShowAllDataPoints ? highlightCircleStrokeAll : highlightCircleStroke
                                     ))
-                                    .style( 'fill', () => {
-                                        return topicColorMap[ d.name ];
-                                    })
                                     .style( 'opacity', () => {
                                         return hiddenPoints.includes(d.topicName) ? 0 : 1;
                                     })
@@ -1431,21 +1448,6 @@ define(function(require){
                 return aspectRatio;
             }
             aspectRatio = _x;
-
-            return this;
-        };
-
-        /**
-         * Gets or Sets whether single line gradient is enabled
-         * @param  {Boolean} _x Desired aspect ratio for the graph
-         * @return { (Boolean | Module) } Current aspect ratio or Line Chart module to chain calls
-         * @public
-         */
-        exports.enableSingleLineGradient = function(_x) {
-            if (!arguments.length) {
-                return enableSingleLineGradient;
-            }
-            enableSingleLineGradient = _x;
 
             return this;
         };

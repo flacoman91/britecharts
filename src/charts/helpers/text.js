@@ -87,7 +87,6 @@ define(function(require) {
                 word,
                 line,
                 lineNumber,
-                lineHeight,
                 y,
                 dy,
                 tspan;

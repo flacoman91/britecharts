@@ -16,7 +16,7 @@ define(function(require) {
     const textHelper = require('./helpers/text');
     const {exportChart} = require('./helpers/export');
     const colorHelper = require('./helpers/color');
-    const {row} = require('./helpers/load');
+    const { bar: barChartLoadingMarkup } = require('./helpers/load');
     const {uniqueId} = require('./helpers/number');
 
     const PERCENTAGE_FORMAT = '%';
@@ -75,7 +75,7 @@ define(function(require) {
             containerRoot,
             width = 960,
             height = 500,
-            loadingState = row,
+            loadingState = barChartLoadingMarkup,
             data,
             dataZeroed,
             chartWidth, chartHeight,
@@ -83,16 +83,11 @@ define(function(require) {
             colorSchema = colorHelper.singleColors.aloeGreen,
             colorList,
             colorMap,
-            chartGradientColors = null,
-            chartGradient = null,
-            chartGradientEl,
-            chartGradientId = uniqueId('row-gradient'),
             yTicks = 5,
             xTicks = 5,
             percentageAxisToMaxRatio = 1,
             numberFormat = NUMBER_FORMAT,
             enableLabels = false,
-            enableGridLines = false,
             enableYAxisRight = false,
             labelsMargin = 7,
             labelsNumberFormat = NUMBER_FORMAT,
@@ -104,27 +99,18 @@ define(function(require) {
             padding = 0.1,
             outerPadding = .3,
             xAxis, yAxis,
-            xAxisPadding = {
-                top: 0,
-                left: 0,
-                bottom: 0,
-                right: 0
-            },
             yAxisPaddingBetweenChart = 20,
             yAxisLineWrapLimit = 1,
             svg,
 
-            hasSingleRowHighlight = true,
             isAnimated = false,
             ease = d3Ease.easeQuadInOut,
             animationDuration = 800,
-            animationStepRatio = 70,
             backgroundColor = '#bebebe',
             backgroundHoverColor = '#d6e8fa',
             backgroundWidth = 70,
             downArrowColor = '#20AA3F',
             upArrowColor = '#D14124',
-            interRowDelay = (d, i) => animationStepRatio * i,
 
             highlightRowFunction = (rowSelection) => rowSelection.attr('fill', ({name}) => d3Color.color(colorMap(name)).darker()),
             orderingFunction,
@@ -136,11 +122,7 @@ define(function(require) {
             wrapLabels = true,
             nameLabel = 'name',
             pctChangeLabel = 'pctChange',
-            //pctOfSet = '',
             pctOfSetLabel = 'pctOfSet',
-
-            baseLine,
-            maskGridLines,
             shouldReverseColorList = true,
             isPrintMode = false,
             // Dispatcher object to broadcast the mouse events
@@ -223,12 +205,10 @@ define(function(require) {
                     width - margin.left - margin.right;
 
                 chartHeight = height - margin.top - margin.bottom;
-                ({data, dataZeroed} = sortData(cleanData(_data)));
+                ({data, dataZeroed} = cleanData(_data));
                 buildScales();
                 buildAxis();
                 buildSVG(this);
-                buildGradient();
-                drawGridLines();
                 drawChartTitleLabels();
                 drawRows();
                 drawAxis();
@@ -260,9 +240,6 @@ define(function(require) {
                   .attr('transform', `translate(${margin.left + yAxisPaddingBetweenChart}, ${margin.top})`);
 
             container
-                .append('g').classed('grid-lines-group', true);
-
-            container
                 .append('g').classed('chart-group', true);
 
             container
@@ -282,33 +259,6 @@ define(function(require) {
             // the tooltip and also labels on the right
             container
                 .append('g').classed('metadata-group', true);
-        }
-
-        /**
-         * Builds the gradient element to be used later
-         * @return {void}
-         * @private
-         */
-        function buildGradient() {
-            if (!chartGradientEl && chartGradientColors) {
-                chartGradientEl = svg.select('.metadata-group')
-                  .append('linearGradient')
-                    .attr('id', chartGradientId)
-                    .attr('x1', '0%')
-                    .attr('y1', '0%')
-                    .attr('x2', '100%')
-                    .attr('y2', '100%')
-                    .attr('gradientUnits', 'userSpaceOnUse')
-                    .selectAll('stop')
-                     .data([
-                        {offset:'0%', color: chartGradientColors[0]},
-                        {offset:'50%', color: chartGradientColors[1]}
-                    ])
-                    .enter()
-                      .append('stop')
-                        .attr('offset', ({offset}) => offset)
-                        .attr('stop-color', ({color}) => color)
-            }
         }
 
         function v(d) {
@@ -494,35 +444,6 @@ define(function(require) {
 
             return { data, dataZeroed };
         }
-
-        /**
-         * A utility function that checks if custom gradient
-         * color map should be applied if specified by the user
-         * @param {String} name - row's data point name
-         * @return {void}
-         * @private
-         */
-        function computeColor(name) {
-            return chartGradientColors ? `url(#${chartGradientId})` : colorMap(name);
-        }
-
-        /**
-         * Sorts data if orderingFunction is specified
-         * @param  {RowChartData}     clean unordered data
-         * @return  {RowChartData}    clean ordered data
-         * @private
-         */
-        function sortData(unorderedData) {
-            let {data, dataZeroed} = unorderedData;
-
-            if (orderingFunction) {
-                data.sort(orderingFunction);
-                dataZeroed.sort(orderingFunction)
-            }
-
-            return { data, dataZeroed };
-        }
-
 
         /**
          * utility function if we are a Root Row, big font, etc
@@ -822,7 +743,7 @@ define(function(require) {
                 } )
                 .attr( 'width', ( { value } ) => xScale( value ) )
                 .attr( 'fill', ( d ) => {
-                    return computeColor( d.name );
+                    return colorMap( d.name );
                 } )
                 .attr('fill-opacity', (d)=>{
                     return d.parent ? 0.5 : 1;
@@ -920,9 +841,8 @@ define(function(require) {
                 .attr( 'height', function (d) {
                     return a * d.width;	//`a` already accounts for both types of padding
                 })
-                // .attr( 'fill', ( { name } ) => computeColor( name ) )
                 .attr( 'fill', ( d ) => {
-                    return computeColor( d.name );
+                    return colorMap( d.name );
                 } )
                 .attr('width', 0)
                 .transition()
@@ -1085,56 +1005,6 @@ define(function(require) {
         }
 
         /**
-         * Draws grid lines on the background of the chart
-         * @return void
-         */
-        function drawGridLines() {
-            if(enableGridLines){
-                svg.select('.grid-lines-group')
-                    .selectAll('line')
-                    .remove();
-
-                    drawHorizontalGridLines();
-            }
-        }
-
-        /**
-         * Draws the grid lines for an horizontal row chart
-         * @return {void}
-         */
-        function drawHorizontalGridLines() {
-            maskGridLines = svg.select('.grid-lines-group')
-                .selectAll('line.vertical-grid-line')
-                .data(xScale.ticks(4))
-                .enter()
-                  .append('line')
-                    .attr('class', 'vertical-grid-line')
-                    .attr('y1', margin.top + 20)
-                    .attr('x1', (d) => xScale(d))
-                    .attr('y2', chartHeight)
-                    .attr('x2', (d) => xScale(d));
-
-            drawVerticalExtendedLine();
-        }
-
-        /**
-         * Draws a vertical line to extend y-axis till the edges
-         * @return {void}
-         */
-        function drawVerticalExtendedLine() {
-            baseLine = svg.select('.grid-lines-group')
-                .selectAll('line.extended-y-line')
-                .data([0])
-                .enter()
-                  .append('line')
-                    .attr('class', 'extended-y-line')
-                    .attr('y1', margin.top + 20)
-                    .attr('x1', 0)
-                    .attr('y2', chartHeight)
-                    .attr('x2', 0);
-        }
-
-        /**
          * Custom OnMouseOver event handler
          * @return {void}
          * @private
@@ -1145,11 +1015,6 @@ define(function(require) {
 
             // eyeball fill-opacity
             rowHoverOver(d);
-
-            if (hasSingleRowHighlight) {
-                highlightRowFunction(d3Selection.select(e));
-                return;
-            }
 
             rowList.forEach(rowRect => {
                 if (rowRect === e) {
@@ -1287,21 +1152,6 @@ define(function(require) {
         }
 
         /**
-         * Gets or Sets the gradient colors of a row in the chart
-         * @param  {String[]} _x Desired color gradient for the line (array of two hexadecimal numbers)
-         * @return {String[] | module} Current color gradient or Line Chart module to chain calls
-         * @public
-         */
-        exports.chartGradient = function(_x) {
-            if (!arguments.length) {
-                return chartGradientColors;
-            }
-            chartGradientColors = _x;
-
-            return this;
-        }
-
-        /**
          * Gets or Sets the colorSchema of the chart
          * @param  {String[]} _x Desired colorSchema for the graph
          * @return { colorSchema | module} Current colorSchema or Chart module to chain calls
@@ -1315,22 +1165,6 @@ define(function(require) {
 
             return this;
         };
-
-        /**
-         * If true, adds gridlines to row chart
-         * @param  {Boolean} [_x=false]
-         * @return {Boolean | module} Current value of enableGridLines or Chart module to chain calls
-         * @public
-         */
-        exports.enableGridLines = function(_x) {
-            if (!arguments.length) {
-                return enableGridLines;
-            }
-            enableGridLines = _x;
-
-            return this;
-        };
-
 
         /**
          * If true, adds labels at the end of the rows
@@ -1392,26 +1226,6 @@ define(function(require) {
         };
 
         /**
-         * Gets or Sets the hasSingleRowHighlight status.
-         * If the value is true (default), only the hovered row is considered to
-         * be highlighted and will be darkened by default. If the value is false,
-         * all the rows but the hovered row are considered to be highlighted
-         * and will be darkened (by default). To customize the row highlight or
-         * remove it completely, use highlightRowFunction instead.
-         * @param  {boolean} _x        Should highlight the hovered row
-         * @return {boolean | module} Is hasSingleRowHighlight used or Chart module to chain calls
-         * @public
-         */
-        exports.hasSingleRowHighlight = function(_x) {
-            if (!arguments.length) {
-                return hasSingleRowHighlight;
-            }
-            hasSingleRowHighlight = _x;
-
-            return this;
-        }
-
-        /**
          * Gets or Sets the height of the chart
          * @param  {number} _x Desired width for the graph
          * @return {height | module} Current height or Chart module to chain calls
@@ -1426,28 +1240,6 @@ define(function(require) {
             return this;
         };
 
-        /**
-         * Gets or Sets the highlightRowFunction function. The callback passed to
-         * this function returns a row selection from the row chart. Use this function
-         * if you want to apply a custom behavior to the highlighted row on hover.
-         * When hasSingleRowHighlight is true the highlighted row will be the
-         * one that was hovered by the user. When hasSingleRowHighlight is false
-         * the highlighted rows are all the rows but the hovered one. The default
-         * highlight effect on a row is darkening the highlighted row(s) color.
-         * @param  {Function} _x        Desired operation operation on a hovered row passed through callback
-         * @return {highlightRowFunction | module} Is highlightRowFunction used or Chart module to chain calls
-         * @public
-         * @example rowChart.highlightRowFunction(row => row.attr('fill', 'blue'))
-         * rowChart.highlightRowFunction(null) // will disable the default highlight effect
-         */
-        exports.highlightRowFunction = function(_x) {
-            if (!arguments.length) {
-                return highlightRowFunction;
-            }
-            highlightRowFunction = _x;
-
-            return this;
-        }
 
         /**
          * Gets or Sets the isAnimated property of the chart, making it to animate when render.

@@ -2,15 +2,15 @@ define(function(require) {
     'use strict';
 
     var _ = require('underscore'),
-        json4ExpandedBars = require('json-loader!../json/row4ExpandedBars.json'),
-        json5Bars = require('json-loader!../json/row5Bars.json'),
-        json5CollapsedBars = require('json-loader!../json/row5CollapsedBars.json'),
-        jsonColors = require('json-loader!../json/rowColors.json'),
-        jsonDataLens = require('json-loader!../json/rowFocusLens.json'),
-        jsonFocusLens = require('json-loader!../json/rowFocusPrintLens.json'),
-        jsonLetters = require('json-loader!../json/rowDataLetters.json'),
-        jsonLongNames = require('json-loader!../json/rowLongNames.json'),
-        jsonMassiveSet = require('json-loader!../json/rowMassiveSetBars.json');
+        json4ExpandedBars = require('../json/row4ExpandedBars.json'),
+        json5Bars = require('../json/row5Bars.json'),
+        json5CollapsedBars = require('../json/row5CollapsedBars.json'),
+        jsonColors = require('../json/rowColors.json'),
+        jsonDataLens = require('../json/rowFocusLens.json'),
+        jsonFocusLens = require('../json/rowFocusPrintLens.json'),
+        jsonLetters = require('../json/rowDataLetters.json'),
+        jsonLongNames = require('../json/rowLongNames.json'),
+        jsonMassiveSet = require('../json/rowMassiveSetBars.json');
 
 
     function RowDataBuilder(config){

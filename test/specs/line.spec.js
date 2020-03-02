@@ -60,14 +60,14 @@ define([
                         expect(actual).toEqual(expected);
                     });
 
-                    it('should have a gradient stroke on the chart line', () => {
-                        const expected = 1;
+                    // CFPB Custom
+                    it('should NOT have a gradient stroke on the chart line', () => {
                         const actual = containerFixture
                             .select('.chart-group')
                             .selectAll('path')
-                            .node().style.stroke.match('one-line-gradient').length;
+                            .node().style.stroke.match('one-line-gradient');
 
-                        expect(actual).toEqual(expected);
+                        expect(actual).toBeNull();
                     });
                 });
 
@@ -174,7 +174,7 @@ define([
                                 let minValue = Math.min(...values);
                                 expect(minValue).toEqual(0);
                                 let indexOf0 = -minValue;
-                                
+
                                 let horizontalGridLines = d3.selectAll('.horizontal-grid-line').filter((_, i) => i === indexOf0);
                                 let classes = horizontalGridLines.attr('class').split(' ');
                                 expect(classes.includes('horizontal-grid-line--highlighted')).toEqual(false);
@@ -564,7 +564,7 @@ define([
                         let values = dataset.dataByTopic[0].dates.map(it => it.value);
                         let minValue = Math.min(...values);
                         let indexOf0 = -minValue;
-                        
+
                         let horizontalGridLines = d3.selectAll('.horizontal-grid-line').filter((_, i) => i === indexOf0);
                         let classes = horizontalGridLines.attr('class').split(' ');
                         expect(classes.includes('horizontal-grid-line--highlighted')).toEqual(true);

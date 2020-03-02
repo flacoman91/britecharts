@@ -80,11 +80,9 @@ function createExportLineChart(optionalColorSchema, optionalData) {
             .xAxisFormat(constants.axisTimeCombinations.MONTH_YEAR);
 
         if (optionalColorSchema) {
-            console.log(optionalColorSchema);
             lineChart1.colorSchema(optionalColorSchema);
         }
 
-        console.log(dataset);
         if (optionalData) {
             container.datum(optionalData).call(lineChart1);
         } else {

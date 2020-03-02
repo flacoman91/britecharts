@@ -3,8 +3,8 @@ define(function(require) {
 
     var _ = require('underscore'),
 
-        jsonTwoSources = require('json-loader!../json/groupedrowDataTwoSources.json'),
-        jsonThreeSources = require('json-loader!../json/groupedrowDataThreeSources.json');
+        jsonTwoSources = require('../json/groupedrowDataTwoSources.json'),
+        jsonThreeSources = require('../json/groupedrowDataThreeSources.json');
 
 
     function GroupedRowChartDataBuilder(config){
