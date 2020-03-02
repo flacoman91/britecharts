@@ -14,9 +14,9 @@ define(function(require){
     const assign = require('lodash.assign');
     const d3Transition = require('d3-transition');
 
-    const {exportChart} = require('./helpers/export');
+    const { exportChart } = require('./helpers/export');
     const colorHelper = require('./helpers/color');
-    const {bar} = require('./helpers/load');
+    const { bar: barChartLoadingMarkup } = require('./helpers/load');
 
     const PERCENTAGE_FORMAT = '%';
     const NUMBER_FORMAT = ',f';
@@ -75,8 +75,7 @@ define(function(require){
             },
             width = 960,
             height = 500,
-            loadingState = bar,
-
+            loadingState = barChartLoadingMarkup,
 
             xScale,
             xAxis,
@@ -137,7 +136,6 @@ define(function(require){
             nameLabel = 'name',
             valueLabel = 'value',
             stackLabel = 'stack',
-            nameLabelFormat,
             valueLabelFormat = NUMBER_FORMAT,
 
             // getters
@@ -1015,21 +1013,6 @@ define(function(require){
                 return nameLabel;
             }
             nameLabel = _x;
-
-            return this;
-        };
-
-        /**
-         * Gets or Sets the valueLabelFormat of the chart
-         * @param  {String[]} _x Desired valueLabelFormat for the graph
-         * @return {String[] | module} Current valueLabelFormat or Chart module to chain calls
-         * @public
-         */
-        exports.nameLabelFormat = function(_x) {
-            if (!arguments.length) {
-                return nameLabelFormat;
-            }
-            nameLabelFormat = _x;
 
             return this;
         };

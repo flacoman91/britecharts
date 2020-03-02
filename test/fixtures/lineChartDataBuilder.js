@@ -2,15 +2,17 @@ define(function(require) {
     'use strict';
 
     var _ = require('underscore'),
-
-        jsonAllDatas = require('json-loader!../json/lineDataAllDatas.json'),
-        jsonFiveTopics = require('json-loader!../json/lineDataFiveTopics.json'),
-        jsonOneSource = require('json-loader!../json/lineDataOneSet.json'),
-        jsonAllZeroes = require('json-loader!../json/lineDataAllZeroes.json'),
-        jsonMultiMonthValueRange = require('json-loader!../json/multiMonthLineData'),
-        jsonHourDateRange = require('json-loader!../json/lineDataOneSetHourly.json'),
-        jsonSmallValueRange = require('json-loader!../json/lineDataSmallValueRange'),
-        jsonTruncated = require('json-loader!../json/lineDataFiveTopicsTruncated.json');
+        jsonAllDatas = require('../json/lineDataAllDatas.json'),
+        jsonFiveTopics = require('../json/lineDataFiveTopics.json'),
+        jsonFourTopics = require('../json/lineDataFourTopics.json'),
+        jsonOneSource = require('../json/lineDataOneSet.json'),
+        jsonAllZeroes = require('../json/lineDataAllZeroes.json'),
+        jsonTwoTopicsFlat = require('../json/lineDataTwoTopicsFlat.json'),
+        jsonMultiMonthValueRange = require('../json/multiMonthLineData'),
+        jsonHourDateRange = require('../json/lineDataOneSetHourly.json'),
+        jsonSmallValueRange = require('../json/lineDataSmallValueRange'),
+        jsonNegativeValues = require('../json/lineDataNegativeValues.json'),
+        jsonTruncated = require('../json/lineDataFiveTopicsTruncated.json');
 
 
         function LineDataBuilder(config) {
@@ -26,6 +28,12 @@ define(function(require) {
 
         this.with5Topics = function(){
             var attributes = _.extend({}, this.config, jsonFiveTopics);
+
+            return new this.Klass(attributes);
+        };
+
+        this.with4Topics = function(){
+            var attributes = _.extend({}, this.config, jsonFourTopics);
 
             return new this.Klass(attributes);
         };
@@ -60,8 +68,20 @@ define(function(require) {
             return new this.Klass(attributes);
         };
 
+        this.withTwoFlatTopics = function() {
+            var attributes = _.extend({}, this.config, jsonTwoTopicsFlat);
+
+            return new this.Klass(attributes);
+        };
+
         this.withAllZeroes = function() {
             var attributes = _.extend({}, this.config, jsonAllZeroes);
+
+            return new this.Klass(attributes);
+        };
+
+        this.withNegativeValues = function() {
+            var attributes = _.extend({}, this.config, jsonNegativeValues);
 
             return new this.Klass(attributes);
         };

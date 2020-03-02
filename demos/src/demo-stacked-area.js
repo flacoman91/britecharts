@@ -53,11 +53,10 @@ function createStackedAreaChartWithTooltip(optionalColorSchema) {
                 chartTooltip.update(dataPoint, topicColorMap, dataPointXPosition);
             })
             .on('customMouseOut', chartTooltip.hide);
-        stackedArea.colorSchema(['red', 'blue', 'green', 'yellow', 'purple', 'pink', 'black', 'grey', 'orange']);
 
-        // if (optionalColorSchema) {
-        //     stackedArea.colorSchema(optionalColorSchema);
-        // }
+        if (optionalColorSchema) {
+            stackedArea.colorSchema(optionalColorSchema);
+        }
 
         container.datum(dataset.data).call(stackedArea);
 

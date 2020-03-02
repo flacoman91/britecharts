@@ -13,11 +13,10 @@ define(function(require){
     const d3TimeFormat = require('d3-time-format');
     const assign = require('lodash.assign');
     const textHelper = require('./helpers/text');
-
-    const {exportChart} = require('./helpers/export');
+    const { exportChart } = require('./helpers/export');
     const colorHelper = require('./helpers/color');
-    const {getTimeSeriesAxis} = require('./helpers/axis');
-    const {axisTimeCombinations, curveMap} = require('./helpers/constants');
+    const { getTimeSeriesAxis } = require('./helpers/axis');
+    const { axisTimeCombinations, curveMap } = require('./helpers/constants');
     const {
         formatIntegerValue,
         formatDecimalValue,
@@ -32,8 +31,7 @@ define(function(require){
         addDays,
         diffDays
     } = require('./helpers/date');
-    const { stackedArea} = require('./helpers/load');
-
+    const { stackedArea: stackedAreaLoadingMarkup } = require('./helpers/load');
 
     const uniq = (arrArg) => arrArg.filter((elem, pos, arr) => arr.indexOf(elem) === pos);
 
@@ -46,9 +44,9 @@ define(function(require){
     /**
      * @typedef areaChartData
      * @type {Object[]}
-     * @property {String} date         Date of the entry
-     * @property {String} name         Name of the entry
-     * @property {Number} value        Value of the entry
+     * @property {String} date         Date of the entry in ISO8601 format (required)
+     * @property {String} name         Name of the entry (required)
+     * @property {Number} value        Value of the entry (required)
      *
      * @example
      * [
@@ -90,7 +88,7 @@ define(function(require){
             },
             width = 960,
             height = 500,
-            loadingState = stackedArea,
+            loadingState = stackedAreaLoadingMarkup,
 
             xScale, xAxis, xMonthAxis,
             yScale, yAxis,
@@ -156,6 +154,8 @@ define(function(require){
             isPrintMode = false,
             ease = d3Ease.easeQuadInOut,
             areaAnimationDuration = 1000,
+
+            hasOutline = true,
 
             svg,
             chartWidth, chartHeight,
@@ -246,6 +246,8 @@ define(function(require){
                 drawAxis();
                 drawStackedAreas();
                 drawLegend();
+
+                addTouchEvents();
 
                 addTouchEvents();
 
@@ -865,7 +867,6 @@ define(function(require){
                     }
                 }
             });
-
         }
 
 
@@ -1073,6 +1074,12 @@ define(function(require){
                     .attr('class', 'area-outline')
                     .attr('d', areaOutline)
                     .style('stroke', ({key}) => categoryColorMap[key]);
+            }
+
+            if (!hasOutline) {
+                svg.select('.chart-group')
+                  .selectAll('.area-outline')
+                  .style('display', 'none');
             }
 
             // Exit
@@ -1291,7 +1298,6 @@ define(function(require){
             verticalMarkerLine.classed('bc-is-active', false);
             // don't hide vertical marker
             //verticalMarkerContainer.attr('transform', 'translate(9999, 0)');
-
             dispatcher.call('customMouseOut', e, d, d3Selection.mouse(e));
         }
 
@@ -1514,6 +1520,15 @@ define(function(require){
 
             return this;
         };
+
+        exports.hasOutline = function(_x) {
+            if (!arguments.length) {
+                return hasOutline;
+            }
+            hasOutline = _x;
+
+            return this;
+        }
 
         /**
          * Gets or Sets the height of the chart

@@ -14,9 +14,10 @@ define(function(require){
     const d3TimeFormat = require('d3-time-format');
     const textHelper = require('./helpers/text');
 
-    const {exportChart} = require('./helpers/export');
+    const { exportChart } = require('./helpers/export');
     const colorHelper = require('./helpers/color');
-    const {line} = require('./helpers/load');
+    const { line: lineChartLoadingMarkup } = require('./helpers/load');
+
 
     const { getTimeSeriesAxis } = require('./helpers/axis');
     const {
@@ -35,6 +36,8 @@ define(function(require){
         uniqueId
     } = require('./helpers/number');
 
+    const acceptNullValue = (value) => value === null ? null : +value;
+
     /**
      * @typedef D3Selection
      * @type {Array[]}
@@ -42,12 +45,31 @@ define(function(require){
      * @property {DOMElement} parentNode    Parent of the selection
      */
 
+    /**
+      * @typedef lineChartFlatData
+      * @type {Object}
+      * @property {String} topicName    Topic name (required)
+      * @property {Number} topic        Topic identifier (required)
+      * @property {Object[]} dates      All date entries with values for that topic in ISO8601 format (required)
+      *
+      * @example
+      * [
+      *     {
+      *         topicName: 'San Francisco',
+      *         name: 123,
+      *         date: '2017-01-16T16:00:00-08:00',
+      *         value: 1
+      *     }
+      * ]
+      */
+
      /**
+      * Former data standard, it is currently calculated internally if not passed
       * @typedef lineChartDataByTopic
       * @type {Object}
       * @property {String} topicName    Topic name (required)
       * @property {Number} topic        Topic identifier (required)
-      * @property {Object[]} dates      All date entries with values for that topic (required)
+      * @property {Object[]} dates      All date entries with values for that topic in ISO8601 format (required)
       *
       * @example
       * {
@@ -66,35 +88,73 @@ define(function(require){
       * }
       */
 
-     /**
-      * @typedef LineChartData
+    /**
+      * The Data by Date is calculated internally in the chart in order to pass it to our tooltips
+      * @typedef lineChartDataByDate
       * @type {Object[]}
-      * @property {lineChartDataByTopic[]} dataByTopic  Data values to chart (required)
+      * @property {String} date         Date in ISO8601 format (required)
+      * @property {Object[]} topics     List of topics with values that date (required)
+      *
+      * @example
+      * [
+      *     {
+      *         date: "2015-06-27T07:00:00.000Z",
+      *         topics: [
+      *             {
+      *                 "name": 1,
+      *                 "value": 1,
+      *                 "topicName": "San Francisco"
+      *             },
+      *             {
+      *                 "name": 2,
+      *                 "value": 20,
+      *                 "topicName": "Los Angeles"
+      *             },
+      *             {
+      *                 "name": 3,
+      *                 "value": 10,
+      *                 "topicName": "Oakland"
+      *             }
+      *         ]
+      *     },
+      *     {...}
+      * ]
+      */
+
+     /**
+      * The data shape for the line chart.
+      * Note that up to version 2.10.1, this required a "dataByTopic" array described on lineChartDataByTopic.
+      * The "dataByTopic" schema still works, but we prefer a flat dataset as described here.
+      * @typedef LineChartData
+      * @type {Object}
+      * @property {lineChartFlatData[]} data  Data values to chart (required)
       *
       * @example
       * {
-      *     dataByTopic: [
+      *     data: [
       *         {
       *             topicName: 'San Francisco',
-      *             topic: 123,
-      *             dates: [
-      *                 {
-      *                     date: '2017-01-16T16:00:00-08:00',
-      *                     value: 1
-      *                 },
-      *                 {
-      *                     date: '2017-01-16T17:00:00-08:00',
-      *                     value: 2
-      *                 }
-      *             ]
+      *             name: 1,
+      *             date: '2017-01-16T16:00:00-08:00',
+      *             value: 1
       *         },
       *         {
-      *             topicName: 'Other',
-      *             topic: 345,
-      *             dates: [
-      *                 {...},
-      *                 {...}
-      *             ]
+      *             topicName: 'San Francisco',
+      *             name: 1,
+      *             date: '2017-01-17T16:00:00-08:00',
+      *             value: 2
+      *         },
+      *         {
+      *             topicName: 'Oakland',
+      *             name: 2,
+      *             date: '2017-01-16T16:00:00-08:00',
+      *             value: 3
+      *         },
+      *         {
+      *             topicName: 'Oakland',
+      *             name: 2,
+      *             date: '2017-01-17T16:00:00-08:00',
+      *             value: 7
       *         }
       *     ]
       * }
@@ -130,7 +190,7 @@ define(function(require){
             },
             width = 960,
             height = 500,
-            loadingState = line,
+            loadingState = lineChartLoadingMarkup,
             aspectRatio = null,
             tooltipThreshold = 480,
             svg,
@@ -167,6 +227,7 @@ define(function(require){
             xTicks = null,
             xAxisCustomFormat = null,
             locale,
+
             shouldShowAllDataPoints = false,
             isAnimated = false,
             isPrintMode = false,
@@ -243,6 +304,7 @@ define(function(require){
             getDate = ({date}) => date,
             getValue = ({value}) => value,
             getTopic = ({topic}) => topic,
+            getVariableTopicName = (d) => d[topicNameLabel],
             getLineColor = ({topic}) => colorScale(topic),
 
             // events
@@ -492,7 +554,7 @@ define(function(require){
                 maxX = d3Array.max(dataByTopic, ({dates}) => d3Array.max(dates, getDate)),
                 maxY = d3Array.max(dataByTopic, ({dates}) => d3Array.max(dates, getValue)),
                 minY = d3Array.min(dataByTopic, ({dates}) => d3Array.min(dates, getValue));
-            let yScaleBottomValue = Math.abs(minY) < 0 ? Math.abs(minY) : 0;
+            let yScaleBottomValue = minY < 0 ? minY : 0;
 
             xScale = d3Scale.scaleTime()
                 .domain([minX, maxX])
@@ -541,66 +603,66 @@ define(function(require){
          * @param  {obj} dataByTopic    Raw data grouped by topic
          * @return {obj}                Parsed data with dataByTopic and dataByDate
          */
-        function cleanData({dataByTopic, dataByDate, dataRange}) {
-            if (!dataByTopic) {
-                throw new Error('Data needs to have a dataByTopic property');
+        function cleanData({dataByTopic, dataByDate, data}) {
+            if (!dataByTopic && !data) {
+                throw new Error('Data needs to have a dataByTopic or data property. See more in http://eventbrite.github.io/britecharts/global.html#LineChartData__anchor');
             }
 
-            const flatData = dataByTopic.reduce((accum, topic) => {
-                topic.dates.forEach((date) => {
-                    accum.push({
-                        topicName: topic[topicNameLabel],
-                        name: topic[topicLabel],
-                        date: date[dateLabel],
-                        value: date[valueLabel]
+            // If dataByTopic or data are not present, we generate them
+            if (!dataByTopic) {
+                dataByTopic = d3Collection.nest()
+                    .key(getVariableTopicName)
+                    .entries(data)
+                    .map(d => ({
+                            topic: d.values[0]['name'],
+                            topicName: d.key,
+                            dates: d.values
+                        })
+                    );
+            } else {
+                data = dataByTopic.reduce((accum, topic) => {
+                    topic.dates.forEach((date) => {
+                        accum.push({
+                            topicName: topic[topicNameLabel],
+                            name: topic[topicLabel],
+                            date: date[dateLabel],
+                            value: date[valueLabel]
+                        });
                     });
-                });
 
-                return accum;
-            }, []);
+                    return accum;
+                }, []);
+            }
 
             // Nest data by date and format
             dataByDate = d3Collection.nest()
-                            .key(getDate)
-                            .entries(flatData)
-                            .map((d) => {
-                                return {
-                                    date: new Date(d.key),
-                                    topics: d.values
-                                }
-                            });
-
-            // Normalize dates in keys
-            dataByDate = dataByDate.map((d) => {
-                d.date = new Date(d.date);
-
-                return d;
-            });
-
-            if(dataRange) {
-                dataRange = dataRange.map( ( d ) => {
-                    d.date = new Date( d.date );
-                    return d;
-                } );
-            }
+                .key(getDate)
+                .entries(data)
+                .map((d) => {
+                    return {
+                        date: new Date(d.key),
+                        topics: d.values
+                    }
+                });
 
             const normalizedDataByTopic = dataByTopic.reduce((accum, topic) => {
                 let {dates, ...restProps} = topic;
 
-                let newDates = dates.map(d => ({
-                       date: new Date(d[dateLabel]),
-                       value: +d[valueLabel]
-                }));
+                let newDates = dates.map(d => {
+                    return {
+                        date: new Date(d[dateLabel]),
+                        value: acceptNullValue(d[valueLabel])
+                    };
+                });
 
                 accum.push({ dates: newDates, ...restProps });
 
                 return accum;
-             }, []);
+            }, []);
 
             return {
                 dataByTopic: normalizedDataByTopic,
-                dataByDate,
-                dataRange
+                dataByDate
             };
         }
 
@@ -700,18 +762,22 @@ define(function(require){
             let lines,
                 topicLine;
 
+            // clear tooltip chache on path redraw
+            pathYCache = {};
+
             topicLine = d3Shape.line()
                 .curve(curveMap[lineCurve])
                 .x(({date}) => xScale(date))
+                .defined(({ value }) => value !== null)
                 .y(({value}) => yScale(value));
 
             lines = svg.select('.chart-group').selectAll('.line')
                 .data(dataByTopic, getTopic);
 
             paths = lines.enter()
-              .append('g')
+                .append('g')
                 .attr('class', 'topic')
-              .append('path')
+                .append('path')
                 .attr('class', 'line')
                 .merge(lines)
                 .attr('id', ({topic}) => topic)
@@ -895,6 +961,9 @@ define(function(require){
                 .selectAll('line')
                 .remove();
 
+            let minY = d3Array.min(dataByTopic, ({dates}) => d3Array.min(dates, getValue));
+            let shouldHighlightXAxis = minY < 0;
+
             if (grid === 'horizontal' || grid === 'full') {
                 horizontalGridLines = svg.select('.grid-lines-group')
                     .selectAll('line.horizontal-grid-line')
@@ -905,7 +974,8 @@ define(function(require){
                         .attr('x1', (-xAxisPadding.left - 30))
                         .attr('x2', chartWidth)
                         .attr('y1', (d) => yScale(d))
-                        .attr('y2', (d) => yScale(d));
+                        .attr('y2', (d) => yScale(d))
+                        .classed('horizontal-grid-line--highlighted', (value) => shouldHighlightXAxis && value === 0);
             }
 
             if (grid === 'vertical' || grid === 'full') {
@@ -1231,12 +1301,12 @@ define(function(require){
             // sorting the topics based on the order of the colors,
             // so that the order always stays constant
             const topicsWithNode = dataPoint.topics
-                                        .map(topic => ({
-                                            topic,
-                                            node: nodesById[topic.name]
-                                        }))
-                                        .filter(({topic}) => !!topic)
-                                        .sort((a, b) => topicColorMap[a.topic.name] < topicColorMap[b.topic.name])
+                .map(topic => ({
+                    topic,
+                    node: nodesById[topic.name]
+                }))
+                .filter(({topic}) => !!topic)
+                .sort((a, b) => topicColorMap[a.topic.name] < topicColorMap[b.topic.name])
 
             dataPoint.topics = topicsWithNode.map(({topic}) => topic);
             dataPoint.topics.forEach((d, index) => {

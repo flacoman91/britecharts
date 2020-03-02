@@ -3,7 +3,8 @@ define(function(require) {
 
     var _ = require('underscore'),
 
-        jsonSimpleData = require('json-loader!../json/brushData.json');
+        jsonShortData = require('../json/brushDataBis.json'),
+        jsonSimpleData = require('../json/brushData.json');
 
 
     function BrushDataBuilder(config){
@@ -13,6 +14,12 @@ define(function(require) {
 
         this.withSimpleData = function(){
             var attributes = _.extend({}, this.config, jsonSimpleData);
+
+            return new this.Klass(attributes);
+        };
+
+        this.withShortData = function(){
+            var attributes = _.extend({}, this.config, jsonShortData);
 
             return new this.Klass(attributes);
         };

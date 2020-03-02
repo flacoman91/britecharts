@@ -28,6 +28,8 @@ function createBrushChart(optionalColorSchema) {
 
     if (containerWidth) {
         dataset = aTestDataSet().withTruncatedTopics().build();
+//        dataset = aTestDataSet().with5Topics().build();
+
         brushChart
             .width(containerWidth)
             .height(100)
@@ -105,10 +107,12 @@ function createLineChart(optionalColorSchema, optionalData) {
         });
 
         dataset = aTestDataSet().withTruncatedTopics().build();
+//        dataset = aTestDataSet().with5Topics().build();
 
         // LineChart Setup and start
         lineChart1
             .isAnimated(true)
+//            .aspectRatio(0.5)
             .grid('horizontal')
             .tooltipThreshold(600)
             .width(containerWidth)
@@ -122,8 +126,7 @@ function createLineChart(optionalColorSchema, optionalData) {
             .on('customDataEntryClick', function(d, mousePosition) {
                 // eslint-disable-next-line no-console
                 console.log('Data entry marker clicked', d, mousePosition);
-            });
-
+            })
 
         if (optionalColorSchema) {
             console.log(optionalColorSchema);
@@ -182,7 +185,6 @@ function createLineChartWithSingleLine() {
 
         // Tooltip Setup and start
         chartTooltip
-            .valueLabel('value')
             .title('Quantity Sold');
 
         // Note that if the viewport width is less than the tooltipThreshold value,

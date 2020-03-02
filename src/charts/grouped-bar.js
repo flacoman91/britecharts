@@ -29,9 +29,9 @@ define(function (require) {
     /**
      * @typedef GroupedBarChartData
      * @type {Object[]}
-     * @property {String} name         Name of the entry
-     * @property {String} group        group of the entry
-     * @property {Number} value        Value of the entry
+     * @property {String} name     Name of the entry
+     * @property {String} group    Group of the entry
+     * @property {Number} value    Value of the entry
      *
      * @example
      * [
@@ -706,7 +706,7 @@ define(function (require) {
          * Click handler, shows data that was clicked and passes to the user
          * @private
          */
-        function handleCustomClick (e, d) {
+        function handleCustomClick (e) {
             let [mouseX, mouseY] = getMousePosition(e);
             let dataPoint = isHorizontal ? getNearestDataPoint2(mouseY) : getNearestDataPoint(mouseX);
 
