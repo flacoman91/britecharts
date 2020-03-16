@@ -217,6 +217,17 @@ define(['d3', 'row', 'rowChartDataBuilder'], function(d3, chart, dataBuilder) {
         });
 
         describe('API', () => {
+            it('should provide backgroundColor getter and setter', () => {
+                let previous = rowChart.backgroundColor(),
+                    expected = '#bebebe',
+                    actual;
+
+                rowChart.backgroundColor(expected);
+                actual = rowChart.backgroundColor();
+
+                expect(previous).not.toBe(actual);
+                expect(actual).toBe(expected);
+            });
 
             it('should provide colorSchema getter and setter', () => {
                 let previous = rowChart.colorSchema(),
@@ -225,6 +236,150 @@ define(['d3', 'row', 'rowChartDataBuilder'], function(d3, chart, dataBuilder) {
 
                 rowChart.colorSchema(expected);
                 actual = rowChart.colorSchema();
+
+                expect(previous).not.toBe(actual);
+                expect(actual).toBe(expected);
+            });
+
+            it('should provide isPrintMode getter and setter', () => {
+                let previous = rowChart.isPrintMode(),
+                    expected = true,
+                    actual;
+
+                rowChart.isPrintMode(expected);
+                actual = rowChart.isPrintMode();
+
+                expect(previous).not.toBe(actual);
+                expect(actual).toBe(expected);
+            });
+
+            it('should provide enableYAxisRight getter and setter', () => {
+                let previous = rowChart.enableYAxisRight(),
+                    expected = true,
+                    actual;
+
+                rowChart.enableYAxisRight(expected);
+                actual = rowChart.enableYAxisRight();
+
+                expect(previous).not.toBe(actual);
+                expect(actual).toBe(expected);
+            });
+
+            it('should provide labelsFocusTitle getter and setter', () => {
+                let previous = rowChart.labelsFocusTitle(),
+                    expected = 'Some Complaint Thingy',
+                    actual;
+
+                rowChart.labelsFocusTitle(expected);
+                actual = rowChart.labelsFocusTitle();
+
+                expect(previous).not.toBe(actual);
+                expect(actual).toBe(expected);
+            });
+
+            it('should provide labelsInterval getter and setter', () => {
+                let previous = rowChart.labelsInterval(),
+                    expected = 'month',
+                    actual;
+
+                rowChart.labelsInterval(expected);
+                actual = rowChart.labelsInterval();
+
+                expect(previous).not.toBe(actual);
+                expect(actual).toBe(expected);
+            });
+
+            it('should provide labelsSuffix getter and setter', () => {
+                let previous = rowChart.labelsSuffix(),
+                    expected = 's',
+                    actual;
+
+                rowChart.labelsSuffix(expected);
+                actual = rowChart.labelsSuffix();
+
+                expect(previous).not.toBe(actual);
+                expect(actual).toBe(expected);
+            });
+
+            it('should provide labelsTotalCount getter and setter', () => {
+                let previous = rowChart.labelsTotalCount(),
+                    expected = '20000',
+                    actual;
+
+                rowChart.labelsTotalCount(expected);
+                actual = rowChart.labelsTotalCount();
+
+                expect(previous).not.toBe(actual);
+                expect(actual).toBe(expected);
+            });
+
+            it('should provide labelsTotalText getter and setter', () => {
+                let previous = rowChart.labelsTotalText(),
+                    expected = 'Total foobars',
+                    actual;
+
+                rowChart.labelsTotalText(expected);
+                actual = rowChart.labelsTotalText();
+
+                expect(previous).not.toBe(actual);
+                expect(actual).toBe(expected);
+            });
+
+            it('should provide wrapLabels getter and setter', () => {
+                let previous = rowChart.wrapLabels(),
+                    expected = false,
+                    actual;
+
+                rowChart.wrapLabels(expected);
+                actual = rowChart.wrapLabels();
+
+                expect(previous).not.toBe(actual);
+                expect(actual).toBe(expected);
+            });
+
+            it('should provide yAxisLineWrapLimit getter and setter', () => {
+                let previous = rowChart.yAxisLineWrapLimit(),
+                    expected = 2,
+                    actual;
+
+                rowChart.yAxisLineWrapLimit(expected);
+                actual = rowChart.yAxisLineWrapLimit();
+
+                expect(previous).not.toBe(actual);
+                expect(actual).toBe(expected);
+            });
+
+            it('should provide upArrowColor getter and setter', () => {
+                let previous = rowChart.upArrowColor(),
+                    expected = '#FFFFFF',
+                    actual;
+
+                rowChart.upArrowColor(expected);
+                actual = rowChart.upArrowColor();
+
+                expect(previous).not.toBe(actual);
+                expect(actual).toBe(expected);
+            });
+
+            it('should provide downArrowColor getter and setter', () => {
+                let previous = rowChart.downArrowColor(),
+                    expected = '#FFFFFF',
+                    actual;
+
+                rowChart.downArrowColor(expected);
+                actual = rowChart.downArrowColor();
+
+                expect(previous).not.toBe(actual);
+                expect(actual).toBe(expected);
+            });
+
+            it('should provide outerPadding getter and setter', () => {
+                let previous = rowChart.outerPadding(),
+                    expected = 0.5,
+                    actual;
+
+                rowChart.outerPadding(expected);
+                actual = rowChart.outerPadding();
 
                 expect(previous).not.toBe(actual);
                 expect(actual).toBe(expected);
@@ -316,6 +471,43 @@ define(['d3', 'row', 'rowChartDataBuilder'], function(d3, chart, dataBuilder) {
 
                 rowChart.labelsSize(expected);
                 actual = rowChart.labelsSize();
+
+                expect(previous).not.toBe(actual);
+                expect(actual).toBe(expected);
+            });
+
+            it('should provide labelsSizeChild getter and setter', () => {
+                let previous = rowChart.labelsSizeChild(),
+                    expected = 10,
+                    actual;
+
+                rowChart.labelsSizeChild(expected);
+                actual = rowChart.labelsSizeChild();
+
+                expect(previous).not.toBe(actual);
+                expect(actual).toBe(expected);
+            });
+
+            it('should provide pctChangeLabel getter and setter', () => {
+                let previous = rowChart.pctChangeLabel(),
+                    expected = 'foobar',
+                    actual;
+
+                rowChart.pctChangeLabel(expected);
+                actual = rowChart.pctChangeLabel();
+
+                expect(previous).not.toBe(actual);
+                expect(actual).toBe(expected);
+            });
+
+
+            it('should provide pctChangeLabelSize getter and setter', () => {
+                let previous = rowChart.pctChangeLabelSize(),
+                    expected = 8,
+                    actual;
+
+                rowChart.pctChangeLabelSize(expected);
+                actual = rowChart.pctChangeLabelSize();
 
                 expect(previous).not.toBe(actual);
                 expect(actual).toBe(expected);
@@ -419,31 +611,6 @@ define(['d3', 'row', 'rowChartDataBuilder'], function(d3, chart, dataBuilder) {
                     expect(actual).toBe(expected);
                 });
 
-            it('should provide a shouldReverseColorList getter and setter',
-                () => {
-                    let previous = rowChart.shouldReverseColorList(),
-                        expected = false,
-                        actual;
-
-                    rowChart.shouldReverseColorList(expected);
-                    actual = rowChart.shouldReverseColorList();
-
-                    expect(previous).not.toBe(expected);
-                    expect(actual).toBe(expected);
-                });
-
-            it('should provide an hasPercentage getter and setter', () => {
-                let previous = rowChart.hasPercentage(),
-                    expected = true,
-                    actual;
-
-                rowChart.hasPercentage(expected);
-                actual = rowChart.hasPercentage();
-
-                expect(previous).not.toBe(expected);
-                expect(actual).toBe(expected);
-            });
-
             it('should provide valueLabel getter and setter', () => {
                 let previous = rowChart.valueLabel(),
                     expected = 'quantity',
@@ -515,6 +682,42 @@ define(['d3', 'row', 'rowChartDataBuilder'], function(d3, chart, dataBuilder) {
 
                 expect(previous).not.toBe(expected);
                 expect(actual).toBe(expected);
+            });
+        });
+    });
+
+    describe('Print Mode Row Chart', () => {
+        let rowChart, dataset, containerFixture, f;
+
+        beforeEach(() => {
+            dataset = buildDataSet('withFocusLens');
+            rowChart = chart();
+            rowChart.isPrintMode(true);
+            rowChart.isAnimated(true);
+
+            // DOM Fixture Setup
+            f = jasmine.getFixtures();
+            f.fixturesPath = 'base/test/fixtures/';
+            f.load('testContainer.html');
+
+            containerFixture = d3.select('.test-container');
+            containerFixture.datum(dataset).call(rowChart);
+        });
+
+        afterEach(() => {
+            containerFixture.remove();
+            f = jasmine.getFixtures();
+            f.cleanUp();
+            f.clearCache();
+        });
+
+        describe('Render', () => {
+
+            it('should show a chart with minimal requirements', () => {
+                const expected = 1;
+                const actual = containerFixture.select('.row-chart').size();
+
+                expect(actual).toEqual(expected);
             });
         });
     });

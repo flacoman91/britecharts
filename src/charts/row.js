@@ -10,16 +10,12 @@ define(function(require) {
     const d3Format = require('d3-format');
     const d3Scale = require('d3-scale');
     const d3Selection = require('d3-selection');
-    const d3Shape = require('d3-shape');
-    const d3Transition = require('d3-transition');
 
     const textHelper = require('./helpers/text');
     const {exportChart} = require('./helpers/export');
     const colorHelper = require('./helpers/color');
     const { bar: barChartLoadingMarkup } = require('./helpers/load');
-    const {uniqueId} = require('./helpers/number');
 
-    const PERCENTAGE_FORMAT = '%';
     const NUMBER_FORMAT = ',f';
 
 
@@ -108,7 +104,6 @@ define(function(require) {
             animationDuration = 800,
             backgroundColor = '#bebebe',
             backgroundHoverColor = '#d6e8fa',
-            backgroundWidth = 70,
             downArrowColor = '#20AA3F',
             upArrowColor = '#D14124',
 
@@ -116,7 +111,6 @@ define(function(require) {
                 rowSelection.attr('fill', ({name}) => {
                     return name ? d3Color.color(colorMap(name)).darker() : ''
                 }),
-            orderingFunction,
             labelsFocusTitle = '',
             labelsTotalText = 'Total complaints',
             labelsTotalCount = '',
@@ -126,7 +120,6 @@ define(function(require) {
             nameLabel = 'name',
             pctChangeLabel = 'pctChange',
             pctOfSetLabel = 'pctOfSet',
-            shouldReverseColorList = true,
             isPrintMode = false,
             // Dispatcher object to broadcast the mouse events
             // Ref: https://github.com/mbostock/d3/wiki/Internals#d3_dispatch
@@ -380,20 +373,11 @@ define(function(require) {
                 .domain(data.map(getName))
                 .range(vals); //force irregular intervals based on value
 
-            if (shouldReverseColorList) {
-                colorList = data.map(d => d)
-                                .reverse()
-                                .map(({name}, i) => ({
-                                        name,
-                                        color: colorSchema[i % colorSchema.length]}
-                                    ));
-            } else {
-                colorList = data.map(d => d)
-                                .map(({name}, i) => ({
-                                        name,
-                                        color: colorSchema[i % colorSchema.length]}
-                                    ));
-            }
+            colorList = data.map(d => d)
+                            .map(({name}, i) => ({
+                                    name,
+                                    color: colorSchema[i % colorSchema.length]}
+                                ));
 
             colorMap = (item) => colorList.filter(({name}) => name === item)[0].color;
         }
@@ -459,9 +443,6 @@ define(function(require) {
             })
         }
 
-        function positionPercentageLabel(d){
-
-        }
         /**
          * utility function to get font size for a row
          * @param d
@@ -470,21 +451,6 @@ define(function(require) {
         function getFontSize(d){
             const e = isParent(d);
             return e ? `${labelsSize}px` : `${labelsSizeChild}px`;
-        }
-
-        /**
-         * Utility function that wraps a text into the given width
-         * @param  {D3Selection} text         Text to write
-         * @param  {Number} containerWidth
-         * @private
-         */
-        function wrapText(text, containerWidth) {
-            const lineHeight = yAxisLineWrapLimit > 1 ? .8 : 1.2;
-            let fontSize = 12;
-
-            textHelper.wrapText.call(null, 0, fontSize, containerWidth, text.node());
-            //textHelper.wrapText(text, containerWidth, 0,
-            // yAxisLineWrapLimit, lineHeight);
         }
 
         /**
@@ -524,12 +490,8 @@ define(function(require) {
                     .attr('height', '50')
                     .attr('width', '50')
                     .attr('fill', backgroundHoverColor)
-                    .on( 'mouseover', function( d ) {
-                        rowHoverOver(d);
-                    } )
-                    .on('mouseout', function(d) {
-                        rowHoverOut(d);
-                    });
+                    .on( 'mouseover', rowHoverOver )
+                    .on( 'mouseout', rowHoverOut );
 
                 group.append( 'path' )
                     .attr('d', 'M 10,10 L 30,30 M 30,10 L 10,30')
@@ -610,14 +572,10 @@ define(function(require) {
                     }).parent;
                 })
                 .classed('print-mode', isPrintMode)
-                .on( 'mouseover', function( d ) {
-                    rowHoverOver(d);
-                } )
-                .on('mouseout', function(d) {
-                    rowHoverOut(d);
-                })
+                .on( 'mouseover', rowHoverOver )
+                .on( 'mouseout', rowHoverOut )
                 // move text right so we have room for the eyeballs
-                .call(wrapTextWithEllipses, labelsBoxWidth)
+                .call( wrapTextWithEllipses, labelsBoxWidth )
                 .selectAll('tspan')
                 .attr('font-size', getFontSize);
 
@@ -963,8 +921,6 @@ define(function(require) {
                 const ltc = labelsTotalCount.toLocaleString();
                 const compCountTxt = labelsTotalText + ' ' + ltc;
                 let cw = textHelper.getTextWidth( compCountTxt, labelsSizeChild, 'Karla, sans-serif');
-                let part1Width = textHelper.getTextWidth( labelsTotalText, labelsSizeChild, 'Karla, sans-serif' );
-                let numWidth = textHelper.getTextWidth( ltc, labelsSizeChild, 'Karla, sans-serif' );
                 let printPadding = isPrintMode && isIE ? 10 : 0;
 
                 const ieTweak = isIE ? 5 :0;
@@ -988,7 +944,6 @@ define(function(require) {
                     chartWidth - complaintTotalGroup.node().getBoundingClientRect().width - 10;
 
                 complaintTotalGroup.attr( 'x', titlexPos )
-
             }
 
             if(labelsInterval && width > 600) {
@@ -1127,23 +1082,6 @@ define(function(require) {
             return this;
         }
 
-
-        /**
-         * Gets or Sets the background width of a row in the chart, num in
-         * percentage
-         * @param  {integer} _x desired width percentage
-         * @return {integer} current percentage
-         * @public
-         */
-        exports.backgroundWidth = function(_x) {
-            if (!arguments.length) {
-                return backgroundWidth;
-            }
-            backgroundWidth = _x;
-
-            return this;
-        }
-
         /**
          * Gets or Sets the colorSchema of the chart
          * @param  {String[]} _x Desired colorSchema for the graph
@@ -1199,24 +1137,6 @@ define(function(require) {
             exportChart.call(exports, svg, filename, title);
         };
 
-        /**
-         * Gets or Sets the hasPercentage status
-         * @param  {boolean} _x     Should use percentage as value format
-         * @return {boolean | module} Is percentage used or Chart module to chain calls
-         * @public
-         */
-        exports.hasPercentage = function(_x) {
-            if (!arguments.length) {
-                return numberFormat === PERCENTAGE_FORMAT;
-            }
-            if (_x) {
-                numberFormat = PERCENTAGE_FORMAT;
-            } else {
-                numberFormat = NUMBER_FORMAT;
-            }
-
-            return this;
-        };
 
         /**
          * Gets or Sets the height of the chart
@@ -1282,6 +1202,12 @@ define(function(require) {
             return this;
         }
 
+        /**
+         * Gets or Sets the labelsSuffix format
+         * @param  {string} [_x=""] desired suffix. Complaint(s)
+         * @return {string | module} Current labelsSuffix or Chart module to chain calls
+         * @public
+         */
         exports.labelsSuffix = function(_x) {
 
             if (!arguments.length) {
@@ -1432,21 +1358,6 @@ define(function(require) {
             return this;
         }
 
-        /**
-         * Gets or Sets whether the color list should be reversed or not
-         * @param  {boolean} _x     Should reverse the color list
-         * @return {boolean | module} Is color list being reversed or Chart module to chain calls
-         * @public
-         */
-        exports.shouldReverseColorList = function(_x) {
-            if (!arguments.length) {
-                return shouldReverseColorList;
-            }
-            shouldReverseColorList = _x;
-
-            return this;
-        };
-
 
         /**
          * Gets or Sets whether the chart should show the expand toggles/eyeball
@@ -1463,21 +1374,6 @@ define(function(require) {
             return this;
         };
 
-
-        /**
-         * Changes the order of items given the custom function
-         * @param  {Function} _x             A custom function that sets logic for ordering
-         * @return {(Function | Module)}   A custom ordering function or Chart module to chain calls
-         * @public
-         */
-        exports.orderingFunction = function(_x) {
-            if (!arguments.length) {
-                return orderingFunction;
-            }
-            orderingFunction = _x;
-
-            return this;
-        };
 
         /**
          * Gets or Sets the outerPadding of the chart
@@ -1526,22 +1422,6 @@ define(function(require) {
 
 
         /**
-         * Gets or Sets the pctOfSet of the chart
-         * @param  {String} _x Desired pctOfSet for the graph
-         * @return { String | module} Current pctOfSet or Chart module to chain
-         * calls
-         * @public
-         */
-        exports.pctOfSet = function(_x) {
-            if (!arguments.length) {
-                return pctOfSet;
-            }
-            pctOfSet = _x;
-
-            return this;
-        };
-
-        /**
          * Gets or Sets the yAxisLineWrapLimit of the chart, default 2
          * @param  {Number} _x Desired yAxisLineWrapLimit for the graph
          * @return { Number | module} Current valueLabel or Chart module to
@@ -1575,6 +1455,7 @@ define(function(require) {
 
         /**
          * Gets or Sets the labelsTotalCount of the chart
+         * the count Total complaints NNNN
          * @param {String} _x Desired labelsTotalCount for the graph
          * @return { String | module} Current labelsTotalCount or Chart
          * module to chain calls
@@ -1590,8 +1471,9 @@ define(function(require) {
         };
 
         /**
-         * Gets or Sets the labelsTotalText of the chart. Companion text for
-         * the count.  Total complaints XXXXXX
+         * Gets or Sets the labelsTotalText of the chart.
+         * label that goes in front of the total count
+         * Total complaints XXXXXX
          * @param {String} _x Desired labelsTotalText for the graph
          * @return { String | module} Current labelsTotalText or Chart
          * module to chain calls
@@ -1609,7 +1491,7 @@ define(function(require) {
 
         /**
          * Gets or Sets the labelsInterval of the chart
-         * @param  {String} _x Desired labelsInterval for the graph
+         * @param  {String} _x Desired labelsInterval for the graph, month, year, etc
          * @return { labelsInterval | module} Current labelsInterval or Chart module to chain calls
          * @public
          */
