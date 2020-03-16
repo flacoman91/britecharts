@@ -1,0 +1,221 @@
+{
+    "data": [
+        {
+            "name": "Student loan",
+            "show": true,
+            "striped": false,
+            "readOnly": true,
+            "value": 0.2958579881656805,
+            "parentVal": 6.89274447949527,
+            "group": "Sum of comparable companies"
+        }, {
+            "name": "Student loan",
+            "show": true,
+            "striped": true,
+            "readOnly": true,
+            "value": 0.29574132492113564,
+            "parentVal": 16.89274447949527,
+            "group": "Average of comparable companies"
+        }, {
+            "name": "Student loan",
+            "readOnly": true,
+            "show": true,
+            "striped": false,
+            "value": 0.2985074626865672,
+            "parentVal": 6.89274447949527,
+            "group": "BANK OF AMERICA, NATIONAL ASSOCIATION"
+        }, {
+            "name": "Payday loan, title loan, or personal loan",
+            "show": true,
+            "striped": false,
+            "readOnly": true,
+            "value": 0.5128205128205128,
+            "parentVal": 16.89274447949527,
+            "group": "Sum of comparable companies"
+        }, {
+            "name": "Payday loan, title loan, or personal loan",
+            "show": true,
+            "striped": true,
+            "readOnly": true,
+            "value": 0.4100946372239748,
+            "parentVal": 9.89274447949527,
+            "group": "Average of comparable companies"
+        }, {
+            "name": "Payday loan, title loan, or personal loan",
+            "readOnly": true,
+            "show": true,
+            "striped": false,
+            "value": 0.1492537313432836,
+            "parentVal": 6.89274447949527,
+            "group": "BANK OF AMERICA, NATIONAL ASSOCIATION"
+        }, {
+            "name": "Vehicle loan or lease",
+            "show": true,
+            "striped": false,
+            "readOnly": true,
+            "value": 1.9526627218934909,
+            "parentVal": 9.89274447949527,
+            "group": "Sum of comparable companies"
+        }, {
+            "name": "Vehicle loan or lease",
+            "show": true,
+            "striped": true,
+            "readOnly": true,
+            "value": 1.5615141955835963,
+            "parentVal": 9.89274447949527,
+            "group": "Average of comparable companies"
+        }, {
+            "name": "Vehicle loan or lease",
+            "readOnly": true,
+            "show": true,
+            "striped": false,
+            "value": 0.9701492537313432,
+            "parentVal": 5.89274447949527,
+            "group": "BANK OF AMERICA, NATIONAL ASSOCIATION"
+        }, {
+            "name": "Money transfer, virtual currency, or money service",
+            "show": true,
+            "striped": false,
+            "readOnly": true,
+            "value": 2.9980276134122286,
+            "parentVal": 6.89274447949527,
+            "group": "Sum of comparable companies"
+        }, {
+            "name": "Money transfer, virtual currency, or money service",
+            "show": true,
+            "striped": true,
+            "readOnly": true,
+            "value": 2.397476340694006,
+            "parentVal": 6.89274447949527,
+            "group": "Average of comparable companies"
+        }, {
+            "name": "Money transfer, virtual currency, or money service",
+            "readOnly": true,
+            "show": true,
+            "striped": false,
+            "value": 3.805970149253731,
+            "parentVal": 16.89274447949527,
+            "group": "BANK OF AMERICA, NATIONAL ASSOCIATION"
+        }, {
+            "name": "Mortgage",
+            "show": true,
+            "striped": false,
+            "readOnly": true,
+            "value": 10.493096646942801,
+            "parentVal": 76.89274447949527,
+            "group": "Sum of comparable companies"
+        }, {
+            "name": "Mortgage",
+            "show": true,
+            "striped": true,
+            "readOnly": true,
+            "value": 10.488958990536277,
+            "parentVal": 46.89274447949527,
+            "group": "Average of comparable companies"
+        }, {
+            "name": "Mortgage",
+            "readOnly": true,
+            "show": true,
+            "striped": false,
+            "value": 15.37313432835821,
+            "parentVal": 46.89274447949527,
+            "group": "BANK OF AMERICA, NATIONAL ASSOCIATION"
+        }, {
+            "name": "Debt collection",
+            "show": true,
+            "striped": false,
+            "readOnly": true,
+            "value": 11.321499013806706,
+            "parentVal": 46.89274447949527,
+            "group": "Sum of comparable companies"
+        }, {
+            "name": "Debt collection",
+            "show": true,
+            "striped": true,
+            "readOnly": true,
+            "value": 9.053627760252365,
+            "parentVal": 15.89274447949527,
+            "group": "Average of comparable companies"
+        }, {
+            "name": "Debt collection",
+            "readOnly": true,
+            "show": true,
+            "striped": false,
+            "value": 6.343283582089552,
+            "parentVal": 26.89274447949527,
+            "group": "BANK OF AMERICA, NATIONAL ASSOCIATION"
+        }, {
+            "name": "Checking or savings account",
+            "show": true,
+            "striped": false,
+            "readOnly": true,
+            "value": 21.794871794871796,
+            "parentVal": 46.89274447949527,
+            "group": "Sum of comparable companies"
+        }, {
+            "name": "Checking or savings account",
+            "show": true,
+            "striped": true,
+            "readOnly": true,
+            "value": 17.42902208201893,
+            "parentVal": 46.89274447949527,
+            "group": "Average of comparable companies"
+        }, {
+            "name": "Checking or savings account",
+            "readOnly": true,
+            "show": true,
+            "striped": false,
+            "value": 34.32835820895522,
+            "parentVal": 46.89274447949527,
+            "group": "BANK OF AMERICA, NATIONAL ASSOCIATION"
+        }, {
+            "name": "Credit reporting, credit repair services, or other personal consumer reports",
+            "show": true,
+            "striped": false,
+            "readOnly": true,
+            "value": 24.674556213017752,
+            "parentVal": 46.89274447949527,
+            "group": "Sum of comparable companies"
+        }, {
+            "name": "Credit reporting, credit repair services, or other personal consumer reports",
+            "show": true,
+            "striped": true,
+            "readOnly": true,
+            "value": 19.73186119873817,
+            "parentVal": 40.89274447949527,
+            "group": "Average of comparable companies"
+        }, {
+            "name": "Credit reporting, credit repair services, or other personal consumer reports",
+            "readOnly": true,
+            "show": true,
+            "striped": false,
+            "value": 13.059701492537313,
+            "parentVal": 46.89274447949527,
+            "group": "BANK OF AMERICA, NATIONAL ASSOCIATION"
+        }, {
+            "name": "Credit card or prepaid card",
+            "show": true,
+            "striped": false,
+            "readOnly": true,
+            "value": 52.38658777120315,
+            "parentVal": 70.89274447949527,
+            "group": "Sum of comparable companies"
+        }, {
+            "name": "Credit card or prepaid card",
+            "show": true,
+            "striped": true,
+            "readOnly": true,
+            "value": 98.46,
+            "parentVal": 98.75,
+            "group": "Average of comparable companies"
+        }, {
+            "name": "Credit card or prepaid card",
+            "readOnly": true,
+            "show": true,
+            "striped": false,
+            "value": 100,
+            "parentVal": 100,
+            "group": "BANK OF AMERICA, NATIONAL ASSOCIATION"
+        }
+    ]
+}

@@ -3,6 +3,7 @@ define(function(require) {
 
     var _ = require('underscore'),
 
+        jsonCFPBSources = require('../json/groupedrowDataCFPBSources.json'),
         jsonTwoSources = require('../json/groupedrowDataTwoSources.json'),
         jsonThreeSources = require('../json/groupedrowDataThreeSources.json');
 
@@ -20,6 +21,12 @@ define(function(require) {
 
         this.with2Sources = function(){
             var attributes = _.extend({}, this.config, jsonTwoSources);
+
+            return new this.Klass(attributes);
+        };
+
+        this.withCFPBSources = function(){
+            var attributes = _.extend({}, this.config, jsonCFPBSources);
 
             return new this.Klass(attributes);
         };
