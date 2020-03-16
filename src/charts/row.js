@@ -112,7 +112,9 @@ define(function(require) {
             downArrowColor = '#20AA3F',
             upArrowColor = '#D14124',
 
-            highlightRowFunction = (rowSelection) => rowSelection.attr('fill', ({name}) => d3Color.color(colorMap(name)).darker()),
+            highlightRowFunction = (rowSelection) =>
+                rowSelection.attr('fill', ({name}) =>
+                    d3Color.color(colorMap(name)).darker()),
             orderingFunction,
             labelsFocusTitle = '',
             labelsTotalText = 'Total complaints',
@@ -643,7 +645,7 @@ define(function(require) {
                 } );
 
             bargroups.append( 'rect' )
-                .classed( 'bg', true )
+                .attr( 'class', 'bg')
                 .attr( 'y', chartHeight )
                 .attr( 'x', 0 )
                 .on( 'click', function( d ) {
@@ -661,7 +663,7 @@ define(function(require) {
                 .attr( 'fill', backgroundColor);
 
             bargroups.append( 'rect' )
-                .classed( 'bg-hover', true )
+                .attr( 'class', 'bg-hover' )
                 .attr( 'y', chartHeight )
                 .attr( 'x', 0 )
                 .merge( rows )
@@ -673,18 +675,15 @@ define(function(require) {
                     return a * d.width;	//`a` already accounts for both types of padding
                 } )
                 .on( 'mouseover', rowHoverOver )
-                .on('mouseout', rowHoverOut)
+                .on( 'mouseout', rowHoverOut )
                 .attr( 'width', width )
                 .attr( 'fill', backgroundHoverColor )
                 .attr( 'fill-opacity', 0);
-//                .attr('stroke', 'red');
 
             // now add the actual bars to what we got
             bargroups
                 .append( 'rect' )
-                .attr( 'class', function( d ) {
-                    return 'focus-bar';
-                } )
+                .attr( 'class', 'focus-bar' )
                 .attr( 'y', chartHeight )
                 .attr( 'x', 0 )
                 .attr( 'height', function( d ) {
@@ -711,9 +710,7 @@ define(function(require) {
             // now add the actual bars to what we got
             bargroups
                 .append( 'rect' )
-                .attr( 'class', function(d){
-                    return 'pct';
-                } )
+                .attr( 'class', 'pct' )
                 .attr( 'y', chartHeight )
                 .attr( 'x', 0 )
                 .attr( 'height', function (d) {
@@ -754,7 +751,7 @@ define(function(require) {
                 const bgWidth = backgroundRows.node().getBBox().x || backgroundRows.node().getBoundingClientRect().width;
 
                 bargroups.append( 'text' )
-                    .classed( 'percentage-label', true )
+                    .attr( 'class', 'percentage-label' )
                     .classed( 'child', ( d ) => !isParent( d ) )
                     .attr( 'x', _labelsHorizontalX )
                     .attr( 'y', _labelsHorizontalY )
@@ -784,7 +781,7 @@ define(function(require) {
                 const gunit  = bargroups
                     .append( 'g' )
                     .attr( 'transform', `translate(${chartWidth + 10}, 0)` )
-                    .classed( 'change-label-group', true );
+                    .attr( 'class', 'change-label-group' );
 
                 // each group should contain the labels and rows
                 gunit.append( 'text' )
@@ -1011,7 +1008,6 @@ define(function(require) {
          */
         function handleMouseOver(e, d, rowList, chartWidth, chartHeight) {
             dispatcher.call('customMouseOver', e, d, d3Selection.mouse(e), [chartWidth, chartHeight]);
-            highlightRowFunction = highlightRowFunction || function() {};
 
             // eyeball fill-opacity
             rowHoverOver(d);
@@ -1028,7 +1024,7 @@ define(function(require) {
             // eyeball fill-opacity 1
             // we should find the index of the currently hovered over row
             let ind = i;
-            if(typeof d.name === "string" || typeof d === "string") {
+            if(typeof d.name === 'string' || typeof d === 'string') {
                 ind = d.name ? getIndex( d.name ) : getIndex( d );
             }
 
@@ -1040,7 +1036,7 @@ define(function(require) {
             // eyeball fill-opacity 0
             // we should find the index of the currently hovered over row
             let ind = i;
-            if(typeof d.name === "string" || typeof d === "string") {
+            if(typeof d.name === 'string' || typeof d === 'string') {
                 ind = d.name ? getIndex( d.name ) : getIndex( d );
             }
 
@@ -1072,9 +1068,10 @@ define(function(require) {
 
             // eyeball fill-opacity 0
             rowHoverOut(d);
-
             rowList.forEach((rowRect) => {
-                d3Selection.select(rowRect).attr('fill', ({name}) => colorMap(name));
+                d3Selection.select(rowRect).attr('fill', ({name}) => {
+                    return name ? colorMap(name) : '';
+                });
             });
         }
 

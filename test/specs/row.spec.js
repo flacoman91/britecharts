@@ -137,61 +137,11 @@ define(['d3', 'row', 'rowChartDataBuilder'], function(d3, chart, dataBuilder) {
         });
 
         describe('Lifecycle', () => {
-            describe('when highlightRowFunction is called', () => {
-
-                it('should change behavior of the hovered row', () => {
-                    const expectedHighlightColor = '#ffffff';
-                    const customHighlightFunction = rowSelection => rowSelection.attr(
-                        'fill', expectedHighlightColor);
-
-                    rowChart.highlightRowFunction(customHighlightFunction);
-                    const row = containerFixture.selectAll('.bg-hover:nth-child(1)');
-
-                    const beforeHighlightColor = row.attr('fill');
-
-                    row.dispatch('mouseover');
-                    const actualHighlightColor = row.attr('fill');
-
-                    expect(actualHighlightColor).toBe(expectedHighlightColor);
-                    expect(beforeHighlightColor).
-                        not.
-                        toBe(expectedHighlightColor);
-                });
-
-                it('should change the behavior of non-hovered rows when hasSingleRowHighlight is False',
-                    () => {
-                        const expectedHighlightColor = '#ffffff';
-                        const customHighlightFunction = rowSelection => rowSelection.attr(
-                            'fill', expectedHighlightColor);
-
-                        rowChart.hasSingleRowHighlight(false);
-                        rowChart.highlightRowFunction(customHighlightFunction);
-                        const rowNotHighlighted = containerFixture.selectAll(
-                            '.row:nth-child(1)');
-                        const rowHighlighted = containerFixture.selectAll(
-                            '.row:nth-child(2)');
-
-                        const beforeHighlightColor = rowNotHighlighted.attr(
-                            'fill');
-
-                        rowNotHighlighted.dispatch('mouseover');
-                        const actualNotHighlightColor = rowNotHighlighted.attr(
-                            'fill');
-                        const actualHighlightColor = rowHighlighted.attr(
-                            'fill');
-
-                        expect(actualHighlightColor).
-                            toBe(expectedHighlightColor);
-                        expect(actualNotHighlightColor).
-                            toBe(beforeHighlightColor);
-                    });
-            });
-
             describe('when clicking on a row', () => {
 
                 it('should trigger a callback on mouse click', () => {
                     const callbackSpy = jasmine.createSpy('callback');
-                    const row = containerFixture.selectAll('.bg-hover:nth-child(1)');
+                    const row = containerFixture.select('.bg:first-child');
                     const expectedCalls = 1;
                     const expectedArgumentsNumber = 3;
                     let actualCalls;
@@ -209,17 +159,21 @@ define(['d3', 'row', 'rowChartDataBuilder'], function(d3, chart, dataBuilder) {
             });
 
             describe('when hovering a row', () => {
+                let callbackSpy, actualCallCount, actualArgumentsNumber,
+                    row
+
+                beforeEach(()=>{
+                    callbackSpy = jasmine.createSpy('callback');
+                })
 
                 it('should trigger a callback on mouse over', () => {
-                    const row = containerFixture.selectAll('.row:nth-child(1)');
-                    const callbackSpy = jasmine.createSpy('callback');
+                    row = containerFixture.select('.pct');
                     const expectedCallCount = 1;
                     const expectedArgumentsNumber = 3;
-                    let actualCallCount;
-                    let actualArgumentsNumber;
 
                     rowChart.on('customMouseOver', callbackSpy);
                     row.dispatch('mouseover');
+
                     actualCallCount = callbackSpy.calls.count();
                     actualArgumentsNumber = callbackSpy.calls.allArgs()[0].length;
 
@@ -232,14 +186,10 @@ define(['d3', 'row', 'rowChartDataBuilder'], function(d3, chart, dataBuilder) {
                     const expectedCallCount = 1;
                     const expectedArgumentsNumber = 3;
 
-                    let actualCallCount;
-                    let actualArgumentsNumber;
-
-                    const row = containerFixture.selectAll('.row:nth-child(1)');
-                    const callbackSpy = jasmine.createSpy('callback');
-
+                    row = containerFixture.select('.pct');
                     rowChart.on('customMouseMove', callbackSpy);
                     row.dispatch('mousemove');
+
                     actualCallCount = callbackSpy.calls.count();
                     actualArgumentsNumber = callbackSpy.calls.allArgs()[0].length;
 
@@ -252,14 +202,10 @@ define(['d3', 'row', 'rowChartDataBuilder'], function(d3, chart, dataBuilder) {
                     const expectedCallCount = 1;
                     const expectedArgumentsNumber = 3;
 
-                    let actualCallCount;
-                    let actualArgumentsNumber;
-
-                    const row = containerFixture.selectAll('.row:nth-child(1)');
-                    const callbackSpy = jasmine.createSpy('callback');
-
+                    row = containerFixture.select('.pct');
                     rowChart.on('customMouseOut', callbackSpy);
                     row.dispatch('mouseout');
+
                     actualCallCount = callbackSpy.calls.count();
                     actualArgumentsNumber = callbackSpy.calls.allArgs()[0].length;
 
