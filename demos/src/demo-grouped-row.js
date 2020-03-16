@@ -114,9 +114,12 @@ function createHorizontalExportGroupedRowChart(optionalColorSchema) {
     let groupedRow = groupedRowChart(),
         container = d3Selection.select('.js-grouped-row-chart-export-container'),
         containerWidth = container.node() ? container.node().getBoundingClientRect().width : false;
+    let dataBuilder = new groupedDataBuilder.GroupedRowChartDataBuilder(),
+        dataset;
 
     if (containerWidth) {
-
+        dataset = dataBuilder.withCFPBSources().build();
+        const data = dataset.data;
         // StackedAreChart Setup and start
         const isStacked = true;
         const ratio = isStacked ? 100 / d3Array.max( data, getParentValue ) :
