@@ -113,8 +113,9 @@ define(function(require) {
             upArrowColor = '#D14124',
 
             highlightRowFunction = (rowSelection) =>
-                rowSelection.attr('fill', ({name}) =>
-                    d3Color.color(colorMap(name)).darker()),
+                rowSelection.attr('fill', ({name}) => {
+                    return name ? d3Color.color(colorMap(name)).darker() : ''
+                }),
             orderingFunction,
             labelsFocusTitle = '',
             labelsTotalText = 'Total complaints',
@@ -1011,13 +1012,8 @@ define(function(require) {
 
             // eyeball fill-opacity
             rowHoverOver(d);
+            highlightRowFunction(d3Selection.select(e));
 
-            rowList.forEach(rowRect => {
-                if (rowRect === e) {
-                    return;
-                }
-                highlightRowFunction(d3Selection.select(rowRect));
-            });
         }
 
         function rowHoverOver(d, i) {
