@@ -28,7 +28,8 @@ function createBrushChart(optionalColorSchema) {
 
     if (containerWidth) {
         dataset = aTestDataSet().withTruncatedTopics().build();
-//        dataset = aTestDataSet().with5Topics().build();
+        // swap these around to test different displays
+        // dataset = aTestDataSet().with5Topics().build();
 
         brushChart
             .width(containerWidth)
@@ -105,12 +106,12 @@ function createLineChart(optionalColorSchema, optionalData) {
         });
 
         dataset = aTestDataSet().withTruncatedTopics().build();
-//        dataset = aTestDataSet().with5Topics().build();
+        // dataset = aTestDataSet().with5Topics().build();
 
         // LineChart Setup and start
         lineChart1
             .isAnimated(true)
-//            .aspectRatio(0.5)
+            // .aspectRatio(0.5)
             .grid('horizontal')
             .tooltipThreshold(600)
             .width(containerWidth)
@@ -127,7 +128,6 @@ function createLineChart(optionalColorSchema, optionalData) {
             })
 
         if (optionalColorSchema) {
-            console.log(optionalColorSchema);
             lineChart1.colorSchema(optionalColorSchema);
         }
 
@@ -177,8 +177,6 @@ function createLineChartWithSingleLine() {
             })
             .on('customMouseOut', chartTooltip.hide);
 
-        console.log('single')
-        console.log(dataset)
         container.datum(dataset).call(lineChart2);
 
         // Tooltip Setup and start
