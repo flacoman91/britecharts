@@ -507,9 +507,11 @@ define(['d3', 'grouped-row', 'groupedRowChartDataBuilder'], function(d3, chart, 
         beforeEach(() => {
             dataset = buildDataSet('with3Sources');
             groupedRowChart = chart()
+                                .isAnimated(true)
                                 .groupLabel('stack')
                                 .nameLabel('date')
                                 .valueLabel('views')
+                                .isStacked(true)
                                 .isPrintMode(true);
 
             // DOM Fixture Setup
