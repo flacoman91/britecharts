@@ -59,16 +59,6 @@ define([
 
                         expect(actual).toEqual(expected);
                     });
-
-                    // CFPB Custom
-                    it('should NOT have a gradient stroke on the chart line', () => {
-                        const actual = containerFixture
-                            .select('.chart-group')
-                            .selectAll('path')
-                            .node().style.stroke.match('one-line-gradient');
-
-                        expect(actual).toBeNull();
-                    });
                 });
 
                 describe('when multiple lines', () => {
@@ -261,16 +251,6 @@ define([
                         expect(actual).toEqual(expected);
                     });
 
-                    it('should not have a gradient line with a data set for more than one line', () => {
-                        const expected = 'url("#line-area-gradient")';
-                        const actual = containerFixture
-                            .select('.chart-group')
-                            .selectAll('path')
-                            .node()
-                            .style.stroke;
-
-                        expect(actual).not.toEqual(expected);
-                    });
 
                     it('should render an overlay to trigger the hover effect', () => {
                         const expected = 1;
@@ -800,6 +780,31 @@ define([
                     expect(actual).toBe(expected);
                 });
 
+                it('should provide a initializeVerticalMarker getter and setter', () => {
+                    let previous = lineChart.initializeVerticalMarker(),
+                        expected = true,
+                        actual;
+
+                    lineChart.initializeVerticalMarker(expected);
+                    actual = lineChart.initializeVerticalMarker();
+
+                    expect(previous).not.toBe(expected);
+                    expect(actual).toBe(expected);
+                });
+
+
+                it('should provide an isPrintMode getter and setter', () => {
+                    let previous = lineChart.isPrintMode(),
+                        expected = true,
+                        actual;
+
+                    lineChart.isPrintMode(expected);
+                    actual = lineChart.isPrintMode();
+
+                    expect(previous).not.toBe(expected);
+                    expect(actual).toBe(expected);
+                });
+
                 it('should provide animation getter and setter', () => {
                     let previous = lineChart.isAnimated(),
                         expected = true,
@@ -873,18 +878,6 @@ define([
 
                     lineChart.lineCurve(expected);
                     actual = lineChart.lineCurve();
-
-                    expect(previous).not.toBe(expected);
-                    expect(actual).toBe(expected);
-                });
-
-                it('should provide lineGradient getter and setter', () => {
-                    let previous = lineChart.lineGradient(),
-                        expected = ['#ddd', '#ccc'],
-                        actual;
-
-                    lineChart.lineGradient(expected);
-                    actual = lineChart.lineGradient();
 
                     expect(previous).not.toBe(expected);
                     expect(actual).toBe(expected);
@@ -1083,6 +1076,38 @@ define([
 
                     expect(previous).not.toBe(expected);
                     expect(actual).toBe(expected);
+                });
+            });
+
+            describe('Print Mode: Chart', () => {
+
+                beforeEach(() => {
+                    dataset = buildDataSet('with5Topics');
+                    lineChart = chart()
+                                    .initializeVerticalMarker(true)
+                                    .isPrintMode(true);
+
+                    // DOM Fixture Setup
+                    f = jasmine.getFixtures();
+                    f.fixturesPath = 'base/test/fixtures/';
+                    f.load('testContainer.html');
+
+                    containerFixture = d3.select('.test-container');
+                    containerFixture.datum(dataset).call(lineChart);
+                });
+
+                afterEach(() => {
+                    containerFixture.remove();
+                    f = jasmine.getFixtures();
+                    f.cleanUp();
+                    f.clearCache();
+                });
+
+                it('should show a chart with minimal requirements', () => {
+                    const expected = 1;
+                    const actual = containerFixture.select('.line-chart').size();
+
+                    expect(actual).toEqual(expected);
                 });
             });
         });

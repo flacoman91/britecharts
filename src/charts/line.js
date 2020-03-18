@@ -207,11 +207,7 @@ define(function(require){
             monthAxisPadding = 28,
             tickPadding = 5,
             colorSchema = colorHelper.colorSchemas.britecharts,
-            singleLineGradientColors = colorHelper.colorGradients.greenBlue,
             topicColorMap,
-            linearGradient,
-            lineGradientId = uniqueId('one-line-gradient'),
-            areaOpacity = 0.24,
 
             highlightFilter = null,
             highlightFilterId = null,
@@ -264,7 +260,6 @@ define(function(require){
             verticalGridLines,
             horizontalGridLines,
             grid = null,
-            enableSingleLineGradient = false,
             isUsingFakeData = false,
 
             baseLine,
@@ -338,7 +333,6 @@ define(function(require){
                 buildSVG(this);
                 buildAxis();
                 drawAxis();
-                buildGradient();
                 drawStackedAreas();
                 drawLines();
                 drawLegend();
@@ -517,32 +511,6 @@ define(function(require){
 
             container
               .append('g').classed('metadata-group', true);
-        }
-
-        /**
-         * Builds the gradient element to be used later
-         * @return {void}
-         */
-        function buildGradient() {
-            if (!linearGradient) {
-                linearGradient = svg.select('.metadata-group')
-                  .append('linearGradient')
-                    .attr('id', lineGradientId)
-                    .attr('x1', '0%')
-                    .attr('y1', '0%')
-                    .attr('x2', '100%')
-                    .attr('y2', '0%')
-                    .attr('gradientUnits', 'userSpaceOnUse')
-                    .selectAll('stop')
-                    .data([
-                        {offset:'0%', color: singleLineGradientColors[0]},
-                        {offset:'100%', color: singleLineGradientColors[1]}
-                    ])
-                    .enter()
-                      .append('stop')
-                        .attr('offset', ({offset}) => offset)
-                        .attr('stop-color', ({color}) => color)
-            }
         }
 
         /**
@@ -784,10 +752,6 @@ define(function(require){
                 .attr('d', ({dates}) => topicLine(dates))
                 // CFPB Custom, we don't ever want a single line gradient
                 .style('stroke', (d) => getLineColor(d))
-                // old default code
-                // .style('stroke', (d) => (
-                //     dataByTopic.length === 1 ? `url(#${lineGradientId})` : getLineColor(d)
-                // ))
                 .style('opacity', (d)=>{
                     // code to make sure this is compatible with britecharts, vs
                     // cfpb customizations
@@ -1582,7 +1546,7 @@ define(function(require){
 
         /**
          * Gets or Sets the height of the chart
-         * @param  {Number} _x Desired width for the graph
+         * @param  {Number} _x Desired height for the graph
          * @return { (Number | Module) } Current height or Line Chart module to chain calls
          * @public
          */
@@ -1603,7 +1567,7 @@ define(function(require){
          * making vertical marker appear when chart renders.
          * By default this is 'false'
          *
-         * @param  {Boolean} _x Desired animation flag
+         * @param  {Boolean} _x Desired initialized flag
          * @return {Boolean | module} Current isAnimated flag or Chart module
          * @public
          */
@@ -1635,8 +1599,8 @@ define(function(require){
         };
 
         /**
-         * Gets or Sets whether the chart should show the expand toggles/eyeball
-         * @param  {boolean} _x Should we show the expand toggles?
+         * Gets or Sets whether the chart should show go into print mode
+         * @param  {boolean} _x flag set to display print mode
          * @return {boolean | module} do we expand toggles
          * @public
          */
@@ -1711,21 +1675,6 @@ define(function(require){
                 return lineCurve;
             }
             lineCurve = _x;
-
-            return this;
-        };
-
-        /**
-         * Gets or Sets the gradient colors of the line chart when there is only one line
-         * @param  {String[]} _x Desired color gradient for the line (array of two hexadecimal numbers)
-         * @return { (Number | Module) } Current color gradient or Line Chart module to chain calls
-         * @public
-         */
-        exports.lineGradient = function(_x) {
-            if (!arguments.length) {
-                return singleLineGradientColors;
-            }
-            singleLineGradientColors = _x;
 
             return this;
         };
