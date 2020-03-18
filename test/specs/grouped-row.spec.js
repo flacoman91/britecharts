@@ -133,6 +133,34 @@ define(['d3', 'grouped-row', 'groupedRowChartDataBuilder'], function(d3, chart, 
                 expect(actual).toBe(expected);
             });
 
+            describe('aspect Ratio', function () {
+                describe('when an aspect ratio is set', function () {
+                    it('should modify the height depending on the width', () => {
+                        let testAspectRatio = 0.5,
+                            testWidth = 400,
+                            newHeight;
+
+                        groupedRowChart.aspectRatio(testAspectRatio);
+                        groupedRowChart.width(testWidth);
+                        newHeight = groupedRowChart.height();
+
+                        expect(newHeight).toEqual(Math.ceil(testWidth * testAspectRatio));
+                    });
+
+                    it('should modify the width depending on the height', () => {
+                        let testAspectRatio = 0.5,
+                            testHeight = 400,
+                            newWidth;
+
+                        groupedRowChart.aspectRatio(testAspectRatio);
+                        groupedRowChart.height(testHeight);
+                        newWidth = groupedRowChart.width();
+
+                        expect(newWidth).toEqual(Math.ceil(testHeight / testAspectRatio));
+                    });
+                });
+            });
+
             it('should provide a colorSchema getter and setter', () => {
                 let previous = groupedRowChart.colorSchema(),
                     expected = ['#ffffff', '#fafefc', '#000000'],
@@ -175,7 +203,7 @@ define(['d3', 'grouped-row', 'groupedRowChartDataBuilder'], function(d3, chart, 
 
             it('should provide height getter and setter', () => {
                 let previous = groupedRowChart.height(),
-                    expected = {top: 4, right: 4, bottom: 4, left: 4},
+                    expected = 1000,
                     actual;
 
                 groupedRowChart.height(expected);
@@ -204,6 +232,30 @@ define(['d3', 'grouped-row', 'groupedRowChartDataBuilder'], function(d3, chart, 
 
                 groupedRowChart.isAnimated(expected);
                 actual = groupedRowChart.isAnimated();
+
+                expect(previous).not.toBe(expected);
+                expect(actual).toBe(expected);
+            });
+
+            it('should provide isPrintMode getter and setter', () => {
+                let previous = groupedRowChart.isPrintMode(),
+                    expected = true,
+                    actual;
+
+                groupedRowChart.isPrintMode(expected);
+                actual = groupedRowChart.isPrintMode();
+
+                expect(previous).not.toBe(expected);
+                expect(actual).toBe(expected);
+            });
+
+            it('should provide isStacked getter and setter', () => {
+                let previous = groupedRowChart.isStacked(),
+                    expected = true,
+                    actual;
+
+                groupedRowChart.isStacked(expected);
+                actual = groupedRowChart.isStacked();
 
                 expect(previous).not.toBe(expected);
                 expect(actual).toBe(expected);
@@ -240,6 +292,18 @@ define(['d3', 'grouped-row', 'groupedRowChartDataBuilder'], function(d3, chart, 
 
                 groupedRowChart.nameLabel(expected);
                 actual = groupedRowChart.nameLabel();
+
+                expect(previous).not.toBe(expected);
+                expect(actual).toBe(expected);
+            });
+
+            it('should provide percentageAxisToMaxRatio getter and setter', () => {
+                let previous = groupedRowChart.percentageAxisToMaxRatio(),
+                    expected = 1.72,
+                    actual;
+
+                groupedRowChart.percentageAxisToMaxRatio(expected);
+                actual = groupedRowChart.percentageAxisToMaxRatio();
 
                 expect(previous).not.toBe(expected);
                 expect(actual).toBe(expected);
@@ -432,6 +496,40 @@ define(['d3', 'grouped-row', 'groupedRowChartDataBuilder'], function(d3, chart, 
                 expect(actualNLayers).toEqual(expectedNLayers);
                 expect(actualNRows).toEqual(expectedNLayers * nRowsPerLayer);
             });
+        });
+    });
+
+
+
+    describe('Print Mode: Grouped Row Chart', () => {
+        let groupedRowChart, dataset, containerFixture, f;
+
+        beforeEach(() => {
+            dataset = buildDataSet('with3Sources');
+            groupedRowChart = chart()
+                                .groupLabel('stack')
+                                .nameLabel('date')
+                                .valueLabel('views')
+                                .isPrintMode(true);
+
+            // DOM Fixture Setup
+            f = jasmine.getFixtures();
+            f.fixturesPath = 'base/test/fixtures/';
+            f.load('testContainer.html');
+
+            containerFixture = d3.select('.test-container');
+            containerFixture.datum(dataset.data).call(groupedRowChart);
+        });
+
+        afterEach(() => {
+            containerFixture.remove();
+            f = jasmine.getFixtures();
+            f.cleanUp();
+            f.clearCache();
+        });
+
+        it('should render a chart with minimal requirements', () => {
+            expect(containerFixture.select('.grouped-row').empty()).toBeFalsy();
         });
     });
 });

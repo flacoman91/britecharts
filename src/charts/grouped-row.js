@@ -147,7 +147,6 @@ define(function (require) {
             getGroup = ({group}) => group,
             getScaledValue = (d) => getValue( d ),
 
-            getStriped = ({striped}) => striped,
             isAnimated = false,
             isPrintMode = false,
 
@@ -428,12 +427,8 @@ define(function (require) {
 
             svg.selectAll('.y-axis-group.axis .tick text')
                 //.classed('print-mode', isPrintMode)
-                .on( 'mouseover', function( d ) {
-                    rowHoverOver(d);
-                } )
-                .on('mouseout', function(d) {
-                    rowHoverOut(d);
-                })
+                .on( 'mouseover', rowHoverOver )
+                .on('mouseout', rowHoverOut )
                 // move text right so we have room for the eyeballs
                 .call(wrapTextWithEllipses, margin.left - 50)
                 .selectAll('tspan');
@@ -791,7 +786,7 @@ define(function (require) {
                 .attr('fill', backgroundHoverColor)
                 .attr('fill-opacity', 0)
                 .on( 'mouseover', rowHoverOver )
-                .on('mouseout', rowHoverOut);
+                .on( 'mouseout', rowHoverOut );
 
 
             if (isAnimated) {
@@ -1113,24 +1108,16 @@ define(function (require) {
                     .attr('height', '50')
                     .attr('width', '50')
                     .attr('fill', backgroundHoverColor)
-                    .on( 'mouseover', function( d ) {
-                        rowHoverOver(d);
-                    } )
-                    .on('mouseout', function(d) {
-                        rowHoverOut(d);
-                    })
+                    .on( 'mouseover', rowHoverOver )
+                    .on('mouseout', rowHoverOut )
                     .attr('opacity', 0);
 
                 group.append( 'path' )
                     .attr('d', 'M 10,10 L 30,30 M 30,10 L 10,30')
                     .attr('stroke', '#0072ce')
                     .attr('stroke-width', '2')
-                    .on( 'mouseover', function( d ) {
-                        rowHoverOver(d);
-                    } )
-                    .on('mouseout', function(d) {
-                        rowHoverOut(d);
-                    });
+                    .on( 'mouseover', rowHoverOver )
+                    .on('mouseout', rowHoverOut );
 
             } );
         }

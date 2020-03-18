@@ -29,6 +29,9 @@ function creategroupedRowChartWithTooltip(optionalColorSchema) {
         // GroupedAreChart Setup and start
         groupedRow
             .tooltipThreshold(600)
+            .margin({
+                left: 100
+            })
             .width(containerWidth)
             .grid('horizontal')
             .isAnimated(true)

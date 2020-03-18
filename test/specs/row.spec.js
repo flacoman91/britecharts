@@ -219,7 +219,7 @@ define(['d3', 'row', 'rowChartDataBuilder'], function(d3, chart, dataBuilder) {
         describe('API', () => {
             it('should provide backgroundColor getter and setter', () => {
                 let previous = rowChart.backgroundColor(),
-                    expected = '#bebebe',
+                    expected = '#fooooo',
                     actual;
 
                 rowChart.backgroundColor(expected);
@@ -691,9 +691,10 @@ define(['d3', 'row', 'rowChartDataBuilder'], function(d3, chart, dataBuilder) {
 
         beforeEach(() => {
             dataset = buildDataSet('withFocusLens');
-            rowChart = chart();
-            rowChart.isPrintMode(true);
-            rowChart.isAnimated(true);
+            rowChart = chart()
+                        .isPrintMode(true)
+                        .isAnimated(true)
+                        .wrapLabels(false);
 
             // DOM Fixture Setup
             f = jasmine.getFixtures();

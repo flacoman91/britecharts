@@ -1200,10 +1200,6 @@ define(function(require){
                         date: new Date(d.key)
                     });
                 });
-
-            // let b =  d3Collection.nest()
-            //                     .key(getDate).sortKeys(d3Array.ascending)
-            //                     .entries(data);
         }
 
         /**

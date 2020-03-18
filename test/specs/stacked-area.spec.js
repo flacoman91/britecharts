@@ -405,7 +405,7 @@ define([
                 expect(actual).toEqual(expected);
             });
 
-            it('should provide an aspect ratio getter and setter', () => {
+            it('should provide an aspectRatio getter and setter', () => {
                 let previous = stackedAreaChart.aspectRatio(),
                     expected = 600,
                     actual;
@@ -482,6 +482,30 @@ define([
 
                 stackedAreaChart.emptyDataConfig(expected);
                 actual = stackedAreaChart.emptyDataConfig();
+
+                expect(previous).not.toEqual(expected);
+                expect(actual).toEqual(expected);
+            });
+
+            it('should provide initializeVerticalMarker getter and setter', () => {
+                let previous = stackedAreaChart.initializeVerticalMarker(),
+                    expected = true,
+                    actual;
+
+                stackedAreaChart.initializeVerticalMarker(expected);
+                actual = stackedAreaChart.initializeVerticalMarker();
+
+                expect(previous).not.toEqual(expected);
+                expect(actual).toEqual(expected);
+            });
+
+            it('should provide isPrintMode getter and setter', () => {
+                let previous = stackedAreaChart.isPrintMode(),
+                    expected = true,
+                    actual;
+
+                stackedAreaChart.isPrintMode(expected);
+                actual = stackedAreaChart.isPrintMode();
 
                 expect(previous).not.toEqual(expected);
                 expect(actual).toEqual(expected);
@@ -755,6 +779,47 @@ define([
                 expect(defaultYAxisLabelOffset).not.toEqual(newYAxisLabelOffset);
                 expect(newYAxisLabelOffset).toEqual(testYAxisLabelOffset);
             });
+        });
+    });
+
+    describe('Print Mode: Stacked Area Chart', () => {
+        let dataset, containerFixture, f, stackedAreaChart;
+
+        beforeEach(() => {
+            dataset = buildDataSet('withReportData');
+            stackedAreaChart = stackedArea()
+                                .valueLabel('views')
+                                .dateLabel('dateUTC')
+                                .initializeVerticalMarker(true)
+                                .isAnimated(true)
+                                .isPrintMode(true);
+
+            // DOM Fixture Setup
+            f = jasmine.getFixtures();
+            f.fixturesPath = 'base/test/fixtures/';
+            f.load('testContainer.html');
+
+            containerFixture = d3.select('.test-container').append('svg');
+            containerFixture.datum(dataset.data).call(stackedAreaChart);
+        });
+
+        afterEach(() => {
+            containerFixture.remove();
+            f = jasmine.getFixtures();
+            f.cleanUp();
+            f.clearCache();
+        });
+
+        describe('Render', () => {
+
+            it('should show a stacked area chart with minimal requirements',
+                () => {
+                    const expected = 1;
+                    const actual = containerFixture.select('.stacked-area').
+                        size();
+
+                    expect(actual).toEqual(expected);
+                });
         });
     });
 });

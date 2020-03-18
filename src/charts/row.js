@@ -197,8 +197,9 @@ define(function(require) {
          */
         function exports(_selection) {
             _selection.each(function(_data) {
-                chartWidth = width > 600 ? width - margin.left - margin.right - (yAxisPaddingBetweenChart * 1.2) - 100 :
-                    width - margin.left - margin.right;
+                const sideMargins = margin.left + margin.right;
+                chartWidth = width > 600 ? width - sideMargins - (yAxisPaddingBetweenChart * 1.2) - 100 :
+                    width - sideMargins;
 
                 chartHeight = height - margin.top - margin.bottom;
                 ({data, dataZeroed} = cleanData(_data));
@@ -1593,7 +1594,7 @@ define(function(require) {
          */
         exports.wrapLabels = function(_x) {
             if (!arguments.length) {
-                return yTicks;
+                return wrapLabels;
             }
             wrapLabels = _x;
 
