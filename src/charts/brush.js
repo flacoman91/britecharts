@@ -16,7 +16,7 @@ define(function(require) {
     const colorHelper = require('./helpers/color');
     const timeAxisHelper = require('./helpers/axis');
 
-    const {axisTimeCombinations} = require('./helpers/constants');
+    const {axisTimeCombinations, timeIntervals} = require('./helpers/constants');
 
     const {uniqueId} = require('./helpers/number');
     const {line} = require('./helpers/load');
@@ -26,7 +26,7 @@ define(function(require) {
      * @typedef BrushChartData
      * @type {Object[]}
      * @property {Number} value        Value to chart (required)
-     * @property {Date} date           Date of the value (required)
+     * @property {Date} date           Date of the value in ISO8601 format (required)
      *
      * @example
      * [
@@ -103,12 +103,16 @@ define(function(require) {
 
             brush,
             chartBrush,
+            brushArea,
             handle,
 
             tickPadding = 5,
 
+            chartGradientEl,
             gradient = colorHelper.colorGradients.greenBlue,
             gradientId = uniqueId('brush-area-gradient'),
+
+            roundingTimeInterval = 'timeDay',
 
             // Dispatcher object to broadcast the mouse events
             // @see {@link https://github.com/d3/d3/blob/master/API.md#dispatches-d3-dispatch}
@@ -149,9 +153,6 @@ define(function(require) {
          */
         function buildAxis(){
             let minor, major;
-            if(!data || !data.length){
-                return;
-            }
 
             if (xAxisFormat === 'custom' && typeof xAxisCustomFormat === 'string') {
                 minor = {
@@ -196,13 +197,15 @@ define(function(require) {
                 .classed('chart-group', true);
             container
               .append('g')
-                .classed('metadata-group', true);
-            container
-              .append('g')
-                .classed('x-axis-group', true);
+                .classed('x-axis-group', true)
+                  .append('g')
+                    .classed('x axis', true);
             container
               .append('g')
                 .classed('brush-group', true);
+            container
+              .append('g')
+                .classed('metadata-group', true);
         }
 
         /**
@@ -210,23 +213,24 @@ define(function(require) {
          * @return {void}
          */
         function buildGradient() {
-            let metadataGroup = svg.select('.metadata-group');
-
-            metadataGroup.append('linearGradient')
-                .attr('id', gradientId)
-                .attr('gradientUnits', 'userSpaceOnUse')
-                .attr('x1', 0)
-                .attr('x2', xScale(data[data.length - 1].date))
-                .attr('y1', 0)
-                .attr('y2', 0)
-              .selectAll('stop')
-                .data([
-                    {offset: '0%', color: gradient[0]},
-                    {offset: '100%', color: gradient[1]}
-                ])
-              .enter().append('stop')
-                .attr('offset', ({offset}) => offset)
-                .attr('stop-color', ({color}) => color);
+            if (!chartGradientEl) {
+                chartGradientEl = svg.select('.metadata-group')
+                  .append('linearGradient')
+                    .attr('id', gradientId)
+                    .attr('gradientUnits', 'userSpaceOnUse')
+                    .attr('x1', 0)
+                    .attr('x2', xScale(data[data.length - 1].date))
+                    .attr('y1', 0)
+                    .attr('y2', 0)
+                  .selectAll('stop')
+                    .data([
+                        {offset: '0%', color: gradient[0]},
+                        {offset: '100%', color: gradient[1]}
+                    ])
+                  .enter().append('stop')
+                    .attr('offset', ({offset}) => offset)
+                    .attr('stop-color', ({color}) => color);
+            }
         }
 
         /**
@@ -292,10 +296,8 @@ define(function(require) {
          *
          * @private
          */
-        function drawAxis(){
-            svg.select('.x-axis-group')
-              .append('g')
-                .attr('class', 'x axis')
+        function drawAxis() {
+            svg.select('.x-axis-group .axis.x')
                 .attr('transform', `translate(0, ${chartHeight})`)
                 .call(xAxis);
         }
@@ -306,8 +308,12 @@ define(function(require) {
          * @return {void}
          */
         function drawArea() {
+            if (brushArea) {
+                svg.selectAll('.brush-area').remove();
+            }
+
             // Create and configure the area generator
-            let area = d3Shape.area()
+            brushArea = d3Shape.area()
                 .x(({date}) => xScale(date))
                 .y0(chartHeight)
                 .y1(({value}) => yScale(value))
@@ -318,7 +324,7 @@ define(function(require) {
               .append('path')
                 .datum(data)
                 .attr('class', 'brush-area')
-                .attr('d', area);
+                .attr('d', brushArea);
         }
 
         /**
@@ -326,8 +332,7 @@ define(function(require) {
          * @return {void}
          */
         function drawBrush() {
-            chartBrush = svg.select('.brush-group')
-                                .call(brush);
+            chartBrush = svg.select('.brush-group').call(brush);
 
             // Update the height of the brushing rectangle
             chartBrush.selectAll('rect')
@@ -384,12 +389,12 @@ define(function(require) {
             if (selection) {
                 let dateExtent = selection.map(xScale.invert);
 
-                dateExtentRounded = dateExtent.map(d3Time.timeDay.round);
+                dateExtentRounded = dateExtent.map(timeIntervals[roundingTimeInterval].round);
 
                 // If empty when rounded, use floor & ceil instead.
                 if (dateExtentRounded[0] >= dateExtentRounded[1]) {
-                    dateExtentRounded[0] = d3Time.timeDay.floor(dateExtent[0]);
-                    dateExtentRounded[1] = d3Time.timeDay.offset(dateExtentRounded[0]);
+                    dateExtentRounded[0] = timeIntervals[roundingTimeInterval].floor(dateExtent[0]);
+                    dateExtentRounded[1] = timeIntervals[roundingTimeInterval].offset(dateExtentRounded[0]);
                 }
 
                 d3Selection.select(this)
@@ -430,8 +435,8 @@ define(function(require) {
 
         /**
          * Gets or Sets the dateRange for the selected part of the brush
-         * @param  {String[]} _x Desired dateRange for the graph
-         * @return { dateRange | module} Current dateRange or Chart module to chain calls
+         * @param  {String[]} _x            Desired dateRange for the graph
+         * @return { dateRange | module}    Current dateRange or Chart module to chain calls
          * @public
          */
         exports.dateRange = function(_x) {
@@ -449,7 +454,7 @@ define(function(require) {
 
         /**
          * Gets or Sets the gradient of the chart
-         * @param  {String[]} _x        Desired gradient for the graph
+         * @param  {String[]} [_x=colorHelper.colorGradients.greenBlue]    Desired gradient for the graph
          * @return {String | Module}    Current gradient or Chart module to chain calls
          * @public
          */
@@ -479,8 +484,8 @@ define(function(require) {
 
         /**
          * Gets or Sets the loading state of the chart
-         * @param  {string} markup Desired markup to show when null data
-         * @return { loadingState | module} Current loading state markup or Chart module to chain calls
+         * @param  {string} markup              Desired markup to show when null data
+         * @return { loadingState | module}     Current loading state markup or Chart module to chain calls
          * @public
          */
         exports.loadingState = function(_markup) {
@@ -496,8 +501,8 @@ define(function(require) {
          * Pass language tag for the tooltip to localize the date.
          * Feature uses Intl.DateTimeFormat, for compatability and support, refer to
          * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DateTimeFormat
-         * @param  {String} _x  must be a language tag (BCP 47) like 'en-US' or 'fr-FR'
-         * @return { (String|Module) }    Current locale or module to chain calls
+         * @param  {String} _x              Must be a language tag (BCP 47) like 'en-US' or 'fr-FR'
+         * @return { (String|Module) }      Current locale or module to chain calls
          */
         exports.locale = function(_x) {
             if (!arguments.length) {
@@ -629,6 +634,25 @@ define(function(require) {
               return xTicks;
             }
             xTicks = _x;
+
+            return this;
+        };
+
+        /**
+         * Gets or Sets the rounding time interval of the selection boundary
+         * @param  {roundingTimeInterval} _x Desired time interval for the selection, default 'timeDay'. All options are:
+         * timeMillisecond, utcMillisecond, timeSecond, utcSecond, timeMinute, utcMinute, timeHour, utcHour, timeDay, utcDay
+         * timeWeek, utcWeek, timeSunday, utcSunday, timeMonday, utcMonday, timeTuesday, utcTuesday, timeWednesday,
+         * utcWednesday, timeThursday, utcThursday, timeFriday, utcFriday, timeSaturday, utcSaturday, timeMonth, utcMonth,
+         * timeYear and utcYear. Visit https://github.com/d3/d3-time#intervals for more information.
+         * @return { (roundingTimeInterval | Module) } Current time interval or module to chain calls
+         * @public
+         */
+        exports.roundingTimeInterval = function(_x) {
+            if (!arguments.length) {
+                return roundingTimeInterval;
+            }
+            roundingTimeInterval = _x;
 
             return this;
         };

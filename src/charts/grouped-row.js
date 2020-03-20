@@ -17,7 +17,7 @@ define(function (require) {
     const textHelper = require('./helpers/text');
     const { exportChart } = require('./helpers/export');
     const colorHelper = require('./helpers/color');
-    const {bar} = require('./helpers/load');
+    const {row} = require('./helpers/load');
     const numberHelper = require('./helpers/number');
 
     const NUMBER_FORMAT = ',f';
@@ -77,7 +77,7 @@ define(function (require) {
             containerRoot,
             width = 960,
             height = 500,
-            loadingState = bar,
+            loadingState = row,
 
             xScale,
             xAxis,
@@ -127,7 +127,7 @@ define(function (require) {
             yAxisLabelEl,
             yAxisLabelOffset = -60,
 
-            barOpacity = 0.24,
+            rowOpacity = 0.24,
 
             animationDelayStep = 20,
             animationDelays,
@@ -147,7 +147,6 @@ define(function (require) {
             getGroup = ({group}) => group,
             getScaledValue = (d) => getValue( d ),
 
-            getStriped = ({striped}) => striped,
             isAnimated = false,
             isPrintMode = false,
 
@@ -236,12 +235,12 @@ define(function (require) {
                     });
             }
 
-            svg.selectAll('.bar')
+            svg.selectAll('.row')
                 .on('mouseover', function(d) {
-                    handleBarsMouseOver(this, d);
+                    handleRowsMouseOver(this, d);
                 })
                 .on('mouseout', function(d) {
-                    handleBarsMouseOut(this, d);
+                    handleRowsMouseOut(this, d);
                 });
         }
 
@@ -337,7 +336,7 @@ define(function (require) {
                 .rangeRound([0, chartWidth - 1]);
             // 1 pix for edge tick
 
-            // names of bars on right side
+            // names of rows on right side
             yScale = d3Scale.scaleBand()
                 .domain(data.map(getName))
                 .rangeRound([chartHeight, 0])
@@ -428,12 +427,8 @@ define(function (require) {
 
             svg.selectAll('.y-axis-group.axis .tick text')
                 //.classed('print-mode', isPrintMode)
-                .on( 'mouseover', function( d ) {
-                    rowHoverOver(d);
-                } )
-                .on('mouseout', function(d) {
-                    rowHoverOut(d);
-                })
+                .on( 'mouseover', rowHoverOver )
+                .on('mouseout', rowHoverOut )
                 // move text right so we have room for the eyeballs
                 .call(wrapTextWithEllipses, margin.left - 50)
                 .selectAll('tspan');
@@ -680,11 +675,11 @@ define(function (require) {
         }
 
         /**
-         * Draws the bars along the x axis
+         * Draws the rows along the x axis
          * @param  {D3Selection} layersSelection Selection of layers
          * @return {void}
          */
-        function drawHorizontalBars(layersSelection) {
+        function drawHorizontalRows(layersSelection) {
             let layerJoin = layersSelection
                 .data(layers);
 
@@ -704,20 +699,20 @@ define(function (require) {
                 .selectAll('.bg-hover')
                 .data([0]);
 
-            let barJoinOverall = layerElements
-                .selectAll('.bar-overall')
+            let rowJoinOverall = layerElements
+                .selectAll('.row-overall')
                 .data(({values}) => values);
 
-            let barJoin = layerElements
-                .selectAll('.bar')
+            let rowJoin = layerElements
+                .selectAll('.row')
                 .data(({values}) => values);
 
-            // only have ones with striped values render bars
-            let barJoinStriped = layerElements
-                .selectAll('.bar')
+            // only have ones with striped values render rows
+            let rowJoinStriped = layerElements
+                .selectAll('.row')
                 .data(({values}) => values.filter(o=>o.striped));
 
-            let barbgCol = bgColor
+            let rowbgCol = bgColor
                 .enter()
                 .append('rect')
                 .classed( 'group-background', true )
@@ -727,27 +722,27 @@ define(function (require) {
                 .attr('width', chartWidth);
 
             // Enter + Update
-            let barsOverall = barJoinOverall
+            let rowsOverall = rowJoinOverall
                 .enter()
                 .append('rect')
-                .classed('bar-overall', true)
+                .classed('row-overall', true)
                 .attr('x', 1)
                 .attr('y', (d) => yScale2(getGroup(d)))
                 .attr('height', yScale2.bandwidth())
                 .attr('fill', (({group}) => categoryColorMap[group]))
                 .attr('fill-opacity', .3);
 
-            let bars = barJoin
+            let rows = rowJoin
                 .enter()
                 .append('rect')
-                .classed('bar', true)
+                .classed('row', true)
                 .attr('x', 1)
                 .attr('y', (d) => yScale2(getGroup(d)))
                 .attr('height', yScale2.bandwidth())
                 .attr('fill', (({group}) => categoryColorMap[group]));
 
             let format = d3Format.format('.2f');
-            let labels = barJoin
+            let labels = rowJoin
                 .enter()
                 .append('text')
                 .classed('percentage-label', true)
@@ -767,7 +762,7 @@ define(function (require) {
                 .attr('y', (d) => yScale2(getGroup(d)) + 16)
                 .text((d)=> format(getValue(d)) + '%');
 
-            let barsStriped = barJoinStriped
+            let rowsStriped = rowJoinStriped
                 .enter()
                 .append('rect')
                 .classed('striped', true)
@@ -777,7 +772,7 @@ define(function (require) {
                 .attr('fill', 'url(#diagonalHatch)');
 
             // Enter + Update
-            let barbg = bgJoin
+            let rowbg = bgJoin
                 .enter()
                 .append('rect')
                 .classed( 'bg-hover', true )
@@ -791,34 +786,34 @@ define(function (require) {
                 .attr('fill', backgroundHoverColor)
                 .attr('fill-opacity', 0)
                 .on( 'mouseover', rowHoverOver )
-                .on('mouseout', rowHoverOut);
+                .on( 'mouseout', rowHoverOut );
 
 
             if (isAnimated) {
-                bars.style('opacity', barOpacity)
+                rows.style('opacity', rowOpacity)
                     .transition()
                     .delay((_, i) => animationDelays[i])
                     .duration(animationDuration)
                     .ease(ease)
-                    .tween('attr.width', horizontalBarsTween);
+                    .tween('attr.width', horizontalRowsTween);
 
                 if(isStacked) {
-                    barsOverall.style( 'opacity', barOpacity )
+                    rowsOverall.style( 'opacity', rowOpacity )
                         .transition()
                         .delay( ( _, i ) => animationDelays[ i ] )
                         .duration( animationDuration )
                         .ease( ease )
-                        .tween( 'attr.width', horizontalParentBarsTween );
+                        .tween( 'attr.width', horizontalParentRowsTween );
                 }
 
-                barsStriped.style('opacity', barOpacity)
+                rowsStriped.style('opacity', rowOpacity)
                     .transition()
                     .delay((_, i) => animationDelays[i])
                     .duration(animationDuration)
                     .ease(ease)
-                    .tween('attr.width', horizontalBarsTween);
+                    .tween('attr.width', horizontalRowsTween);
             } else {
-                bars.attr( 'width', ( d ) => {
+                rows.attr( 'width', ( d ) => {
                     if(isStacked){
                         return xScale( getScaledValue(d) );
                     }
@@ -826,9 +821,9 @@ define(function (require) {
                 } );
 
                 if(isStacked) {
-                    barsOverall.attr( 'width', ( d ) => xScale( getParentValue( d ) ) );
+                    rowsOverall.attr( 'width', ( d ) => xScale( getParentValue( d ) ) );
                 }
-                barsStriped.attr('width', (d) => {
+                rowsStriped.attr('width', (d) => {
                     if(isStacked) {
                         return xScale( getScaledValue( d ) );
                     }
@@ -850,7 +845,7 @@ define(function (require) {
             let series = svg.select('.chart-group').selectAll('.layer');
 
             animationDelays = d3Array.range(animationDelayStep, (layers.length + 1) * animationDelayStep, animationDelayStep)
-            drawHorizontalBars(series);
+            drawHorizontalRows(series);
 
             // Exit
             series.exit()
@@ -893,23 +888,23 @@ define(function (require) {
         }
 
         /**
-         * Handles a mouseover event on top of a bar
+         * Handles a mouseover event on top of a row
          * @param  {obj} e the fired event
-         * @param  {obj} d data of bar
+         * @param  {obj} d data of row
          * @return {void}
          */
-        function handleBarsMouseOver(e, d) {
+        function handleRowsMouseOver(e, d) {
             d3Selection.select(e)
                 .attr('fill', () => d3Color.color(categoryColorMap[d.group]).darker());
         }
 
         /**
-         * Handles a mouseout event out of a bar
+         * Handles a mouseout event out of a row
          * @param  {obj} e the fired event
-         * @param  {obj} d data of bar
+         * @param  {obj} d data of row
          * @return {void}
          */
-        function handleBarsMouseOut(e, d) {
+        function handleRowsMouseOut(e, d) {
             d3Selection.select(e)
                 .attr('fill', () => categoryColorMap[d.group])
         }
@@ -1007,11 +1002,11 @@ define(function (require) {
         }
 
         /**
-         * Animation tween of horizontal bars
-         * @param  {obj} d data of bar
+         * Animation tween of horizontal rows
+         * @param  {obj} d data of row
          * @return {void}
          */
-        function horizontalBarsTween(d) {
+        function horizontalRowsTween(d) {
             let node = d3Selection.select(this),
                 j = d3Interpolate.interpolateNumber(0, 1);
 
@@ -1024,11 +1019,11 @@ define(function (require) {
         }
 
         /**
-         * Animation tween of horizontal overall bars
-         * @param  {obj} d data of bar
+         * Animation tween of horizontal overall rows
+         * @param  {obj} d data of row
          * @return {void}
          */
-        function horizontalParentBarsTween(d) {
+        function horizontalParentRowsTween(d) {
             let node = d3Selection.select(this),
                 i = d3Interpolate.interpolateRound(0, xScale(getParentValue(d))),
                 j = d3Interpolate.interpolateNumber(0, 1);
@@ -1113,24 +1108,16 @@ define(function (require) {
                     .attr('height', '50')
                     .attr('width', '50')
                     .attr('fill', backgroundHoverColor)
-                    .on( 'mouseover', function( d ) {
-                        rowHoverOver(d);
-                    } )
-                    .on('mouseout', function(d) {
-                        rowHoverOut(d);
-                    })
+                    .on( 'mouseover', rowHoverOver )
+                    .on('mouseout', rowHoverOut )
                     .attr('opacity', 0);
 
                 group.append( 'path' )
                     .attr('d', 'M 10,10 L 30,30 M 30,10 L 10,30')
                     .attr('stroke', '#0072ce')
                     .attr('stroke-width', '2')
-                    .on( 'mouseover', function( d ) {
-                        rowHoverOver(d);
-                    } )
-                    .on('mouseout', function(d) {
-                        rowHoverOut(d);
-                    });
+                    .on( 'mouseover', rowHoverOver )
+                    .on('mouseout', rowHoverOut );
 
             } );
         }
@@ -1233,7 +1220,7 @@ define(function (require) {
         /**
          * Gets or Sets the horizontal direction of the chart
          * @param  {number} _x Desired horizontal direction for the graph
-         * @return { isHorizontal | module} If it is horizontal or Bar Chart module to chain calls
+         * @return { isHorizontal | module} If it is horizontal or Row Chart module to chain calls
          * @public
          */
         exports.isHorizontal = function (_x) {
@@ -1262,9 +1249,9 @@ define(function (require) {
         };
 
         /**
-         * Is this a stacked bar chart
+         * Is this a stacked row chart
          * @param  {number} _x Desired horizontal direction for the graph
-         * @return { isStacked | module} If it is horizontal or Bar Chart module to chain calls
+         * @return { isStacked | module} If it is horizontal or Row Chart module to chain calls
          * @public
          */
         exports.isStacked = function (_x) {
@@ -1361,7 +1348,7 @@ define(function (require) {
          * We are going to expose this events:
          * customMouseOver, customMouseMove, customMouseOut, and customClick
          *
-         * @return {module} Bar Chart
+         * @return {module} Row Chart
          * @public
          */
         exports.on = function () {

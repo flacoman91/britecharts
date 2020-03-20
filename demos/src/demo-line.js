@@ -28,6 +28,9 @@ function createBrushChart(optionalColorSchema) {
 
     if (containerWidth) {
         dataset = aTestDataSet().withTruncatedTopics().build();
+        // swap these around to test different displays
+        // dataset = aTestDataSet().with5Topics().build();
+
         brushChart
             .width(containerWidth)
             .height(100)
@@ -78,11 +81,9 @@ function createExportLineChart(optionalColorSchema, optionalData) {
             .xAxisFormat(constants.axisTimeCombinations.MONTH_YEAR);
 
         if (optionalColorSchema) {
-            console.log(optionalColorSchema);
             lineChart1.colorSchema(optionalColorSchema);
         }
 
-        console.log(dataset);
         if (optionalData) {
             container.datum(optionalData).call(lineChart1);
         } else {
@@ -105,10 +106,12 @@ function createLineChart(optionalColorSchema, optionalData) {
         });
 
         dataset = aTestDataSet().withTruncatedTopics().build();
+        // dataset = aTestDataSet().with5Topics().build();
 
         // LineChart Setup and start
         lineChart1
             .isAnimated(true)
+            // .aspectRatio(0.5)
             .grid('horizontal')
             .tooltipThreshold(600)
             .width(containerWidth)
@@ -122,11 +125,9 @@ function createLineChart(optionalColorSchema, optionalData) {
             .on('customDataEntryClick', function(d, mousePosition) {
                 // eslint-disable-next-line no-console
                 console.log('Data entry marker clicked', d, mousePosition);
-            });
-
+            })
 
         if (optionalColorSchema) {
-            console.log(optionalColorSchema);
             lineChart1.colorSchema(optionalColorSchema);
         }
 
@@ -176,13 +177,10 @@ function createLineChartWithSingleLine() {
             })
             .on('customMouseOut', chartTooltip.hide);
 
-        console.log('single')
-        console.log(dataset)
         container.datum(dataset).call(lineChart2);
 
         // Tooltip Setup and start
         chartTooltip
-            .valueLabel('value')
             .title('Quantity Sold');
 
         // Note that if the viewport width is less than the tooltipThreshold value,

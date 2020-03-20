@@ -42,6 +42,10 @@
   stroke-width: 1;
   stroke-dasharray: 4, 4; }
 
+.horizontal-grid-line--highlighted {
+  stroke: #45494E;
+  stroke-dasharray: 2, 2; }
+
 .extended-y-line,
 .extended-x-line {
   fill: none;
@@ -113,6 +117,9 @@
 
 .line-chart .area {
   fill: #EFF2F5; }
+
+.line-chart .data-point-mark {
+  fill: #ffffff; }
 
 .line-chart .data-point-mark {
   fill: #ffffff; }

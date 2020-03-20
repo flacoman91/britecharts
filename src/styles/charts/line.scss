@@ -11,6 +11,11 @@ $line-width: 2;
         fill: $white;
     }
 
+    // Class for data point markers
+    .data-point-mark {
+        fill: $white;
+    }
+
     // Lines
     .topic .line {
         fill: none;

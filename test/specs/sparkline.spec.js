@@ -13,26 +13,19 @@ define([
     ) {
     'use strict';
 
-    const aTestDataSet = () => new dataBuilder.SparklineDataBuilder();    
+    const aTestDataSet = () => new dataBuilder.SparklineDataBuilder();
     const buildDataSet = (dataSetName) => {
         return aTestDataSet()
             [dataSetName]()
             .build();
     };
-
-    const hasClass = (element, className) => {
-        return _.contains(element[0][0].classList, className);
-    };
-
-    const hasIdWithPrefix = (element, prefix) => {
-        return element.id.match(prefix) !== null;
-    };
+    const hasIdWithPrefix = (element, prefix) => element.id.match(prefix) !== null;
 
     describe('Sparkline Chart', () => {
         let dataset, containerFixture, f, sparklineChart;
 
         beforeEach(() => {
-            dataset = aTestDataSet().with1Source().build();
+            dataset = buildDataSet('with1Source');
             sparklineChart = sparkline().dateLabel('dateUTC');
 
             // DOM Fixture Setup
@@ -51,163 +44,183 @@ define([
             f.clearCache();
         });
 
-        it('should render a sparkline chart with minimal requirements', () =>  {
-            expect(containerFixture.select('.line').empty()).toBeFalsy();
-        });
+        describe('Render', () => {
 
-        it('should render container and chart groups', () => {
-            expect(containerFixture.select('g.container-group').empty()).toBeFalsy();
-            expect(containerFixture.select('g.text-group').empty()).toBeFalsy();
-            expect(containerFixture.select('g.chart-group').empty()).toBeFalsy();
-            expect(containerFixture.select('g.metadata-group').empty()).toBeFalsy();
-        });
-
-        it('should render a sparkline', () => {
-            let expected = 1;
-            let actual = containerFixture.selectAll('.sparkline').nodes().length;
-
-            expect(actual).toEqual(expected);
-        });
-
-        it('should create a gradient for the area', () => {
-            let expected = 1;
-            let actual = _.filter(containerFixture.selectAll('.area-gradient').nodes(), f => f && hasIdWithPrefix(f, 'sparkline-area-gradient')).length;
-
-            expect(actual).toEqual(expected);
-        });
-
-        it('should render the sparkline area', () => {
-            let expected = 1;
-            let actual = containerFixture.selectAll('.sparkline-area').nodes().length;
-            
-            expect(actual).toEqual(expected);
-        });
-
-        it('should create a gradient for the line', () => {
-            let expected = 1;
-            let actual = _.filter(containerFixture.selectAll('.line-gradient').nodes(), f => f && hasIdWithPrefix(f, 'sparkline-line-gradient')).length;
-
-            expect(actual).toEqual(expected);
-        });
-
-        describe('when the title text is set to specified string', () => {
-            
-            it('should create a text node with proper attributes', () => {
-                let titleTextNode;
-                
-                sparklineChart.titleText('text');
-                containerFixture.datum(dataset.data).call(sparklineChart);
-
-                titleTextNode = containerFixture.selectAll('.sparkline-text').node();
-                
-                expect(titleTextNode).toBeInDOM();
-                expect(titleTextNode).toHaveAttr('x');
-                expect(titleTextNode).toHaveAttr('y');
-                expect(titleTextNode).toHaveAttr('text-anchor');
-                expect(titleTextNode).toHaveAttr('class');
-                expect(titleTextNode).toHaveAttr('style');
-            });
-
-            it('should properly set the text inside of text node', () => {
-                let expected = 'Tickets Sale';
-                let actual;
-                
-                sparklineChart.titleText(expected);
-                containerFixture.datum(dataset.data).call(sparklineChart);
-                actual = containerFixture.selectAll('.sparkline-text').node().textContent;
-
-                expect(actual).toEqual(expected);
-            });
-        });
-
-        describe('when reloading with a different dataset', () => {
-            
-            it('should render in the same svg', function() {
-                let actual;
-                let expected = 1;
-                let newDataset = buildDataSet('withLowValues');
-
-                containerFixture.datum(newDataset.data).call(sparklineChart);
-
-                actual = containerFixture.selectAll('.sparkline').nodes().length;
+            it('should show a sparkline chart with minimal requirements', () => {
+                const expected = 1;
+                const actual = containerFixture.select('.line').size();
 
                 expect(actual).toEqual(expected);
             });
 
-            it('should render one line', function() {
-                let actual;
-                let expected = 1;
-                let newDataset = buildDataSet('withLowValues');
+            describe('groups', () => {
+                it('should create a container-group', () => {
+                    const expected = 1;
+                    const actual = containerFixture.select('g.container-group').size();
 
-                containerFixture.datum(newDataset.data).call(sparklineChart);
+                    expect(actual).toEqual(expected);
+                });
 
-                actual = containerFixture.selectAll('.sparkline .line').nodes().length;
+                it('should create a chart-group', () => {
+                    const expected = 1;
+                    const actual = containerFixture.select('g.chart-group').size();
+
+                    expect(actual).toEqual(expected);
+                });
+
+                it('should create a text-group', () => {
+                    const expected = 1;
+                    const actual = containerFixture.select('g.text-group').size();
+
+                    expect(actual).toEqual(expected);
+                });
+
+                it('should create a metadata-group', () => {
+                    const expected = 1;
+                    const actual = containerFixture.select('g.metadata-group').size();
+
+                    expect(actual).toEqual(expected);
+                });
+            });
+
+            it('should render a sparkline', () => {
+                const expected = 1;
+                const actual = containerFixture.selectAll('.sparkline').size();
 
                 expect(actual).toEqual(expected);
             });
 
-            it('should render one area', function() {
-                let actual;
-                let expected = 1;
-                let newDataset = buildDataSet('withLowValues');
-
-                containerFixture.datum(newDataset.data).call(sparklineChart);
-
-                actual = containerFixture.selectAll('.sparkline .sparkline-area').nodes().length;
+            it('should create a gradient for the area', () => {
+                const expected = 1;
+                const actual = _.filter(
+                    containerFixture.selectAll('.area-gradient').nodes(),
+                    (f) => f && hasIdWithPrefix(f, 'sparkline-area-gradient')
+                ).length;
 
                 expect(actual).toEqual(expected);
             });
 
-            it('should render one end circle', function() {
-                let actual;
-                let expected = 1;
-                let newDataset = buildDataSet('withLowValues');
-
-                containerFixture.datum(newDataset.data).call(sparklineChart);
-
-                actual = containerFixture.selectAll('.sparkline .sparkline-circle').nodes().length;
+            it('should render the sparkline area', () => {
+                const expected = 1;
+                const actual = containerFixture.selectAll('.sparkline-area').size();
 
                 expect(actual).toEqual(expected);
             });
-        });
 
-        describe('when isAnimated is true', () => {
-
-            it('should create a masking clip', () => {
-                sparklineChart.isAnimated(true);
-                containerFixture.datum(dataset.data).call(sparklineChart);
-
-                let expected = 1;
-                let actual = _.filter(containerFixture.selectAll('.clip-path').nodes(), f => f && hasIdWithPrefix(f, 'maskingClip')).length;
+            it('should create a gradient for the line', () => {
+                const expected = 1;
+                const actual = _.filter(
+                    containerFixture.selectAll('.line-gradient').nodes(),
+                    (f) => f && hasIdWithPrefix(f, 'sparkline-line-gradient')
+                ).length;
 
                 expect(actual).toEqual(expected);
+            });
+
+            describe('when the title text is set', () => {
+
+                it('should create a text node with proper attributes', () => {
+                    sparklineChart.titleText('text');
+                    containerFixture.datum(dataset.data).call(sparklineChart);
+                    const titleTextNode = containerFixture.selectAll('.sparkline-text').node();
+
+                    expect(titleTextNode).toBeInDOM();
+                    expect(titleTextNode).toHaveAttr('x');
+                    expect(titleTextNode).toHaveAttr('y');
+                    expect(titleTextNode).toHaveAttr('text-anchor');
+                    expect(titleTextNode).toHaveAttr('class');
+                    expect(titleTextNode).toHaveAttr('style');
+                });
+
+                it('should properly set the text inside of text node', () => {
+                    const expected = 'Tickets Sale';
+                    let actual;
+
+                    sparklineChart.titleText(expected);
+                    containerFixture.datum(dataset.data).call(sparklineChart);
+                    actual = containerFixture.selectAll('.sparkline-text').node().textContent;
+
+                    expect(actual).toEqual(expected);
+                });
+            });
+
+            describe('when reloading with a different dataset', () => {
+
+                it('should render in the same svg', () => {
+                    const expected = 1;
+                    const newDataset = buildDataSet('withLowValues');
+                    let actual;
+
+                    containerFixture.datum(newDataset.data).call(sparklineChart);
+                    actual = containerFixture.selectAll('.sparkline').size();
+
+                    expect(actual).toEqual(expected);
+                });
+
+                it('should render one line', () => {
+                    const expected = 1;
+                    const newDataset = buildDataSet('withLowValues');
+                    let actual;
+
+                    containerFixture.datum(newDataset.data).call(sparklineChart);
+                    actual = containerFixture.selectAll('.sparkline .line').size();
+
+                    expect(actual).toEqual(expected);
+                });
+
+                it('should render one area', () => {
+                    const expected = 1;
+                    const newDataset = buildDataSet('withLowValues');
+                    let actual;
+
+                    containerFixture.datum(newDataset.data).call(sparklineChart);
+                    actual = containerFixture.selectAll('.sparkline .sparkline-area').size();
+
+                    expect(actual).toEqual(expected);
+                });
+
+                it('should render one end circle', () => {
+                    const expected = 1;
+                    const newDataset = buildDataSet('withLowValues');
+                    let actual;
+
+                    containerFixture.datum(newDataset.data).call(sparklineChart);
+
+                    actual = containerFixture.selectAll('.sparkline .sparkline-circle').size();
+
+                    expect(actual).toEqual(expected);
+                });
+            });
+
+            describe('when is animated', () => {
+
+                it('should create a masking clip', () => {
+                    const expected = 1;
+
+                    sparklineChart.isAnimated(true);
+                    containerFixture.datum(dataset.data).call(sparklineChart);
+                    const actual = _.filter(
+                        containerFixture.selectAll('.clip-path').nodes(),
+                        (f) => f && hasIdWithPrefix(f, 'maskingClip')
+                    ).length;
+
+                    expect(actual).toEqual(expected);
+                });
             });
         });
 
         describe('API', () => {
 
-            it('should provide margin getter and setter', () => {
-                let defaultMargin = sparklineChart.margin(),
-                    testMargin = {top: 4, right: 4, bottom: 4, left: 4},
-                    newMargin;
+            it('should provide an areaGradient getter and setter', () => {
+                let defaultGradient = sparklineChart.areaGradient(),
+                    testGradient = ['#ffffff', '#fafefc'],
+                    newGradient;
 
-                sparklineChart.margin(testMargin);
-                newMargin = sparklineChart.margin();
+                sparklineChart.areaGradient(testGradient);
+                newGradient = sparklineChart.areaGradient();
 
-                expect(defaultMargin).not.toBe(testMargin);
-                expect(newMargin).toEqual(testMargin);
-            });
-
-            it('should provide loadingState getter and setter', () => {
-                let previous = sparklineChart.loadingState(),
-                    expected = 'test',
-                    actual;
-
-                sparklineChart.loadingState(expected);
-                actual = sparklineChart.loadingState();
-
-                expect(previous).not.toBe(actual);
-                expect(actual).toBe(expected);
+                expect(defaultGradient).not.toBe(testGradient);
+                expect(newGradient).toBe(testGradient);
             });
 
             it('should provide width getter and setter', () => {
@@ -234,18 +247,6 @@ define([
                 expect(newHeight).toBe(testHeight);
             });
 
-            it('should provide valueLabel getter and setter', () => {
-                let defaultValueLabel = sparklineChart.valueLabel(),
-                    testValueLabel = 'quantity',
-                    newValueLabel;
-
-                sparklineChart.valueLabel(testValueLabel);
-                newValueLabel = sparklineChart.valueLabel();
-
-                expect(defaultValueLabel).not.toBe(testValueLabel);
-                expect(newValueLabel).toBe(testValueLabel);
-            });
-
             it('should provide dateLabel getter and setter', () => {
                 let defaultDateLabel = sparklineChart.dateLabel(),
                     testDateLabel = 'date',
@@ -256,18 +257,6 @@ define([
 
                 expect(defaultDateLabel).not.toBe(testDateLabel);
                 expect(newDateLabel).toBe(testDateLabel);
-            });
-
-            it('should provide animation getter and setter', () => {
-                let defaultAnimation = sparklineChart.isAnimated(),
-                    testAnimation = true,
-                    newAnimation;
-
-                sparklineChart.isAnimated(testAnimation);
-                newAnimation = sparklineChart.isAnimated();
-
-                expect(defaultAnimation).not.toBe(testAnimation);
-                expect(newAnimation).toBe(testAnimation);
             });
 
             it('should provide animation duration getter and setter', () => {
@@ -282,6 +271,52 @@ define([
                 expect(newAnimationDuration).toBe(testAnimationDuration);
             });
 
+            it('should provide isAnimated getter and setter', () => {
+                let defaultAnimation = sparklineChart.isAnimated(),
+                    testAnimation = true,
+                    newAnimation;
+
+                sparklineChart.isAnimated(testAnimation);
+                newAnimation = sparklineChart.isAnimated();
+
+                expect(defaultAnimation).not.toBe(testAnimation);
+                expect(newAnimation).toBe(testAnimation);
+            });
+
+            describe('export chart', () => {
+
+                it('should have exportChart defined', () => {
+                    expect(sparklineChart.exportChart).toBeDefined();
+                });
+            });
+
+            describe('loadingState', () => {
+
+                it('should provide a loading state getter and setter', () => {
+                    let previous = sparklineChart.loadingState(),
+                        expected = '<svg></svg>',
+                        actual;
+
+                    sparklineChart.loadingState(expected);
+                    actual = sparklineChart.loadingState();
+
+                    expect(previous).not.toBe(expected);
+                    expect(actual).toBe(expected);
+                });
+
+                describe('when getting a loadingState', () => {
+                    it('should return an SVG element', () => {
+                        let expected = 1,
+                            actual;
+
+                        sparklineChart = sparkline();
+                        actual = sparklineChart.loadingState().match('stacked-area-load-state').length;
+
+                        expect(actual).toEqual(expected);
+                    });
+                });
+            });
+
             it('should provide a lineGradient getter and setter', () => {
                 let defaultGradient = sparklineChart.lineGradient(),
                     testGradient = ['#ffffff', '#fafefc'],
@@ -294,16 +329,37 @@ define([
                 expect(newGradient).toBe(testGradient);
             });
 
-            it('should provide an areaGradient getter and setter', () => {
-                let defaultGradient = sparklineChart.areaGradient(),
-                    testGradient = ['#ffffff', '#fafefc'],
-                    newGradient;
+            describe('margin', () => {
+                it('should provide margin getter and setter', () => {
+                    let defaultMargin = sparklineChart.margin(),
+                        testMargin = { top: 4, right: 4, bottom: 4, left: 4 },
+                        newMargin;
 
-                sparklineChart.areaGradient(testGradient);
-                newGradient = sparklineChart.areaGradient();
+                    sparklineChart.margin(testMargin);
+                    newMargin = sparklineChart.margin();
 
-                expect(defaultGradient).not.toBe(testGradient);
-                expect(newGradient).toBe(testGradient);
+                    expect(defaultMargin).not.toBe(testMargin);
+                    expect(newMargin).toEqual(testMargin);
+                });
+
+                describe('when margins are set partially', function () {
+
+                    it('should override the default values', () => {
+                        let previous = sparklineChart.margin(),
+                            expected = {
+                                ...previous,
+                                top: 10,
+                                right: 20
+                            },
+                            actual;
+
+                        sparklineChart.width(expected);
+                        actual = sparklineChart.width();
+
+                        expect(previous).not.toBe(actual);
+                        expect(actual).toEqual(expected);
+                    });
+                });
             });
 
             it('should provide a titleText getter and setter', () => {
@@ -335,31 +391,17 @@ define([
                 expect(defaultTitleTextStyle).not.toEqual(testTitleTextStyle);
                 expect(newTitleTextStyle).toEqual(testTitleTextStyle);
             });
-        });
 
-        describe('when margins are set partially', function() {
-            
-            it('should override the default values', () => {
-                let previous = sparklineChart.margin(),
-                expected = {
-                    ...previous,
-                    top: 10,
-                    right: 20
-                },
-                actual;
+            it('should provide valueLabel getter and setter', () => {
+                let defaultValueLabel = sparklineChart.valueLabel(),
+                    testValueLabel = 'quantity',
+                    newValueLabel;
 
-                sparklineChart.width(expected);
-                actual = sparklineChart.width();
+                sparklineChart.valueLabel(testValueLabel);
+                newValueLabel = sparklineChart.valueLabel();
 
-                expect(previous).not.toBe(actual);
-                expect(actual).toEqual(expected);
-            })
-        });   
-
-        describe('Export chart functionality', () => {
-
-            it('should have exportChart defined', () => {
-                expect(sparklineChart.exportChart).toBeDefined();
+                expect(defaultValueLabel).not.toBe(testValueLabel);
+                expect(newValueLabel).toBe(testValueLabel);
             });
         });
     });

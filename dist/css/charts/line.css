@@ -4,6 +4,9 @@
 .line-chart .data-point-mark {
   fill: #ffffff; }
 
+.line-chart .data-point-mark {
+  fill: #ffffff; }
+
 .line-chart .topic .line {
   fill: none;
   stroke-width: 2;

@@ -13,3 +13,4 @@ require('./demo-legend');
 require('./demo-scatter-plot');
 require('./demo-bullet');
 require('./demo-row');
+require('./demo-color');

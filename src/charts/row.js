@@ -10,16 +10,12 @@ define(function(require) {
     const d3Format = require('d3-format');
     const d3Scale = require('d3-scale');
     const d3Selection = require('d3-selection');
-    const d3Shape = require('d3-shape');
-    const d3Transition = require('d3-transition');
 
     const textHelper = require('./helpers/text');
     const {exportChart} = require('./helpers/export');
     const colorHelper = require('./helpers/color');
-    const {row} = require('./helpers/load');
-    const {uniqueId} = require('./helpers/number');
+    const { bar: barChartLoadingMarkup } = require('./helpers/load');
 
-    const PERCENTAGE_FORMAT = '%';
     const NUMBER_FORMAT = ',f';
 
 
@@ -75,7 +71,7 @@ define(function(require) {
             containerRoot,
             width = 960,
             height = 500,
-            loadingState = row,
+            loadingState = barChartLoadingMarkup,
             data,
             dataZeroed,
             chartWidth, chartHeight,
@@ -83,16 +79,11 @@ define(function(require) {
             colorSchema = colorHelper.singleColors.aloeGreen,
             colorList,
             colorMap,
-            chartGradientColors = null,
-            chartGradient = null,
-            chartGradientEl,
-            chartGradientId = uniqueId('row-gradient'),
             yTicks = 5,
             xTicks = 5,
             percentageAxisToMaxRatio = 1,
             numberFormat = NUMBER_FORMAT,
             enableLabels = false,
-            enableGridLines = false,
             enableYAxisRight = false,
             labelsMargin = 7,
             labelsNumberFormat = NUMBER_FORMAT,
@@ -104,30 +95,22 @@ define(function(require) {
             padding = 0.1,
             outerPadding = .3,
             xAxis, yAxis,
-            xAxisPadding = {
-                top: 0,
-                left: 0,
-                bottom: 0,
-                right: 0
-            },
             yAxisPaddingBetweenChart = 20,
             yAxisLineWrapLimit = 1,
             svg,
 
-            hasSingleRowHighlight = true,
             isAnimated = false,
             ease = d3Ease.easeQuadInOut,
             animationDuration = 800,
-            animationStepRatio = 70,
             backgroundColor = '#bebebe',
             backgroundHoverColor = '#d6e8fa',
-            backgroundWidth = 70,
             downArrowColor = '#20AA3F',
             upArrowColor = '#D14124',
-            interRowDelay = (d, i) => animationStepRatio * i,
 
-            highlightRowFunction = (rowSelection) => rowSelection.attr('fill', ({name}) => d3Color.color(colorMap(name)).darker()),
-            orderingFunction,
+            highlightRowFunction = (rowSelection) =>
+                rowSelection.attr('fill', ({name}) => {
+                    return name ? d3Color.color(colorMap(name)).darker() : ''
+                }),
             labelsFocusTitle = '',
             labelsTotalText = 'Total complaints',
             labelsTotalCount = '',
@@ -136,12 +119,7 @@ define(function(require) {
             wrapLabels = true,
             nameLabel = 'name',
             pctChangeLabel = 'pctChange',
-            //pctOfSet = '',
             pctOfSetLabel = 'pctOfSet',
-
-            baseLine,
-            maskGridLines,
-            shouldReverseColorList = true,
             isPrintMode = false,
             // Dispatcher object to broadcast the mouse events
             // Ref: https://github.com/mbostock/d3/wiki/Internals#d3_dispatch
@@ -219,16 +197,15 @@ define(function(require) {
          */
         function exports(_selection) {
             _selection.each(function(_data) {
-                chartWidth = width > 600 ? width - margin.left - margin.right - (yAxisPaddingBetweenChart * 1.2) - 100 :
-                    width - margin.left - margin.right;
+                const sideMargins = margin.left + margin.right;
+                chartWidth = width > 600 ? width - sideMargins - (yAxisPaddingBetweenChart * 1.2) - 100 :
+                    width - sideMargins;
 
                 chartHeight = height - margin.top - margin.bottom;
-                ({data, dataZeroed} = sortData(cleanData(_data)));
+                ({data, dataZeroed} = cleanData(_data));
                 buildScales();
                 buildAxis();
                 buildSVG(this);
-                buildGradient();
-                drawGridLines();
                 drawChartTitleLabels();
                 drawRows();
                 drawAxis();
@@ -260,9 +237,6 @@ define(function(require) {
                   .attr('transform', `translate(${margin.left + yAxisPaddingBetweenChart}, ${margin.top})`);
 
             container
-                .append('g').classed('grid-lines-group', true);
-
-            container
                 .append('g').classed('chart-group', true);
 
             container
@@ -282,33 +256,6 @@ define(function(require) {
             // the tooltip and also labels on the right
             container
                 .append('g').classed('metadata-group', true);
-        }
-
-        /**
-         * Builds the gradient element to be used later
-         * @return {void}
-         * @private
-         */
-        function buildGradient() {
-            if (!chartGradientEl && chartGradientColors) {
-                chartGradientEl = svg.select('.metadata-group')
-                  .append('linearGradient')
-                    .attr('id', chartGradientId)
-                    .attr('x1', '0%')
-                    .attr('y1', '0%')
-                    .attr('x2', '100%')
-                    .attr('y2', '100%')
-                    .attr('gradientUnits', 'userSpaceOnUse')
-                    .selectAll('stop')
-                     .data([
-                        {offset:'0%', color: chartGradientColors[0]},
-                        {offset:'50%', color: chartGradientColors[1]}
-                    ])
-                    .enter()
-                      .append('stop')
-                        .attr('offset', ({offset}) => offset)
-                        .attr('stop-color', ({color}) => color)
-            }
         }
 
         function v(d) {
@@ -427,20 +374,11 @@ define(function(require) {
                 .domain(data.map(getName))
                 .range(vals); //force irregular intervals based on value
 
-            if (shouldReverseColorList) {
-                colorList = data.map(d => d)
-                                .reverse()
-                                .map(({name}, i) => ({
-                                        name,
-                                        color: colorSchema[i % colorSchema.length]}
-                                    ));
-            } else {
-                colorList = data.map(d => d)
-                                .map(({name}, i) => ({
-                                        name,
-                                        color: colorSchema[i % colorSchema.length]}
-                                    ));
-            }
+            colorList = data.map(d => d)
+                            .map(({name}, i) => ({
+                                    name,
+                                    color: colorSchema[i % colorSchema.length]}
+                                ));
 
             colorMap = (item) => colorList.filter(({name}) => name === item)[0].color;
         }
@@ -496,35 +434,6 @@ define(function(require) {
         }
 
         /**
-         * A utility function that checks if custom gradient
-         * color map should be applied if specified by the user
-         * @param {String} name - row's data point name
-         * @return {void}
-         * @private
-         */
-        function computeColor(name) {
-            return chartGradientColors ? `url(#${chartGradientId})` : colorMap(name);
-        }
-
-        /**
-         * Sorts data if orderingFunction is specified
-         * @param  {RowChartData}     clean unordered data
-         * @return  {RowChartData}    clean ordered data
-         * @private
-         */
-        function sortData(unorderedData) {
-            let {data, dataZeroed} = unorderedData;
-
-            if (orderingFunction) {
-                data.sort(orderingFunction);
-                dataZeroed.sort(orderingFunction)
-            }
-
-            return { data, dataZeroed };
-        }
-
-
-        /**
          * utility function if we are a Root Row, big font, etc
          * @param d
          * @returns {*}
@@ -535,9 +444,6 @@ define(function(require) {
             })
         }
 
-        function positionPercentageLabel(d){
-
-        }
         /**
          * utility function to get font size for a row
          * @param d
@@ -546,21 +452,6 @@ define(function(require) {
         function getFontSize(d){
             const e = isParent(d);
             return e ? `${labelsSize}px` : `${labelsSizeChild}px`;
-        }
-
-        /**
-         * Utility function that wraps a text into the given width
-         * @param  {D3Selection} text         Text to write
-         * @param  {Number} containerWidth
-         * @private
-         */
-        function wrapText(text, containerWidth) {
-            const lineHeight = yAxisLineWrapLimit > 1 ? .8 : 1.2;
-            let fontSize = 12;
-
-            textHelper.wrapText.call(null, 0, fontSize, containerWidth, text.node());
-            //textHelper.wrapText(text, containerWidth, 0,
-            // yAxisLineWrapLimit, lineHeight);
         }
 
         /**
@@ -600,12 +491,8 @@ define(function(require) {
                     .attr('height', '50')
                     .attr('width', '50')
                     .attr('fill', backgroundHoverColor)
-                    .on( 'mouseover', function( d ) {
-                        rowHoverOver(d);
-                    } )
-                    .on('mouseout', function(d) {
-                        rowHoverOut(d);
-                    });
+                    .on( 'mouseover', rowHoverOver )
+                    .on( 'mouseout', rowHoverOut );
 
                 group.append( 'path' )
                     .attr('d', 'M 10,10 L 30,30 M 30,10 L 10,30')
@@ -686,14 +573,10 @@ define(function(require) {
                     }).parent;
                 })
                 .classed('print-mode', isPrintMode)
-                .on( 'mouseover', function( d ) {
-                    rowHoverOver(d);
-                } )
-                .on('mouseout', function(d) {
-                    rowHoverOut(d);
-                })
+                .on( 'mouseover', rowHoverOver )
+                .on( 'mouseout', rowHoverOut )
                 // move text right so we have room for the eyeballs
-                .call(wrapTextWithEllipses, labelsBoxWidth)
+                .call( wrapTextWithEllipses, labelsBoxWidth )
                 .selectAll('tspan')
                 .attr('font-size', getFontSize);
 
@@ -722,7 +605,7 @@ define(function(require) {
                 } );
 
             bargroups.append( 'rect' )
-                .classed( 'bg', true )
+                .attr( 'class', 'bg')
                 .attr( 'y', chartHeight )
                 .attr( 'x', 0 )
                 .on( 'click', function( d ) {
@@ -740,7 +623,7 @@ define(function(require) {
                 .attr( 'fill', backgroundColor);
 
             bargroups.append( 'rect' )
-                .classed( 'bg-hover', true )
+                .attr( 'class', 'bg-hover' )
                 .attr( 'y', chartHeight )
                 .attr( 'x', 0 )
                 .merge( rows )
@@ -752,18 +635,15 @@ define(function(require) {
                     return a * d.width;	//`a` already accounts for both types of padding
                 } )
                 .on( 'mouseover', rowHoverOver )
-                .on('mouseout', rowHoverOut)
+                .on( 'mouseout', rowHoverOut )
                 .attr( 'width', width )
                 .attr( 'fill', backgroundHoverColor )
                 .attr( 'fill-opacity', 0);
-//                .attr('stroke', 'red');
 
             // now add the actual bars to what we got
             bargroups
                 .append( 'rect' )
-                .attr( 'class', function( d ) {
-                    return 'focus-bar';
-                } )
+                .attr( 'class', 'focus-bar' )
                 .attr( 'y', chartHeight )
                 .attr( 'x', 0 )
                 .attr( 'height', function( d ) {
@@ -790,9 +670,7 @@ define(function(require) {
             // now add the actual bars to what we got
             bargroups
                 .append( 'rect' )
-                .attr( 'class', function(d){
-                    return 'pct';
-                } )
+                .attr( 'class', 'pct' )
                 .attr( 'y', chartHeight )
                 .attr( 'x', 0 )
                 .attr( 'height', function (d) {
@@ -822,7 +700,7 @@ define(function(require) {
                 } )
                 .attr( 'width', ( { value } ) => xScale( value ) )
                 .attr( 'fill', ( d ) => {
-                    return computeColor( d.name );
+                    return colorMap( d.name );
                 } )
                 .attr('fill-opacity', (d)=>{
                     return d.parent ? 0.5 : 1;
@@ -833,7 +711,7 @@ define(function(require) {
                 const bgWidth = backgroundRows.node().getBBox().x || backgroundRows.node().getBoundingClientRect().width;
 
                 bargroups.append( 'text' )
-                    .classed( 'percentage-label', true )
+                    .attr( 'class', 'percentage-label' )
                     .classed( 'child', ( d ) => !isParent( d ) )
                     .attr( 'x', _labelsHorizontalX )
                     .attr( 'y', _labelsHorizontalY )
@@ -863,7 +741,7 @@ define(function(require) {
                 const gunit  = bargroups
                     .append( 'g' )
                     .attr( 'transform', `translate(${chartWidth + 10}, 0)` )
-                    .classed( 'change-label-group', true );
+                    .attr( 'class', 'change-label-group' );
 
                 // each group should contain the labels and rows
                 gunit.append( 'text' )
@@ -920,9 +798,8 @@ define(function(require) {
                 .attr( 'height', function (d) {
                     return a * d.width;	//`a` already accounts for both types of padding
                 })
-                // .attr( 'fill', ( { name } ) => computeColor( name ) )
                 .attr( 'fill', ( d ) => {
-                    return computeColor( d.name );
+                    return colorMap( d.name );
                 } )
                 .attr('width', 0)
                 .transition()
@@ -1045,8 +922,6 @@ define(function(require) {
                 const ltc = labelsTotalCount.toLocaleString();
                 const compCountTxt = labelsTotalText + ' ' + ltc;
                 let cw = textHelper.getTextWidth( compCountTxt, labelsSizeChild, 'Karla, sans-serif');
-                let part1Width = textHelper.getTextWidth( labelsTotalText, labelsSizeChild, 'Karla, sans-serif' );
-                let numWidth = textHelper.getTextWidth( ltc, labelsSizeChild, 'Karla, sans-serif' );
                 let printPadding = isPrintMode && isIE ? 10 : 0;
 
                 const ieTweak = isIE ? 5 :0;
@@ -1070,7 +945,6 @@ define(function(require) {
                     chartWidth - complaintTotalGroup.node().getBoundingClientRect().width - 10;
 
                 complaintTotalGroup.attr( 'x', titlexPos )
-
             }
 
             if(labelsInterval && width > 600) {
@@ -1085,85 +959,24 @@ define(function(require) {
         }
 
         /**
-         * Draws grid lines on the background of the chart
-         * @return void
-         */
-        function drawGridLines() {
-            if(enableGridLines){
-                svg.select('.grid-lines-group')
-                    .selectAll('line')
-                    .remove();
-
-                    drawHorizontalGridLines();
-            }
-        }
-
-        /**
-         * Draws the grid lines for an horizontal row chart
-         * @return {void}
-         */
-        function drawHorizontalGridLines() {
-            maskGridLines = svg.select('.grid-lines-group')
-                .selectAll('line.vertical-grid-line')
-                .data(xScale.ticks(4))
-                .enter()
-                  .append('line')
-                    .attr('class', 'vertical-grid-line')
-                    .attr('y1', margin.top + 20)
-                    .attr('x1', (d) => xScale(d))
-                    .attr('y2', chartHeight)
-                    .attr('x2', (d) => xScale(d));
-
-            drawVerticalExtendedLine();
-        }
-
-        /**
-         * Draws a vertical line to extend y-axis till the edges
-         * @return {void}
-         */
-        function drawVerticalExtendedLine() {
-            baseLine = svg.select('.grid-lines-group')
-                .selectAll('line.extended-y-line')
-                .data([0])
-                .enter()
-                  .append('line')
-                    .attr('class', 'extended-y-line')
-                    .attr('y1', margin.top + 20)
-                    .attr('x1', 0)
-                    .attr('y2', chartHeight)
-                    .attr('x2', 0);
-        }
-
-        /**
          * Custom OnMouseOver event handler
          * @return {void}
          * @private
          */
         function handleMouseOver(e, d, rowList, chartWidth, chartHeight) {
             dispatcher.call('customMouseOver', e, d, d3Selection.mouse(e), [chartWidth, chartHeight]);
-            highlightRowFunction = highlightRowFunction || function() {};
 
             // eyeball fill-opacity
             rowHoverOver(d);
+            highlightRowFunction(d3Selection.select(e));
 
-            if (hasSingleRowHighlight) {
-                highlightRowFunction(d3Selection.select(e));
-                return;
-            }
-
-            rowList.forEach(rowRect => {
-                if (rowRect === e) {
-                    return;
-                }
-                highlightRowFunction(d3Selection.select(rowRect));
-            });
         }
 
         function rowHoverOver(d, i) {
             // eyeball fill-opacity 1
             // we should find the index of the currently hovered over row
             let ind = i;
-            if(typeof d.name === "string" || typeof d === "string") {
+            if(typeof d.name === 'string' || typeof d === 'string') {
                 ind = d.name ? getIndex( d.name ) : getIndex( d );
             }
 
@@ -1175,7 +988,7 @@ define(function(require) {
             // eyeball fill-opacity 0
             // we should find the index of the currently hovered over row
             let ind = i;
-            if(typeof d.name === "string" || typeof d === "string") {
+            if(typeof d.name === 'string' || typeof d === 'string') {
                 ind = d.name ? getIndex( d.name ) : getIndex( d );
             }
 
@@ -1207,9 +1020,10 @@ define(function(require) {
 
             // eyeball fill-opacity 0
             rowHoverOut(d);
-
             rowList.forEach((rowRect) => {
-                d3Selection.select(rowRect).attr('fill', ({name}) => colorMap(name));
+                d3Selection.select(rowRect).attr('fill', ({name}) => {
+                    return name ? colorMap(name) : '';
+                });
             });
         }
 
@@ -1269,38 +1083,6 @@ define(function(require) {
             return this;
         }
 
-
-        /**
-         * Gets or Sets the background width of a row in the chart, num in
-         * percentage
-         * @param  {integer} _x desired width percentage
-         * @return {integer} current percentage
-         * @public
-         */
-        exports.backgroundWidth = function(_x) {
-            if (!arguments.length) {
-                return backgroundWidth;
-            }
-            backgroundWidth = _x;
-
-            return this;
-        }
-
-        /**
-         * Gets or Sets the gradient colors of a row in the chart
-         * @param  {String[]} _x Desired color gradient for the line (array of two hexadecimal numbers)
-         * @return {String[] | module} Current color gradient or Line Chart module to chain calls
-         * @public
-         */
-        exports.chartGradient = function(_x) {
-            if (!arguments.length) {
-                return chartGradientColors;
-            }
-            chartGradientColors = _x;
-
-            return this;
-        }
-
         /**
          * Gets or Sets the colorSchema of the chart
          * @param  {String[]} _x Desired colorSchema for the graph
@@ -1315,22 +1097,6 @@ define(function(require) {
 
             return this;
         };
-
-        /**
-         * If true, adds gridlines to row chart
-         * @param  {Boolean} [_x=false]
-         * @return {Boolean | module} Current value of enableGridLines or Chart module to chain calls
-         * @public
-         */
-        exports.enableGridLines = function(_x) {
-            if (!arguments.length) {
-                return enableGridLines;
-            }
-            enableGridLines = _x;
-
-            return this;
-        };
-
 
         /**
          * If true, adds labels at the end of the rows
@@ -1372,44 +1138,6 @@ define(function(require) {
             exportChart.call(exports, svg, filename, title);
         };
 
-        /**
-         * Gets or Sets the hasPercentage status
-         * @param  {boolean} _x     Should use percentage as value format
-         * @return {boolean | module} Is percentage used or Chart module to chain calls
-         * @public
-         */
-        exports.hasPercentage = function(_x) {
-            if (!arguments.length) {
-                return numberFormat === PERCENTAGE_FORMAT;
-            }
-            if (_x) {
-                numberFormat = PERCENTAGE_FORMAT;
-            } else {
-                numberFormat = NUMBER_FORMAT;
-            }
-
-            return this;
-        };
-
-        /**
-         * Gets or Sets the hasSingleRowHighlight status.
-         * If the value is true (default), only the hovered row is considered to
-         * be highlighted and will be darkened by default. If the value is false,
-         * all the rows but the hovered row are considered to be highlighted
-         * and will be darkened (by default). To customize the row highlight or
-         * remove it completely, use highlightRowFunction instead.
-         * @param  {boolean} _x        Should highlight the hovered row
-         * @return {boolean | module} Is hasSingleRowHighlight used or Chart module to chain calls
-         * @public
-         */
-        exports.hasSingleRowHighlight = function(_x) {
-            if (!arguments.length) {
-                return hasSingleRowHighlight;
-            }
-            hasSingleRowHighlight = _x;
-
-            return this;
-        }
 
         /**
          * Gets or Sets the height of the chart
@@ -1426,28 +1154,6 @@ define(function(require) {
             return this;
         };
 
-        /**
-         * Gets or Sets the highlightRowFunction function. The callback passed to
-         * this function returns a row selection from the row chart. Use this function
-         * if you want to apply a custom behavior to the highlighted row on hover.
-         * When hasSingleRowHighlight is true the highlighted row will be the
-         * one that was hovered by the user. When hasSingleRowHighlight is false
-         * the highlighted rows are all the rows but the hovered one. The default
-         * highlight effect on a row is darkening the highlighted row(s) color.
-         * @param  {Function} _x        Desired operation operation on a hovered row passed through callback
-         * @return {highlightRowFunction | module} Is highlightRowFunction used or Chart module to chain calls
-         * @public
-         * @example rowChart.highlightRowFunction(row => row.attr('fill', 'blue'))
-         * rowChart.highlightRowFunction(null) // will disable the default highlight effect
-         */
-        exports.highlightRowFunction = function(_x) {
-            if (!arguments.length) {
-                return highlightRowFunction;
-            }
-            highlightRowFunction = _x;
-
-            return this;
-        }
 
         /**
          * Gets or Sets the isAnimated property of the chart, making it to animate when render.
@@ -1497,6 +1203,12 @@ define(function(require) {
             return this;
         }
 
+        /**
+         * Gets or Sets the labelsSuffix format
+         * @param  {string} [_x=""] desired suffix. Complaint(s)
+         * @return {string | module} Current labelsSuffix or Chart module to chain calls
+         * @public
+         */
         exports.labelsSuffix = function(_x) {
 
             if (!arguments.length) {
@@ -1647,21 +1359,6 @@ define(function(require) {
             return this;
         }
 
-        /**
-         * Gets or Sets whether the color list should be reversed or not
-         * @param  {boolean} _x     Should reverse the color list
-         * @return {boolean | module} Is color list being reversed or Chart module to chain calls
-         * @public
-         */
-        exports.shouldReverseColorList = function(_x) {
-            if (!arguments.length) {
-                return shouldReverseColorList;
-            }
-            shouldReverseColorList = _x;
-
-            return this;
-        };
-
 
         /**
          * Gets or Sets whether the chart should show the expand toggles/eyeball
@@ -1678,21 +1375,6 @@ define(function(require) {
             return this;
         };
 
-
-        /**
-         * Changes the order of items given the custom function
-         * @param  {Function} _x             A custom function that sets logic for ordering
-         * @return {(Function | Module)}   A custom ordering function or Chart module to chain calls
-         * @public
-         */
-        exports.orderingFunction = function(_x) {
-            if (!arguments.length) {
-                return orderingFunction;
-            }
-            orderingFunction = _x;
-
-            return this;
-        };
 
         /**
          * Gets or Sets the outerPadding of the chart
@@ -1741,22 +1423,6 @@ define(function(require) {
 
 
         /**
-         * Gets or Sets the pctOfSet of the chart
-         * @param  {String} _x Desired pctOfSet for the graph
-         * @return { String | module} Current pctOfSet or Chart module to chain
-         * calls
-         * @public
-         */
-        exports.pctOfSet = function(_x) {
-            if (!arguments.length) {
-                return pctOfSet;
-            }
-            pctOfSet = _x;
-
-            return this;
-        };
-
-        /**
          * Gets or Sets the yAxisLineWrapLimit of the chart, default 2
          * @param  {Number} _x Desired yAxisLineWrapLimit for the graph
          * @return { Number | module} Current valueLabel or Chart module to
@@ -1790,6 +1456,7 @@ define(function(require) {
 
         /**
          * Gets or Sets the labelsTotalCount of the chart
+         * the count Total complaints NNNN
          * @param {String} _x Desired labelsTotalCount for the graph
          * @return { String | module} Current labelsTotalCount or Chart
          * module to chain calls
@@ -1805,8 +1472,9 @@ define(function(require) {
         };
 
         /**
-         * Gets or Sets the labelsTotalText of the chart. Companion text for
-         * the count.  Total complaints XXXXXX
+         * Gets or Sets the labelsTotalText of the chart.
+         * label that goes in front of the total count
+         * Total complaints XXXXXX
          * @param {String} _x Desired labelsTotalText for the graph
          * @return { String | module} Current labelsTotalText or Chart
          * module to chain calls
@@ -1824,7 +1492,7 @@ define(function(require) {
 
         /**
          * Gets or Sets the labelsInterval of the chart
-         * @param  {String} _x Desired labelsInterval for the graph
+         * @param  {String} _x Desired labelsInterval for the graph, month, year, etc
          * @return { labelsInterval | module} Current labelsInterval or Chart module to chain calls
          * @public
          */
@@ -1926,7 +1594,7 @@ define(function(require) {
          */
         exports.wrapLabels = function(_x) {
             if (!arguments.length) {
-                return yTicks;
+                return wrapLabels;
             }
             wrapLabels = _x;
 

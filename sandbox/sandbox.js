@@ -6,29 +6,31 @@ const defaultData = require('./constants/data');
 const storage = require('./helpers/localStorageHelpers');
 const domHelpers = require('./helpers/domHelpers');
 
+require('../src/styles/britecharts.scss');
+
 const {
     dataSelectorClass,
     chartSelectorClass,
+
     // chart containers
     britechartContainerClass,
+
     // data input
     dataSubmitButtonClass,
     dataResetButtonClass,
-    dataInputSizeToggleClass,
+
     // config input
     configSubmitButtonClass,
     configResetButtonClass,
     configAddTooltipClass,
     configAddMiniTooltipClass,
+
     // tooltip
     tooltipMetaGroup,
     tooltipHoverGroup,
-
 } = constants.domClassNames;
 const {
-    rootSaveKey,
     savedDataKey,
-    // savedDataTypeKey,
     savedChartTypeKey,
     savedConfigKey
 } = constants.saveKeys;
@@ -62,9 +64,9 @@ const errors = [];
 // move to constants
 const dataEditorWidth = '400px';
 
-require('./styles.scss');
-window.d3 = d3;
+require('./styles/styles.scss');
 
+window.d3 = d3;
 
 // start the sandbox
 main();
@@ -101,7 +103,6 @@ function setHandlers() {
 
     d3.select(`.${dataSubmitButtonClass}`).on('click', _handleDataUpdate);
     d3.select(`.${dataResetButtonClass}`).on('click', _handleDataReset);
-    d3.select(`.${dataInputSizeToggleClass}`).on('click', _handleDataSizeToggle);
 
     d3.select(`.${configSubmitButtonClass}`).on('click', _handleConfigUpdate);
     d3.select(`.${configResetButtonClass}`).on('click', _handleConfigReset);
@@ -267,18 +268,6 @@ function _handleDataSelectorChange () {
 
     storage.setDataByKey(savedDataKey, currentData);
     updateAllComponents();
-}
-
-/**
- * Exapnds the data text editor area, making it wider
- * TODO: use more constants for this
- */
-function _handleDataSizeToggle() {
-    let {isDataInputExpanded} = state;
-    let width = isDataInputExpanded ? dataEditorWidth : '1000px';
-
-    state.isDataInputExpanded = !isDataInputExpanded;
-    d3.select(`#${dataInputId}`).style('width', width);
 }
 
 /**

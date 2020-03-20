@@ -72,10 +72,10 @@ define(function(require) {
     }
 
     /**
-     * takes d3 svg el, adds proper svg tags, adds inline styles
+     * Takes the D3 SVG element, adds proper SVG tags, adds inline styles
      * from stylesheets, adds white background and returns string
-     * @param  {object} d3svg TYPE d3 svg element
-     * @return {string} string of passed d3
+     * @param  {SVGElement} d3svg   TYPE d3 svg element
+     * @return {String}             String of passed d3
      */
     function convertSvgToHtml (d3svg, title) {
         if (!d3svg) {
@@ -188,7 +188,8 @@ define(function(require) {
         }
         let {grey} = colorSchemas;
 
-        html =  html.replace(/<g/,`<text x="${config.titleLeftOffset}" y="${config.titleTopOffset}" font-family="${config.titleFontFamily}" font-size="${config.titleFontSize}" fill="${grey[6]}"> ${title} </text><g `);
+//        html =  html.replace(/<g/,`<text x="${config.titleLeftOffset}" y="${config.titleTopOffset}" font-family="${config.titleFontFamily}" font-size="${config.titleFontSize}" fill="${grey[6]}"> ${title} </text><g `);
+        html =  html.replace(/<g/,`<text x="${this.margin().left}" y="${config.titleTopOffset}" font-family="${config.titleFontFamily}" font-size="${config.titleFontSize}" fill="${grey[6]}"> ${title} </text><g `);
 
         return html;
     }

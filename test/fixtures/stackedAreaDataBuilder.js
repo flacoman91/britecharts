@@ -3,13 +3,12 @@ define(function(require) {
 
     var _ = require('underscore'),
 
-        jsonThreeSources = require('json-loader!../json/areaDataThreeSources.json'),
-        jsonSixSources = require('json-loader!../json/areaDataSixSources.json'),
-        jsonSalesChannel = require('json-loader!../json/areaDataSalesChannel.json'),
-        jsonReportService = require('json-loader!../json/areaDataReportService.json'),
-        jsonLargeService = require('json-loader!../json/areaDataLarge.json'),
-        jsonMassiveWeekSource = require('json-loader!../json/areaMassiveWeekSources.json');
-
+        jsonThreeSources = require('../json/areaDataThreeSources.json'),
+        jsonSixSources = require('../json/areaDataSixSources.json'),
+        jsonSalesChannel = require('../json/areaDataSalesChannel.json'),
+        jsonReportService = require('../json/areaDataReportService.json'),
+        jsonLargeService = require('../json/areaDataLarge.json'),
+        jsonMassiveWeekSource = require('../json/areaMassiveWeekSources.json');
 
     function StackedAreaDataBuilder(config){
         this.Klass = StackedAreaDataBuilder;

@@ -14,12 +14,12 @@ define(function(require) {
     const textHelper = require('./helpers/text');
     const {exportChart} = require('./helpers/export');
     const colorHelper = require('./helpers/color');
-    const {bar} = require('./helpers/load');
+    const { bar: barChartLoadingMarkup } = require('./helpers/load');
     const {uniqueId} = require('./helpers/number');
+    const {setDefaultLocale} = require('./helpers/locale');
 
     const PERCENTAGE_FORMAT = '%';
     const NUMBER_FORMAT = ',f';
-
 
     /**
      * @typedef BarChartData
@@ -38,6 +38,28 @@ define(function(require) {
      *         name: 'luminous'
      *     }
      * ]
+     */
+
+    /**
+     * @typedef LocaleObject
+     * @type {Object}
+     * @property {String} decimal       the decimal point(e.g., ".")
+     * @property {String} thousands     the group separator(e.g., ",")
+     * @property {Number[]} grouping    the array of group sizes(e.g., [3]), cycled as needed
+     * @property {String[]} currency    the currency prefix and suffix(e.g., ["$", ""])
+     * @property {String[]} numerals    optional; an array of ten strings to replace the numerals 0 - 9.
+     * @property {String} percent       optional; the percent sign(defaults to "%")
+     * @property {String} minus         optional; the minus sign(defaults to hyphen - minus, "-")
+     * @property {String} nan           optional; the not - a - number value(defaults "NaN")
+     *
+     * See some standard locale object values [here]{@link https://cdn.jsdelivr.net/npm/d3-format/locale/}.
+     * @example
+     * {
+     *     "decimal": ",",
+     *     "thousands": ".",
+     *     "grouping": [3],
+     *     "currency": ["", "\u00a0€"]
+     * }
      */
 
     /**
@@ -70,7 +92,7 @@ define(function(require) {
             },
             width = 960,
             height = 500,
-            loadingState = bar,
+            loadingState = barChartLoadingMarkup,
             data,
             dataZeroed,
             chartWidth, chartHeight,
@@ -135,6 +157,8 @@ define(function(require) {
             baseLine,
             maskGridLines,
             shouldReverseColorList = true,
+            locale = null,
+            localeFormatter = d3Format,
 
             // Dispatcher object to broadcast the mouse events
             // Ref: https://github.com/mbostock/d3/wiki/Internals#d3_dispatch
@@ -149,8 +173,6 @@ define(function(require) {
             getName = ({name}) => name,
             getValue = ({value}) => value,
 
-            _labelsFormatValue = ({value}) => d3Format.format(labelsNumberFormat)(value),
-
             _labelsHorizontalX = ({value}) => xScale(value) + labelsMargin,
             _labelsHorizontalY= ({name}) => yScale(name) + (yScale.bandwidth() / 2) + (labelsSize * (3/8)),
 
@@ -164,21 +186,25 @@ define(function(require) {
          * @param {BarChartData} _data The data to attach and generate the chart
          */
         function exports(_selection) {
+            if (locale) {
+                localeFormatter = setDefaultLocale(locale);
+            }
+
             _selection.each(function(_data) {
                 chartWidth = width - margin.left - margin.right - (yAxisPaddingBetweenChart * 1.2);
                 chartHeight = height - margin.top - margin.bottom;
                 ({data, dataZeroed} = sortData(cleanData(_data)));
 
                 buildScales();
-                buildAxis();
+                buildAxis(localeFormatter);
                 buildSVG(this);
                 buildGradient();
                 drawGridLines();
-                drawBars();
                 drawAxis();
+                drawBars();
 
                 if (enableLabels) {
-                    drawLabels();
+                    drawLabels(localeFormatter);
                 }
             });
         }
@@ -187,10 +213,10 @@ define(function(require) {
          * Creates the d3 x and y axis, setting orientations
          * @private
          */
-        function buildAxis() {
+        function buildAxis(locale) {
             if (isHorizontal) {
                 xAxis = d3Axis.axisBottom(xScale)
-                    .ticks(xTicks, numberFormat)
+                    .ticks(xTicks, locale.format(numberFormat))
                     .tickSizeInner([-chartHeight]);
 
                 yAxis = d3Axis.axisLeft(yScale);
@@ -198,7 +224,7 @@ define(function(require) {
                 xAxis = d3Axis.axisBottom(xScale);
 
                 yAxis = d3Axis.axisLeft(yScale)
-                    .ticks(yTicks, numberFormat)
+                    .ticks(yTicks, locale.format(numberFormat))
             }
         }
 
@@ -210,26 +236,29 @@ define(function(require) {
         function buildContainerGroups() {
             let container = svg
                 .append('g')
-                .classed('container-group', true)
-                .attr('transform', `translate(${margin.left + yAxisPaddingBetweenChart}, ${margin.top})`);
+                  .classed('container-group', true)
+                  .attr('transform', `translate(${margin.left + yAxisPaddingBetweenChart}, ${margin.top})`);
 
             container
-                .append('g').classed('grid-lines-group', true);
+              .append('g')
+                .classed('grid-lines-group', true);
             container
-                .append('g').classed('chart-group', true);
+              .append('g')
+                .classed('chart-group', true);
             container
-                .append('g')
+              .append('g')
                 .classed('x-axis-group axis', true)
-                .append('g')
+              .append('g')
                 .classed('x-axis-label', true);
             container
-                .append('g')
+              .append('g')
                 .attr('transform', `translate(${-1 * (yAxisPaddingBetweenChart)}, 0)`)
                 .classed('y-axis-group axis', true)
-                .append('g')
-                .classed('y-axis-label', true);
+                  .append('g')
+                    .classed('y-axis-label', true);
             container
-                .append('g').classed('metadata-group', true);
+              .append('g')
+                .classed('metadata-group', true);
         }
 
         /**
@@ -240,7 +269,7 @@ define(function(require) {
         function buildGradient() {
             if (!chartGradientEl && chartGradientColors) {
                 chartGradientEl = svg.select('.metadata-group')
-                    .append('linearGradient')
+                  .append('linearGradient')
                     .attr('id', chartGradientId)
                     .attr('x1', '0%')
                     .attr('y1', '0%')
@@ -248,14 +277,14 @@ define(function(require) {
                     .attr('y2', '100%')
                     .attr('gradientUnits', 'userSpaceOnUse')
                     .selectAll('stop')
-                    .data([
+                     .data([
                         {offset:'0%', color: chartGradientColors[0]},
                         {offset:'50%', color: chartGradientColors[1]}
                     ])
                     .enter()
-                    .append('stop')
-                    .attr('offset', ({offset}) => offset)
-                    .attr('stop-color', ({color}) => color)
+                      .append('stop')
+                        .attr('offset', ({offset}) => offset)
+                        .attr('stop-color', ({color}) => color)
             }
         }
 
@@ -288,17 +317,17 @@ define(function(require) {
 
             if (shouldReverseColorList) {
                 colorList = data.map(d => d)
-                    .reverse()
-                    .map(({name}, i) => ({
-                            name,
-                            color: colorSchema[i % colorSchema.length]}
-                    ));
+                                .reverse()
+                                .map(({name}, i) => ({
+                                        name,
+                                        color: colorSchema[i % colorSchema.length]}
+                                    ));
             } else {
                 colorList = data.map(d => d)
-                    .map(({name}, i) => ({
-                            name,
-                            color: colorSchema[i % colorSchema.length]}
-                    ));
+                                .map(({name}, i) => ({
+                                        name,
+                                        color: colorSchema[i % colorSchema.length]}
+                                    ));
             }
 
             colorMap = (item) => colorList.filter(({name}) => name === item)[0].color;
@@ -313,7 +342,7 @@ define(function(require) {
             if (!svg) {
                 svg = d3Selection.select(container)
                     .append('svg')
-                    .classed('britechart bar-chart', true);
+                      .classed('britechart bar-chart', true);
 
                 buildContainerGroups();
             }
@@ -414,7 +443,7 @@ define(function(require) {
                     yAxisLabelEl.remove();
                 }
                 yAxisLabelEl = svg.select('.y-axis-label')
-                    .append('text')
+                  .append('text')
                     .classed('y-axis-label-text', true)
                     .attr('x', -chartHeight / 2)
                     .attr('y', yAxisLabelOffset)
@@ -428,7 +457,7 @@ define(function(require) {
                     xAxisLabelEl.remove();
                 }
                 xAxisLabelEl = svg.select('.x-axis-label')
-                    .append('text')
+                  .append('text')
                     .attr('y', xAxisLabelOffset)
                     .attr('text-anchor', 'middle')
                     .classed('x-axis-label-text', true)
@@ -445,7 +474,7 @@ define(function(require) {
         function drawHorizontalBars(bars) {
             // Enter + Update
             bars.enter()
-                .append('rect')
+              .append('rect')
                 .classed('bar', true)
                 .attr('y', chartHeight)
                 .attr('x', 0)
@@ -463,7 +492,7 @@ define(function(require) {
                 .on('click', function(d) {
                     handleClick(this, d, chartWidth, chartHeight);
                 })
-                .merge(bars)
+              .merge(bars)
                 .attr('x', 0)
                 .attr('y', ({name}) => yScale(name))
                 .attr('height', yScale.bandwidth())
@@ -479,7 +508,7 @@ define(function(require) {
         function drawAnimatedHorizontalBars(bars) {
             // Enter + Update
             bars.enter()
-                .append('rect')
+              .append('rect')
                 .classed('bar', true)
                 .attr('x', 0)
                 .attr('y', chartHeight)
@@ -518,7 +547,7 @@ define(function(require) {
         function drawAnimatedVerticalBars(bars) {
             // Enter + Update
             bars.enter()
-                .append('rect')
+              .append('rect')
                 .classed('bar', true)
                 .attr('x', chartWidth)
                 .attr('y', ({value}) => yScale(value))
@@ -536,7 +565,7 @@ define(function(require) {
                 .on('click', function(d) {
                     handleClick(this, d, chartWidth, chartHeight);
                 })
-                .merge(bars)
+              .merge(bars)
                 .attr('x', ({name}) => xScale(name))
                 .attr('width', xScale.bandwidth())
                 .attr('fill', ({name}) => computeColor(name))
@@ -556,7 +585,7 @@ define(function(require) {
         function drawVerticalBars(bars) {
             // Enter + Update
             bars.enter()
-                .append('rect')
+              .append('rect')
                 .classed('bar', true)
                 .attr('x', chartWidth)
                 .attr('y', ({value}) => yScale(value))
@@ -574,7 +603,7 @@ define(function(require) {
                 .on('click', function(d) {
                     handleClick(this, d, chartWidth, chartHeight);
                 })
-                .merge(bars)
+              .merge(bars)
                 .attr('x', ({name}) => xScale(name))
                 .attr('y', ({value}) => yScale(value))
                 .attr('width', xScale.bandwidth())
@@ -587,28 +616,28 @@ define(function(require) {
          * @private
          * @return {void}
          */
-        function drawLabels() {
-            let labelXPosition = isHorizontal ? _labelsHorizontalX : _labelsVerticalX;
-            let labelYPosition = isHorizontal ? _labelsHorizontalY : _labelsVerticalY;
-            let text = _labelsFormatValue
+        function drawLabels(locale) {
+            const labelXPosition = isHorizontal ? _labelsHorizontalX : _labelsVerticalX;
+            const labelYPosition = isHorizontal ? _labelsHorizontalY : _labelsVerticalY;
+            const textFormatter = ({ value }) => locale.format(labelsNumberFormat)(value);
 
             if (labelEl) {
                 svg.selectAll('.percentage-label-group').remove();
             }
 
             labelEl = svg.select('.metadata-group')
-                .append('g')
+              .append('g')
                 .classed('percentage-label-group', true)
                 .selectAll('text')
                 .data(data.reverse())
                 .enter()
-                .append('text');
+                  .append('text');
 
             labelEl
                 .classed('percentage-label', true)
                 .attr('x', labelXPosition)
                 .attr('y', labelYPosition)
-                .text(text)
+                .text(textFormatter)
                 .attr('font-size', labelsSize + 'px')
         }
 
@@ -685,12 +714,12 @@ define(function(require) {
                 .selectAll('line.vertical-grid-line')
                 .data(xScale.ticks(xTicks).slice(1))
                 .enter()
-                .append('line')
-                .attr('class', 'vertical-grid-line')
-                .attr('y1', (xAxisPadding.left))
-                .attr('y2', chartHeight)
-                .attr('x1', (d) => xScale(d))
-                .attr('x2', (d) => xScale(d))
+                  .append('line')
+                    .attr('class', 'vertical-grid-line')
+                    .attr('y1', (xAxisPadding.left))
+                    .attr('y2', chartHeight)
+                    .attr('x1', (d) => xScale(d))
+                    .attr('x2', (d) => xScale(d))
 
             drawVerticalExtendedLine();
         }
@@ -704,12 +733,12 @@ define(function(require) {
                 .selectAll('line.extended-y-line')
                 .data([0])
                 .enter()
-                .append('line')
-                .attr('class', 'extended-y-line')
-                .attr('y1', (xAxisPadding.bottom))
-                .attr('y2', chartHeight)
-                .attr('x1', 0)
-                .attr('x2', 0);
+                  .append('line')
+                    .attr('class', 'extended-y-line')
+                    .attr('y1', (xAxisPadding.bottom))
+                    .attr('y2', chartHeight)
+                    .attr('x1', 0)
+                    .attr('x2', 0);
         }
 
         /**
@@ -721,12 +750,12 @@ define(function(require) {
                 .selectAll('line.horizontal-grid-line')
                 .data(yScale.ticks(yTicks).slice(1))
                 .enter()
-                .append('line')
-                .attr('class', 'horizontal-grid-line')
-                .attr('x1', (xAxisPadding.left))
-                .attr('x2', chartWidth)
-                .attr('y1', (d) => yScale(d))
-                .attr('y2', (d) => yScale(d))
+                  .append('line')
+                    .attr('class', 'horizontal-grid-line')
+                    .attr('x1', (xAxisPadding.left))
+                    .attr('x2', chartWidth)
+                    .attr('y1', (d) => yScale(d))
+                    .attr('y2', (d) => yScale(d))
 
             drawHorizontalExtendedLine();
         }
@@ -740,12 +769,12 @@ define(function(require) {
                 .selectAll('line.extended-x-line')
                 .data([0])
                 .enter()
-                .append('line')
-                .attr('class', 'extended-x-line')
-                .attr('x1', (xAxisPadding.left))
-                .attr('x2', chartWidth)
-                .attr('y1', chartHeight)
-                .attr('y2', chartHeight);
+                  .append('line')
+                    .attr('class', 'extended-x-line')
+                    .attr('x1', (xAxisPadding.left))
+                    .attr('x2', chartWidth)
+                    .attr('y1', chartHeight)
+                    .attr('y2', chartHeight);
         }
 
         /**
@@ -954,8 +983,8 @@ define(function(require) {
          * Gets or Sets the isAnimated property of the chart, making it to animate when render.
          * By default this is 'false'
          *
-         * @param  {Boolean} _x Desired animation flag
-         * @return {isAnimated | module} Current isAnimated flag or Chart module
+         * @param  {Boolean} _x             Desired animation flag
+         * @return {isAnimated | module}    Current isAnimated flag or Chart module
          * @public
          */
         exports.isAnimated = function(_x) {
@@ -969,7 +998,7 @@ define(function(require) {
 
         /**
          * Gets or Sets the horizontal direction of the chart
-         * @param  {number} _x Desired horizontal direction for the graph
+         * @param  {number} _x              Desired horizontal direction for the graph
          * @return { isHorizontal | module} If it is horizontal or Chart module to chain calls
          * @public
          */
@@ -984,7 +1013,7 @@ define(function(require) {
 
         /**
          * Offset between end of bar and start of the percentage bars
-         * @param  {number} [_x=7] margin offset from end of bar
+         * @param  {number} [_x=7]      Margin offset from end of bar
          * @return {number | module}    Current offset or Chart module to chain calls
          * @public
          */
@@ -1077,7 +1106,7 @@ define(function(require) {
 
         /**
          * Gets or Sets the number format of the bar chart
-         * @param  {string} _x Desired number format for the bar chart
+         * @param  {string} [_x=',f'] Desired number format for the bar chart
          * @return {numberFormat | module} Current numberFormat or Chart module to chain calls
          * @public
          */
@@ -1285,6 +1314,23 @@ define(function(require) {
                 return yTicks;
             }
             yTicks = _x;
+
+            return this;
+        };
+
+        /**
+         * Gets or Sets the locale which our formatting functions use.
+         * Check [the d3-format docs]{@link https://github.com/d3/d3-format#formatLocale} for the required values.
+         *
+         * @param  {LocaleObject}  [_x=null]  _x    Desired locale object format.
+         * @return {LocaleObject | module}           Current locale object or Chart module to chain calls
+         * @public
+         */
+        exports.locale = function (_x) {
+            if (!arguments.length) {
+                return locale;
+            }
+            locale = _x;
 
             return this;
         };

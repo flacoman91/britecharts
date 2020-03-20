@@ -78,6 +78,8 @@ define(function (require) {
 
             animationDuration = 2000,
 
+            yAxisLabels,
+
             dayLabels,
             daysHuman = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'],
             dayLabelWidth = 30,
@@ -111,6 +113,50 @@ define(function (require) {
                 drawHourLabels();
                 drawBoxes();
             });
+        }
+
+        function drawBoxes() {
+            boxes = svg.select('.chart-group').selectAll('.box').data(data);
+
+            boxes.enter()
+                .append('rect')
+                .classed('box', true)
+                .attr('width', boxSize)
+                .attr('height', boxSize)
+                .attr('x', ({hour}) => hour * boxSize)
+                .attr('y', ({day}) => day * boxSize)
+                .style('opacity', boxInitialOpacity)
+                .style('fill', boxInitialColor)
+                .style('stroke', boxBorderColor)
+                .style('stroke-width', boxBorderSize)
+                .transition()
+                    .duration(animationDuration)
+                    .style('fill', ({value}) => colorScale(value))
+                    .style('opacity', boxFinalOpacity);
+
+            boxes.exit().remove();
+        }
+
+        /**
+         * Draws the day labels
+         */
+        function drawDayLabels() {
+            const dayLabelsGroup = svg.select('.day-labels-group');
+            const arrayForYAxisLabels = yAxisLabels || daysHuman;
+
+            dayLabels = svg.select('.day-labels-group').selectAll('.day-label')
+                .data(arrayForYAxisLabels);
+
+            dayLabels.enter()
+                .append('text')
+                .text((label) => label)
+                .attr('x', 0)
+                .attr('y', (d, i) => i * boxSize)
+                .style('text-anchor', 'start')
+                .style('dominant-baseline', 'central')
+                .attr('class', 'day-label y-axis-label');
+
+            dayLabelsGroup.attr('transform', `translate(-${dayLabelWidth}, ${boxSize / 2})`);
         }
 
         /**
@@ -293,6 +339,21 @@ define(function (require) {
          */
         exports.exportChart = function (filename, title) {
             exportChart.call(exports, svg, filename, title);
+        };
+
+        /**
+         * Gets or Sets the y-axis labels of the chart
+         * @param  {String[]} _x            An array of string labels across the y-axis
+         * @return {yAxisLabels | module}   Current yAxisLabels array or Chart module to chain calls
+         * @public
+         */
+        exports.yAxisLabels = function (_x) {
+            if (!arguments.length) {
+                return yAxisLabels;
+            }
+            yAxisLabels = _x;
+
+            return this;
         };
 
         /**
