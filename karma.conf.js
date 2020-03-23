@@ -79,17 +79,17 @@ module.exports = function(config) {
                 emitWarning: true, // set to `true` to not fail the test command when thresholds are not met
                 // thresholds for all files
                 global: {
-                    statements: 75,
-                    lines: 75,
-                    branches: 75,
-                    functions: 75
+                    statements: 50,
+                    lines: 50,
+                    branches: 50,
+                    functions: 50
                 },
                 // thresholds per file
                 each: {
-                    statements: 75,
-                    lines: 75,
-                    branches: 75,
-                    functions: 75
+                    statements: 50,
+                    lines: 50,
+                    branches: 50,
+                    functions: 50
                 }
             },
 
