@@ -79,17 +79,37 @@ module.exports = function(config) {
                 emitWarning: true, // set to `true` to not fail the test command when thresholds are not met
                 // thresholds for all files
                 global: {
-                    statements: 75,
-                    lines: 75,
-                    branches: 75,
-                    functions: 75
+                    statements: 50,
+                    lines: 50,
+                    branches: 50,
+                    functions: 50
                 },
                 // thresholds per file
                 each: {
-                    statements: 75,
-                    lines: 75,
-                    branches: 75,
-                    functions: 75
+                    statements: 50,
+                    lines: 50,
+                    branches: 50,
+                    functions: 50,
+                    overrides: {
+                        'src/charts/helpers/date.js': {
+                            statements: 0,
+                            lines: 0,
+                            branches: 0,
+                            functions: 0
+                        },
+                        'src/charts/helpers/export.js': {
+                            statements: 0,
+                            lines: 0,
+                            branches: 0,
+                            functions: 0
+                        },
+                        'src/charts/helpers/filter.js': {
+                            statements: 0,
+                            lines: 0,
+                            branches: 0,
+                            functions: 0
+                        }
+                    }
                 }
             },
 
