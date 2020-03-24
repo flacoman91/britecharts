@@ -37,7 +37,6 @@
     "styles": "grunt lint && grunt sass && grunt cssmin",
     "docs": "webpack --env=demos && yarn run styles && grunt docs",
     "prebuild": "yarn run styles",
-    "prepare": "webpack --env=production",
     "build": "webpack --env=production",
     "lint": "eslint src/charts/ webpack.*.js --cache",
     "lint:fix": "eslint src/charts/ webpack.*.js --cache --fix",
