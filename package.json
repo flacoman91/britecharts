@@ -99,7 +99,7 @@
     "grunt-contrib-watch": "1.1.0",
     "grunt-jsdoc": "2.4.0",
     "grunt-karma": "2.0.0",
-    "grunt-release": "git://github.com/beevelop/grunt-release",
+    "grunt-release": "https://github.com/beevelop/grunt-release.git",
     "grunt-reload": "^0.2.0",
     "grunt-sass": "3.0.2",
     "grunt-sass-lint": "0.2.4",
