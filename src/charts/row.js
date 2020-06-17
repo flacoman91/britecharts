@@ -93,6 +93,7 @@ define(function(require) {
             parentFocusColor = '#e7e8e9',
             pctChangeLabelSize = 10,
             padding = 0.1,
+            paddingBetweenGroups = 10,
             outerPadding = .3,
             xAxis, yAxis,
             yAxisPaddingBetweenChart = 20,
@@ -137,7 +138,14 @@ define(function(require) {
 
             _labelsFormatValue = ( d, bgWidth ) => {
 
-                const { isNotFilter, pctOfSet, parent, value, isParent } = d;
+                const { isNotFilter, pctOfSet, parent, value, isParent,
+                    splitterText } = d;
+
+                // early exit if its intended to be a splitter
+                if (splitterText) {
+                    return;
+                }
+
                 let pctLabel = '';
 
                 // exclude this on NOT filters
@@ -170,7 +178,10 @@ define(function(require) {
 
             },
 
-            _labelsFormatPct = ({pctChange}) => {
+            _labelsFormatPct = ({pctChange, splitterText}) => {
+                if (splitterText) {
+                    return;
+                }
                 if (isNaN(pctChange))
                     return '----';
 
@@ -308,11 +319,11 @@ define(function(require) {
                 groupIndices.forEach(g=>{
                     // space above group
                     if ( g[ 0 ] > 1 &&i >= g[ 0 ] ) {
-                        retVal += isPrintMode ? 20 : 10;
+                        retVal += isPrintMode ? 20 : paddingBetweenGroups;
                     }
                     //space below group
                     if ( i > g[ g.length - 1 ] ) {
-                        retVal += isPrintMode ? 20 : 10;
+                        retVal += isPrintMode ? 20 : paddingBetweenGroups;
                     }
                 });
 
@@ -475,7 +486,9 @@ define(function(require) {
                 let textHgt = elem.node().getBBox().height/2;
                 let group = elem.append('svg')
                     .attr('class', (d) => {
-                        return 'visibility visibility-' + getIndex(d);
+                    const item = getItem(d)
+                    return item.splitterText ? 'hidden' :
+                            'visibility visibility-' + getIndex(d);
                     })
                     .attr('x', -(margin.left) + 30)
                     .attr('y', -textHgt)
@@ -580,6 +593,16 @@ define(function(require) {
                 .selectAll('tspan')
                 .attr('font-size', getFontSize);
 
+            // hide the splitter text with a class
+            svg.selectAll('.y-axis-group.axis .tick text')
+            .classed('hidden', function(d) {
+                // lets us know it's a child element
+                return data.find((o) => {
+                    return o.name === d;
+                }).splitterText;
+            })
+
+
             // adding the down arrow for parent elements
             if(!isPrintMode) {
                 svg.selectAll( '.y-axis-group.axis .tick' )
@@ -620,7 +643,12 @@ define(function(require) {
                     return a * d.width;	//`a` already accounts for both types of padding
                 } )
                 .attr( 'width', chartWidth )
-                .attr( 'fill', backgroundColor);
+                // .attr( 'fill-opacity', d =>{
+                //     return d.splitterText ? 0 : 1
+                // })
+                .attr( 'fill', function(d) {
+                    return d.splitterText ? '#fff' : backgroundColor
+                })
 
             bargroups.append( 'rect' )
                 .attr( 'class', 'bg-hover' )
@@ -637,8 +665,10 @@ define(function(require) {
                 .on( 'mouseover', rowHoverOver )
                 .on( 'mouseout', rowHoverOut )
                 .attr( 'width', width )
-                .attr( 'fill', backgroundHoverColor )
-                .attr( 'fill-opacity', 0);
+                .attr( 'fill-opacity', 0)
+                .attr( 'fill', function(d) {
+                    return d.splitterText ? '#fff' : backgroundHoverColor
+                })
 
             // now add the actual bars to what we got
             bargroups
@@ -735,6 +765,15 @@ define(function(require) {
                     } )
                     .on( 'mouseover', rowHoverOver )
                     .on('mouseout', rowHoverOut );
+
+                bargroups.append( 'text' )
+                .attr( 'class', 'view-more-label' )
+                .attr( 'x', _labelsHorizontalX )
+                .attr( 'y', _labelsHorizontalY )
+                .text( (d)=>{
+                    return d.splitterText
+                } )
+                .attr( 'font-size', getFontSize );
             }
 
             if(enableYAxisRight && enableLabels && width > 600) {
@@ -964,6 +1003,9 @@ define(function(require) {
          * @private
          */
         function handleMouseOver(e, d, rowList, chartWidth, chartHeight) {
+            if(d.splitterText)
+                return;
+
             dispatcher.call('customMouseOver', e, d, d3Selection.mouse(e), [chartWidth, chartHeight]);
 
             // eyeball fill-opacity
@@ -973,6 +1015,9 @@ define(function(require) {
         }
 
         function rowHoverOver(d, i) {
+            // early exit if it's a separator row
+            if(d.splitterText)
+                return;
             // eyeball fill-opacity 1
             // we should find the index of the currently hovered over row
             let ind = i;
@@ -985,6 +1030,9 @@ define(function(require) {
         }
 
         function rowHoverOut(d, i) {
+            // early exit if it's a separator row
+            if(d.splitterText)
+                return;
             // eyeball fill-opacity 0
             // we should find the index of the currently hovered over row
             let ind = i;
@@ -1001,12 +1049,21 @@ define(function(require) {
                 return o.name === name;
             });
         }
+
+        function getItem(name){
+            return data.find((o)=>{
+                return o.name === name;
+            });
+        }
         /**
          * Custom OnMouseMove event handler
          * @return {void}
          * @private
          */
         function handleMouseMove(e, d, chartWidth, chartHeight) {
+            // early exit if it's a separator row
+            if(d.splitterText)
+                return;
             dispatcher.call('customMouseMove', e, d, d3Selection.mouse(e), [chartWidth, chartHeight]);
         }
 
@@ -1016,6 +1073,9 @@ define(function(require) {
          * @private
          */
         function handleMouseOut(e, d, rowList, chartWidth, chartHeight) {
+            // early exit if it's a separator row
+            if(d.splitterText)
+                return;
             dispatcher.call('customMouseOut', e, d, d3Selection.mouse(e), [chartWidth, chartHeight]);
 
             // eyeball fill-opacity 0
@@ -1402,6 +1462,21 @@ define(function(require) {
                 return padding;
             }
             padding = _x;
+
+            return this;
+        };
+
+        /**
+         * Gets or Sets the paddingBetweenGroups of the chart to give it a bigger or smaller gap
+         * @param  {Number} _x Desired pctChangeLabel for the graph
+         * @return { valueLabel | module} Current pctChangeLabel or Chart module to chain calls
+         * @public
+         */
+        exports.paddingBetweenGroups = function(_x) {
+            if (!arguments.length) {
+                return paddingBetweenGroups;
+            }
+            paddingBetweenGroups = _x;
 
             return this;
         };

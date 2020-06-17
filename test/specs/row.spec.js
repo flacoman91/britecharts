@@ -373,6 +373,18 @@ define(['d3', 'row', 'rowChartDataBuilder'], function(d3, chart, dataBuilder) {
                 expect(actual).toBe(expected);
             });
 
+            it('should provide paddingBetweenGroups getter and setter', () => {
+                let previous = rowChart.paddingBetweenGroups(),
+                    expected = 10,
+                    actual;
+
+                rowChart.paddingBetweenGroups(expected);
+                actual = rowChart.paddingBetweenGroups();
+
+                expect(previous).not.toBe(actual);
+                expect(actual).toBe(expected);
+            });
+
             it('should provide outerPadding getter and setter', () => {
                 let previous = rowChart.outerPadding(),
                     expected = 0.5,
