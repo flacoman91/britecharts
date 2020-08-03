@@ -22,3 +22,6 @@
 
 .row-chart .percentage-label {
   fill: #666A73; }
+
+.row-chart .view-more-label {
+  text-anchor: end; }
