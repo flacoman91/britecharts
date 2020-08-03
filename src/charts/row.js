@@ -627,6 +627,8 @@ define(function(require) {
                     return `row_${i} row-wrapper`;
                 } );
 
+            const splitterRows = bargroups.filter(o=> { return o.splitterText })
+
             bargroups.append( 'rect' )
                 .attr( 'class', 'bg')
                 .attr( 'y', chartHeight )
@@ -643,9 +645,6 @@ define(function(require) {
                     return a * d.width;	//`a` already accounts for both types of padding
                 } )
                 .attr( 'width', chartWidth )
-                // .attr( 'fill-opacity', d =>{
-                //     return d.splitterText ? 0 : 1
-                // })
                 .attr( 'fill', function(d) {
                     return d.splitterText ? '#fff' : backgroundColor
                 })
@@ -766,14 +765,14 @@ define(function(require) {
                     .on( 'mouseover', rowHoverOver )
                     .on('mouseout', rowHoverOut );
 
-                bargroups.append( 'text' )
-                .attr( 'class', 'view-more-label' )
-                .attr( 'x', _labelsHorizontalX )
-                .attr( 'y', _labelsHorizontalY )
-                .text( (d)=>{
-                    return d.splitterText
-                } )
-                .attr( 'font-size', getFontSize );
+                splitterRows.append('text')
+                    .attr('class', 'view-more-label')
+                    .attr('x', chartWidth - 10 )
+                    .attr('y', _labelsHorizontalY)
+                    .text((d) => {
+                        return d.splitterText;
+                    })
+                    .attr('font-size', getFontSize);
             }
 
             if(enableYAxisRight && enableLabels && width > 600) {

@@ -41,8 +41,10 @@ $row-stroke-width: 0;
     .adjust-upwards {
         transform: translate(0, -10px);
     }
-
     .percentage-label {
         fill: $grey-600;
+    }
+    .view-more-label {
+        text-anchor: end;
     }
 }
