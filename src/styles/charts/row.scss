@@ -44,7 +44,13 @@ $row-stroke-width: 0;
     .percentage-label {
         fill: $grey-600;
     }
-    .view-more-label {
-        text-anchor: end;
+    .view-more-group {
+        .view-more-background {
+            fill: aqua;
+        }
+        .view-more-label {
+            font-weight: bold;
+            text-anchor: end;
+        }
     }
 }

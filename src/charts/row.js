@@ -765,14 +765,43 @@ define(function(require) {
                     .on( 'mouseover', rowHoverOver )
                     .on('mouseout', rowHoverOut );
 
-                splitterRows.append('text')
+                // append group so we can manipulate the size
+                const splitterRowGroup = splitterRows
+                    .append('g')
+                    .attr('class', 'view-more-group')
+
+                // view more row group here
+                splitterRowGroup.append( 'rect' )
+                    .attr( 'class', 'view-more-background' )
+                    .attr( 'x', 0 )
+                    .merge( rows )
+                    .attr( 'x',  -margin.left)
+                    .attr( 'y',  function (d) {
+                        // center bar on tick
+                        return yScale(d.name) - a * d.width/2
+                    } )
+                    .attr( 'height', function (d) {
+                        return a * d.width;	//`a` already accounts for both types of padding
+                    } )
+                    .on( 'mouseover', rowHoverOver )
+                    .on( 'mouseout', rowHoverOut )
+                    .attr( 'width', width )
+                    .attr( 'fill', 'none' )
+
+                splitterRowGroup.append('text')
                     .attr('class', 'view-more-label')
                     .attr('x', chartWidth - 10 )
-                    .attr('y', _labelsHorizontalY)
+                    .attr( 'y', _labelsHorizontalY )
                     .text((d) => {
-                        return d.splitterText;
+                        return d.splitterText
                     })
-                    .attr('font-size', getFontSize);
+                    .attr('font-size', getFontSize)
+
+                // this is much more complicated than just a greater than sign in text
+                // splitterRowGroup.append('path')
+                //     .attr('class', 'view-more-icon')
+                //     .attr('transform', `translate(${chartWidth - 10}, -10) scale(.01)`)
+                //     .attr('d', 'M65.1 1090.2c-35.9 0-65-29-65.1-64.9 0-17.3 6.8-33.9 19.1-46.1l383.6-383.5L19.1 212.2c-25.1-25.6-24.8-66.8.9-92 25.3-24.8 65.8-24.8 91.1 0l429.5 429.5c25.4 25.4 25.4 66.5 0 91.9L111 1071.2c-12.1 12.2-28.7 19.1-45.9 19z')
             }
 
             if(enableYAxisRight && enableLabels && width > 600) {

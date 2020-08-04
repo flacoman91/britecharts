@@ -419,6 +419,77 @@ function createHorizontalRowChartWithSeparators(containerId, width) {
     }
 }
 
+function createHorizontalRowChartWithSeparatorsNoDelta(containerId, width) {
+    let rowChart = row(),
+        rowContainer = d3Selection.select(containerId),
+        containerWidth = width ? width : rowContainer.node().getBoundingClientRect().width,
+        containerHeight = rowContainer.node() ? rowContainer.node().getBoundingClientRect().height : false,
+        dataset;
+
+    if (containerWidth) {
+        d3Selection.select('.js-download-button-123').on('click', function() {
+            const scope = {
+                chartName: 'deez',
+                chartWidth: containerWidth - 50,
+                dateRange: { to: '9/23/1980', from: '9/23/2012' },
+                filters: [
+                    'EQUIFAX, INC.',
+                    'Experian Information Solutions',
+                    'CAPITAL ONE FINANCIAL CORPORATION',
+                    'Incorrect information on your report',
+                    'Problem with a credit reporting company\'s investigation' +
+                    ' into an existing problem',
+                    'not CAPITAL ONE FINANCIAL CORPORATION'
+                ]
+            };
+            appendExportDetails(rowChart, rowContainer, scope);
+        });
+
+        dataset = aRowDataSet().withSeparatorsNoDelta().build();
+
+        const colorScheme = dataset.map((o)=>{ return '#20aa3f'; });
+        const isDesktop = containerWidth > 600;
+        let height = calculateHeight(dataset);
+        let axisWrapLimit = 1;
+        if(!isDesktop) {
+            height = height * 1.5;
+            axisWrapLimit = 2;
+        }
+        const margin = {
+            left: isDesktop ? 200 : containerWidth / 2.5,
+            right: -65,
+            top: 14,
+            bottom: 5
+        };
+
+        rowChart
+        .isAnimated(true)
+        .margin(margin)
+        .backgroundColor('#f7f8f9')
+        .enableYAxisRight(false)
+        .enableLabels(true)
+        .labelsNumberFormat(',d')
+        .labelsSize(16)
+        .labelsSizeChild(12)
+        .downArrowColor( '#257675' )
+            //.labelsSuffix('complaints')
+            .labelsTotalCount(7000)
+            .paddingBetweenGroups(20)
+        .colorSchema(colorScheme)
+        .outerPadding(.1)
+        .width(containerWidth)
+        .height(height)
+        .xTicks( 0 )
+        .yTicks( 0 )
+        .yAxisLineWrapLimit(axisWrapLimit)
+        .percentageAxisToMaxRatio(1);
+
+        rowContainer.datum(dataset).call(rowChart);
+
+    }
+}
+
+
 function createSimpleRowChart() {
     let rowChart = row(),
         tooltip = miniTooltip(),
@@ -989,6 +1060,7 @@ if (d3Selection.select('.js-row-chart-tooltip-container').node()){
 
     createHorizontalRowChart('.js-horizontal-row-chart-container');
     createHorizontalRowChartWithSeparators('.js-horizontal-row-separator-chart-container');
+    createHorizontalRowChartWithSeparatorsNoDelta('.js-horizontal-row-separator-no-delta-chart-container');
     createHorizontalRowChart('.js-mobile-lg-row-chart-container', 600);
     createHorizontalRowChart('.js-mobile-sm-row-chart-container', 320);
     createSimpleRowChart();
@@ -1009,6 +1081,7 @@ if (d3Selection.select('.js-row-chart-tooltip-container').node()){
 
         createHorizontalRowChart('.js-horizontal-row-chart-container');
         createHorizontalRowChartWithSeparators('.js-horizontal-row-separator-chart-container');
+        createHorizontalRowChartWithSeparatorsNoDelta('.js-horizontal-row-separator-no-delta-chart-container');
         createHorizontalRowChart('.js-mobile-lg-row-chart-container', 600);
         createHorizontalRowChart('.js-mobile-sm-row-chart-container', 320);
 
