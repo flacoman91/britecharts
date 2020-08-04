@@ -631,12 +631,9 @@ define(function(require) {
 
             bargroups.append( 'rect' )
                 .attr( 'class', 'bg')
-                .attr( 'y', chartHeight )
-                .attr( 'x', 0 )
                 .on( 'click', function( d ) {
                     handleClick( this, d, chartWidth, chartHeight );
                 } )
-                .merge( rows )
                 .attr( 'x', 0 )
                 .attr( 'y', function (d, i) {
                     return yScale(d.name) - a * d.width/2;	//center the bar on the tick
@@ -651,19 +648,16 @@ define(function(require) {
 
             bargroups.append( 'rect' )
                 .attr( 'class', 'bg-hover' )
-                .attr( 'y', chartHeight )
-                .attr( 'x', 0 )
-                .merge( rows )
                 .attr( 'x',  -margin.left)
                 .attr( 'y', function (d, i) {
                     return yScale(d.name) - a * d.width/2;	//center the bar on the tick
                 })
+                .attr( 'width', width )
                 .attr( 'height', function (d) {
                     return a * d.width;	//`a` already accounts for both types of padding
                 } )
                 .on( 'mouseover', rowHoverOver )
                 .on( 'mouseout', rowHoverOut )
-                .attr( 'width', width )
                 .attr( 'fill-opacity', 0)
                 .attr( 'fill', function(d) {
                     return d.splitterText ? '#fff' : backgroundHoverColor
@@ -673,13 +667,6 @@ define(function(require) {
             bargroups
                 .append( 'rect' )
                 .attr( 'class', 'focus-bar' )
-                .attr( 'y', chartHeight )
-                .attr( 'x', 0 )
-                .attr( 'height', function( d ) {
-                    return a * d.width;	//`a` already accounts for both types of padding
-                } )
-                .attr( 'width', ( { value } ) => xScale( value ) )
-                .merge( rows )
                 .attr( 'x', 0 )
                 .attr( 'y', function( d, i ) {
                     return yScale( d.name ) - a * d.width / 2;
@@ -700,12 +687,6 @@ define(function(require) {
             bargroups
                 .append( 'rect' )
                 .attr( 'class', 'pct' )
-                .attr( 'y', chartHeight )
-                .attr( 'x', 0 )
-                .attr( 'height', function (d) {
-                    return a * d.width;	//`a` already accounts for both types of padding
-                } )
-                .attr( 'width', ( { value } ) => xScale( value ) )
                 .on( 'mouseover', function( d, index, rowList ) {
                     handleMouseOver( this, d, rowList, chartWidth, chartHeight );
                 } )
@@ -718,7 +699,6 @@ define(function(require) {
                 .on( 'click', function( d ) {
                     handleClick( this, d, chartWidth, chartHeight );
                 } )
-                .merge( rows )
                 .attr( 'x', 0 )
                 .attr( 'y', function (d, i) {
                     return yScale(d.name) - a * d.width/2;
@@ -731,9 +711,9 @@ define(function(require) {
                 .attr( 'fill', ( d ) => {
                     return colorMap( d.name );
                 } )
-                .attr('fill-opacity', (d)=>{
+                .attr( 'fill-opacity', (d)=>{
                     return d.parent ? 0.5 : 1;
-                });
+                } );
 
             const backgroundRows = d3Selection.select( '.chart-group .bg' );
             if(enableLabels && backgroundRows.node()) {
@@ -773,8 +753,6 @@ define(function(require) {
                 // view more row group here
                 splitterRowGroup.append( 'rect' )
                     .attr( 'class', 'view-more-background' )
-                    .attr( 'x', 0 )
-                    .merge( rows )
                     .attr( 'x',  -margin.left)
                     .attr( 'y',  function (d) {
                         // center bar on tick
@@ -785,7 +763,7 @@ define(function(require) {
                     } )
                     .on( 'mouseover', rowHoverOver )
                     .on( 'mouseout', rowHoverOut )
-                    .attr( 'width', width )
+                    .attr( 'width', chartWidth + margin.left )
                     .attr( 'fill', 'none' )
 
                 splitterRowGroup.append('text')
