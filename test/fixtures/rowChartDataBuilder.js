@@ -7,6 +7,7 @@ define(function(require) {
         json5CollapsedBars = require('../json/row5CollapsedBars.json'),
         jsonColors = require('../json/rowColors.json'),
         jsonColorsSeparators = require('../json/rowColorsSeparators.json'),
+        jsonColorsSeparatorsNoDelta = require('../json/rowColorsSeparatorsNoDelta.json'),
         jsonDataLens = require('../json/rowFocusLens.json'),
         jsonFocusLens = require('../json/rowFocusPrintLens.json'),
         jsonLetters = require('../json/rowDataLetters.json'),
@@ -56,6 +57,12 @@ define(function(require) {
         };
         this.withSeparators = function(){
             var attributes = _.extend({}, this.config, jsonColorsSeparators);
+
+            return new this.Klass(attributes);
+        };
+
+        this.withSeparatorsNoDelta = function(){
+            var attributes = _.extend({}, this.config, jsonColorsSeparatorsNoDelta);
 
             return new this.Klass(attributes);
         };

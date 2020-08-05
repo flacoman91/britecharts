@@ -375,7 +375,7 @@ define(['d3', 'row', 'rowChartDataBuilder'], function(d3, chart, dataBuilder) {
 
             it('should provide paddingBetweenGroups getter and setter', () => {
                 let previous = rowChart.paddingBetweenGroups(),
-                    expected = 10,
+                    expected = 100,
                     actual;
 
                 rowChart.paddingBetweenGroups(expected);
@@ -394,21 +394,6 @@ define(['d3', 'row', 'rowChartDataBuilder'], function(d3, chart, dataBuilder) {
                 actual = rowChart.outerPadding();
 
                 expect(previous).not.toBe(actual);
-                expect(actual).toBe(expected);
-            });
-
-            it('should update color', () => {
-                let previous = rowChart.colorSchema(),
-                    expected = '#FFFFFF',
-                    actual;
-
-                rowChart.colorSchema([expected]);
-
-                const rowColor = containerFixture.select('rect.pct');
-
-                containerFixture.call(rowChart);
-                actual = rowColor.attr('fill');
-
                 expect(actual).toBe(expected);
             });
 
@@ -697,6 +682,46 @@ define(['d3', 'row', 'rowChartDataBuilder'], function(d3, chart, dataBuilder) {
             });
         });
     });
+
+    describe('Row Chart', () => {
+        let rowChart, dataset, containerFixture, f;
+
+        beforeEach(() => {
+            dataset = buildDataSet('withSeparatorsNoDelta');
+            rowChart = chart().enableLabels(true);
+
+            // DOM Fixture Setup
+            f = jasmine.getFixtures();
+            f.fixturesPath = 'base/test/fixtures/';
+            f.load('testContainer.html');
+
+            containerFixture = d3.select('.test-container');
+            containerFixture.datum(dataset).call(rowChart);
+        });
+
+        afterEach(() => {
+            containerFixture.remove();
+            f = jasmine.getFixtures();
+            f.cleanUp();
+            f.clearCache();
+        });
+
+        describe('Render', () => {
+            it('should show a chart with minimal requirements', () => {
+                const expected = 1;
+                const actual = containerFixture.select('.row-chart').size();
+
+                expect(actual).toEqual(expected);
+            });
+
+            it('should draw a focus links when splittertext', () => {
+                const expected = dataset.filter(o=>{return o.splitterText;}).length;
+                const actual = containerFixture.selectAll('.view-more-label').size();
+
+                expect(actual).toEqual(expected);
+            });
+        })
+    })
 
     describe('Print Mode Row Chart', () => {
         let rowChart, dataset, containerFixture, f;

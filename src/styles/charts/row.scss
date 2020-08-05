@@ -41,8 +41,16 @@ $row-stroke-width: 0;
     .adjust-upwards {
         transform: translate(0, -10px);
     }
-
     .percentage-label {
         fill: $grey-600;
+    }
+    .view-more-group {
+        .view-more-background {
+            fill: aqua;
+        }
+        .view-more-label {
+            font-weight: bold;
+            text-anchor: end;
+        }
     }
 }

@@ -165,6 +165,13 @@
 .row-chart .percentage-label {
   fill: #666A73; }
 
+.row-chart .view-more-group .view-more-background {
+  fill: aqua; }
+
+.row-chart .view-more-group .view-more-label {
+  font-weight: bold;
+  text-anchor: end; }
+
 .scatter-plot .y-axis-group .tick line {
   display: none; }
 
