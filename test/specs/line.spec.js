@@ -418,34 +418,6 @@ define([
                         });
                     });
 
-                    describe('when using flat data', () => {
-                        beforeEach(() => {
-                            dataset = buildDataSet('withTwoFlatTopics');
-                            lineChart = chart();
-
-                            // DOM Fixture Setup
-                            f = jasmine.getFixtures();
-                            f.fixturesPath = 'base/test/fixtures/';
-                            f.load('testContainer.html');
-
-                            containerFixture = d3.select('.test-container');
-                            containerFixture.datum(dataset).call(lineChart);
-                        });
-
-                        afterEach(() => {
-                            containerFixture.remove();
-                            f = jasmine.getFixtures();
-                            f.cleanUp();
-                            f.clearCache();
-                        });
-
-                        it('should render a chart with two lines', () => {
-                            const expected = 2;
-                            const actual = containerFixture.select('.chart-group').selectAll('path').size();
-
-                            expect(actual).toEqual(expected);
-                        });
-                    });
                 });
 
                 describe('data points', () => {
@@ -466,47 +438,6 @@ define([
                         f.clearCache();
                     });
 
-                    describe('when shouldShowAllDataPoints is true', () => {
-
-                        beforeEach(() => {
-                            lineChart = chart().shouldShowAllDataPoints(true);
-
-                            containerFixture = d3.select('.test-container').append('svg');
-                            containerFixture.datum(dataset).call(lineChart);
-                        });
-
-                        it('chart should render data points container', () => {
-                            const expected = 1;
-                            const actual = containerFixture.select('.data-points-container').size();
-
-                            expect(actual).toEqual(expected);
-                        });
-
-                        it('data points container renders a circle for each data point', () => {
-                            const expected = dataset.dataByDate.reduce((accum, dataPoint) => (
-                                accum + dataPoint.topics.length
-                            ), 0);
-                            const actual = containerFixture.select('.data-points-container')
-                                .selectAll('circle')
-                                .size();
-
-                            expect(actual).toEqual(expected);
-                        });
-
-                        it('each data circle has proper attributes', () => {
-                            const circles = containerFixture.select('.data-points-container')
-                                .selectAll('circle')
-                                .nodes();
-
-                            circles.forEach((circle) => {
-                                expect(circle).toHaveAttr('class', 'data-point-mark');
-                                expect(circle).toHaveAttr('r', '5');
-                                expect(circle).toHaveAttr('cx');
-                                expect(circle).toHaveAttr('cy');
-                                expect(circle).toHaveAttr('style');
-                            });
-                        });
-                    });
                 });
 
                 describe('when has negative values', () => {
@@ -540,15 +471,6 @@ define([
                         expect(text.text()).toEqual(minValueText);
                     })
 
-                    it('0-axis is highlited with an additional class', () => {
-                        let values = dataset.dataByTopic[0].dates.map(it => it.value);
-                        let minValue = Math.min(...values);
-                        let indexOf0 = -minValue;
-
-                        let horizontalGridLines = d3.selectAll('.horizontal-grid-line').filter((_, i) => i === indexOf0);
-                        let classes = horizontalGridLines.attr('class').split(' ');
-                        expect(classes.includes('horizontal-grid-line--highlighted')).toEqual(true);
-                    });
                 });
             });
 
@@ -934,17 +856,6 @@ define([
                     });
                 });
 
-                it('should have shouldShowAllDataPoints getter and setter', () => {
-                    let previous = lineChart.shouldShowAllDataPoints(),
-                        expected = true,
-                        actual;
-
-                    lineChart.shouldShowAllDataPoints(expected);
-                    actual = lineChart.shouldShowAllDataPoints();
-
-                    expect(previous).not.toBe(expected);
-                    expect(actual).toBe(expected);
-                });
 
                 it('should provide a tooltip threshold getter and setter', () => {
                     let previous = lineChart.tooltipThreshold(),
