@@ -336,25 +336,25 @@ function createLoadingState() {
 
 if (d3Selection.select('.js-stacked-area-chart-tooltip-container').node()){
     // Chart creation
-    // createStackedAreaChartExport();
+    createStackedAreaChartExport();
     createStackedAreaChartHidden();
-    // createStackedAreaChartWithTooltip();
-    // createStackedAreaJumping();
-    // createStackedAreaChartWithFixedAspectRatio();
-    // createStackedAreaChartWithSyncedTooltip();
-    // createLoadingState();
+    createStackedAreaChartWithTooltip();
+    createStackedAreaJumping();
+    createStackedAreaChartWithFixedAspectRatio();
+    createStackedAreaChartWithSyncedTooltip();
+    createLoadingState();
 
     // For getting a responsive behavior on our chart,
     // we'll need to listen to the window resize event
     redrawCharts = function(){
         d3Selection.selectAll('.stacked-area').remove();
-        // createStackedAreaChartExport();
+        createStackedAreaChartExport();
         createStackedAreaChartHidden();
-        // createStackedAreaChartWithTooltip();
-        // createStackedAreaJumping();
-        // createStackedAreaChartWithFixedAspectRatio();
-        // createStackedAreaChartWithSyncedTooltip();
-        // createLoadingState();
+        createStackedAreaChartWithTooltip();
+        createStackedAreaJumping();
+        createStackedAreaChartWithFixedAspectRatio();
+        createStackedAreaChartWithSyncedTooltip();
+        createLoadingState();
     };
 
     // Redraw charts on window resize
