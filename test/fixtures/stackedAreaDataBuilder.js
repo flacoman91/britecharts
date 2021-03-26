@@ -2,7 +2,7 @@ define(function(require) {
     'use strict';
 
     var _ = require('underscore'),
-
+        jsonHiddenSource = require('../json/areaDataHiddenArea.json'),
         jsonThreeSources = require('../json/areaDataThreeSources.json'),
         jsonSixSources = require('../json/areaDataSixSources.json'),
         jsonSalesChannel = require('../json/areaDataSalesChannel.json'),
@@ -17,6 +17,12 @@ define(function(require) {
 
         this.with3Sources = function(){
             var attributes = _.extend({}, this.config, jsonThreeSources);
+
+            return new this.Klass(attributes);
+        };
+
+        this.withHiddenSources = function(){
+            var attributes = _.extend({}, this.config, jsonHiddenSource);
 
             return new this.Klass(attributes);
         };
