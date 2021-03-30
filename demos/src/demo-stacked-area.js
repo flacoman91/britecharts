@@ -113,6 +113,43 @@ function createStackedAreaChartExport(optionalColorSchema) {
     }
 }
 
+
+function createStackedAreaChartHidden(optionalColorSchema) {
+    let stackedArea = stackedAreaChart(),
+        container = d3Selection.select('.js-stacked-area-chart-hidden-val-container'),
+        containerWidth = container.node() ? container.node().getBoundingClientRect().width : false,
+        dataset;
+
+    if (containerWidth) {
+        dataset = aTestDataSet().withHiddenSources().build();
+        // StackedAreChart Setup and start
+        stackedArea
+        .isAnimated(true)
+        .isPrintMode(false)
+        .margin( {
+            top: 60,
+            bottom: 50,
+            left: 50,
+            right: 60
+        } )
+        .areaOpacity(.5)
+        .tooltipThreshold(600)
+        .height(564)
+        .width(1175)
+        .dateLabel('dateUTC')
+        .valueLabel('views')
+        .grid('horizontal');
+
+        stackedArea.colorSchema(['red', 'blue', 'green', 'yellow', 'purple', 'pink', 'black', 'grey', 'orange']);
+
+        // if (optionalColorSchema) {
+        //     stackedArea.colorSchema(optionalColorSchema);
+        // }
+
+        container.datum(dataset.data).call(stackedArea);
+    }
+}
+
 function createStackedAreaJumping() {
     let stackedArea = stackedAreaChart(),
         chartTooltip = tooltip(),
@@ -300,6 +337,7 @@ function createLoadingState() {
 if (d3Selection.select('.js-stacked-area-chart-tooltip-container').node()){
     // Chart creation
     createStackedAreaChartExport();
+    createStackedAreaChartHidden();
     createStackedAreaChartWithTooltip();
     createStackedAreaJumping();
     createStackedAreaChartWithFixedAspectRatio();
@@ -311,6 +349,7 @@ if (d3Selection.select('.js-stacked-area-chart-tooltip-container').node()){
     redrawCharts = function(){
         d3Selection.selectAll('.stacked-area').remove();
         createStackedAreaChartExport();
+        createStackedAreaChartHidden();
         createStackedAreaChartWithTooltip();
         createStackedAreaJumping();
         createStackedAreaChartWithFixedAspectRatio();

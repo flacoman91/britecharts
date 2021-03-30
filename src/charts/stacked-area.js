@@ -117,6 +117,7 @@ define(function(require){
             highlightCircleActiveStrokeOpacity = 0.6,
             areaOpacity = 0.24,
             categoryColorMap,
+            hiddenAreaMap,
             order,
             topicsOrder,
 
@@ -514,6 +515,8 @@ define(function(require){
             categoryColorMap =  order.reduce((memo, topic, index) => (
                 assign({}, memo, {[topic]: colorSchema[index]})
             ), {});
+
+            hiddenAreaMap = getAreaVisibility();
         }
 
         /**
@@ -1015,14 +1018,19 @@ define(function(require){
                   .append('path')
                     .attr('class', 'layer')
                     .attr('d', area)
-                    .style('opacity', areaOpacity)
+                    .style('opacity', ({key})=>{
+                        return hiddenAreaMap[key] ? areaOpacity : 0;
+                    })
                     .style('fill', ({key}) => categoryColorMap[key]);
 
                 series
                   .append('path')
                     .attr('class', 'area-outline')
                     .attr('d', areaOutline)
-                    .style('stroke', ({key}) => categoryColorMap[key]);
+                    .style('stroke', ({key}) => categoryColorMap[key])
+                    .style('opacity', ({key})=>{
+                        return hiddenAreaMap[key] ? areaOpacity : 0;
+                    });
 
                 // Update
                 svg.select('.chart-group').selectAll('.layer')
@@ -1032,7 +1040,9 @@ define(function(require){
                     .duration(areaAnimationDuration)
                     .ease(ease)
                     .attr('d', area)
-                    .style('opacity', areaOpacity)
+                    .style('opacity', ({key})=>{
+                        return hiddenAreaMap[key] ? areaOpacity : 0;
+                    })
                     .style('fill', ({key}) => categoryColorMap[key]);
 
                 svg.select('.chart-group').selectAll('.area-outline')
@@ -1041,7 +1051,10 @@ define(function(require){
                     .delay( (_, i) => areaAnimationDelays[i])
                     .duration(areaAnimationDuration)
                     .ease(ease)
-                    .attr('d', areaOutline);
+                    .attr('d', areaOutline)
+                    .style('opacity', ({key})=>{
+                        return hiddenAreaMap[key] ? areaOpacity : 0;
+                    });
 
             } else {
                 series = svg.select('.chart-group').selectAll('.layer')
@@ -1054,26 +1067,36 @@ define(function(require){
                   .append('path')
                     .attr('class', 'layer')
                     .attr('d', area)
-                    .style('opacity', areaOpacity)
+                    .style('opacity', ({key})=>{
+                        return hiddenAreaMap[key] ? areaOpacity : 0;
+                    })
                     .style('fill', ({key}) => categoryColorMap[key]);
 
                 series
                   .append('path')
                     .attr('class', 'area-outline')
                     .attr('d', areaOutline)
-                    .style('stroke', ({key}) => categoryColorMap[key]);
+                    .style('stroke', ({key}) => categoryColorMap[key])
+                    .style('opacity', ({key})=>{
+                        return hiddenAreaMap[key] ? areaOpacity : 0;
+                    });
 
 
                 // Update
                 svg.select('.chart-group').selectAll('.layer')
                     .attr('d', area)
-                    .style('opacity', areaOpacity)
+                    .style('opacity', ({key})=>{
+                        return hiddenAreaMap[key] ? areaOpacity : 0;
+                    })
                     .style('fill', ({key}) => categoryColorMap[key]);
 
                 svg.select('.chart-group').selectAll('.area-outline')
                     .attr('class', 'area-outline')
                     .attr('d', areaOutline)
-                    .style('stroke', ({key}) => categoryColorMap[key]);
+                    .style('stroke', ({key}) => categoryColorMap[key])
+                    .style('opacity', ({key})=>{
+                        return hiddenAreaMap[key] ? areaOpacity : 0;
+                    });
             }
 
             if (!hasOutline) {
@@ -1127,7 +1150,7 @@ define(function(require){
             const keys = [];
             for(let i=0; i< uniqNames.length; i++){
                 const item = {};
-                const name =uniqNames[i];
+                const name = uniqNames[i];
                 item.name = name;
                 item.sum = data.filter(o=>o.name === uniqNames[i])
                     .reduce((a, b)=>a + b.value, 0);
@@ -1216,6 +1239,21 @@ define(function(require){
             });
 
             return maxValueByDate;
+        }
+
+        function getAreaVisibility() {
+            const names = uniq(data.map(o => o.name));
+            const visibleAreas = {};
+            names.forEach(n=>{
+                const needle = data.find(o=>o.name === n);
+                if(needle.hasOwnProperty('show')){
+                    visibleAreas[n] = needle.show;
+                } else {
+                    // default for old data
+                    visibleAreas[n] = true;
+                }
+            });
+            return visibleAreas;
         }
 
         /**
@@ -1354,6 +1392,9 @@ define(function(require){
                         .attr('r', highlightCircleRadius)
                         .style('stroke-width', highlightCircleStroke)
                         .style('stroke', categoryColorMap[d.name])
+                        .style('opacity', ({key})=>{
+                            return hiddenAreaMap[key] ? areaOpacity : 0;
+                        })
                         .style('cursor', 'pointer')
                         .on('click', function() {
                             addGlowFilter(this);
