@@ -143,6 +143,7 @@ define(function (require) {
             // getters
             getName = ({name}) => name,
             getParentValue = ({parentVal}) => parentVal,
+            getCount = ({count}) => count,
             getValue = ({value}) => value,
             getGroup = ({group}) => group,
             getScaledValue = (d) => getValue( d ),
@@ -515,6 +516,9 @@ define(function (require) {
             ttTextY += textHeight + 7;
         }
 
+        function getCountLabel(count){
+           return count ? count + ' | ' : ''
+        }
         /**
          * Wraps a text given the text, width, x position and textFormatter function
          * @param  {D3Selection} text  Selection with the text to wrap inside
@@ -747,20 +751,19 @@ define(function (require) {
                 .append('text')
                 .classed('percentage-label', true)
                 .attr( 'x', ( d ) => {
-                    let width = 0;
-                    if ( isStacked ) {
-                        width = xScale( getScaledValue( d ) ) + 5;
-                    } else {
-                        width = xScale( getValue( d ) ) + 5;
-                    }
-                    const textWidth = textHelper.getTextWidth(format(getValue(d)) + '%', 16);
+                    let width = isStacked ? xScale( getScaledValue( d ) ) :
+                        xScale( getValue( d ) );
+
+                    width += 5;
+
+                    const textWidth = textHelper.getTextWidth(getCountLabel(getCount(d) ) + format(getValue(d)) + '%', 16);
                     if(width + textWidth > chartWidth){
                         return width - textWidth - 10;
                     }
                     return width;
                 } )
                 .attr('y', (d) => yScale2(getGroup(d)) + 16)
-                .text((d)=> format(getValue(d)) + '%');
+                .text((d)=> getCountLabel( getCount(d) ) + format(getValue(d)) + '%');
 
             let rowsStriped = rowJoinStriped
                 .enter()
@@ -973,7 +976,9 @@ define(function (require) {
                 ind = layerName.replace('layer layer-', '');
             }
 
-            if(ind === null) {
+            // find the index, sometimes we mouse over the X (visibility toggle)
+            // the value isn't found and the X disappears.
+            if( typeof d === 'string' ) {
                 ind = getIndex(d);
             }
             if(parseInt(ind) > -1) {
@@ -992,7 +997,7 @@ define(function (require) {
                 ind = layerName.replace('layer layer-', '');
             }
 
-            if(ind === null) {
+            if( typeof d === 'string' ) {
                 ind = getIndex(d);
             }
             if(parseInt(ind) > -1) {
